@@ -13,7 +13,7 @@ extension Project {
     public static func app(
         name: String,
         dependencies: [TargetDependency] = [],
-        infoPlist: InfoPlist? = nil,
+        infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
@@ -49,7 +49,7 @@ extension Project {
         bundleID: String,
         schemes: [Scheme] = [],
         dependencies: [TargetDependency] = [],
-        infoPlist: InfoPlist? = nil,
+        infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
