@@ -9,4 +9,6 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.framework(name: Module.designSystem.name,
-                                dependencies: [Module.thirdParty.project])
+                                dependencies: [Module.thirdParty.project],
+                                sources: .default,
+                                resources: .default)
