@@ -8,10 +8,11 @@
 import ProjectDescription
 
 public enum Module {
-    // 실행 App
     case app
-    // DesignSystem
     case designSystem
+    case feature
+    case service
+    case thirdParty
 }
 
 extension Module {
@@ -22,6 +23,12 @@ extension Module {
             return "App"
         case .designSystem:
             return "DesignSystem"
+        case .feature:
+            return "Feature"
+        case .service:
+            return "Service"
+        case .thirdParty:
+            return "ThirdParty"
         }
     }
     

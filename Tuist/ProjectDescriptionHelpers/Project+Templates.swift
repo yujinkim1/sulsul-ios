@@ -7,12 +7,14 @@ import ProjectDescription
 
 extension Project {
     static let bundleID = "bumjun.SulSul-iOS"
-    static let iosVersion = "16.2"
+    static let iosVersion = "15.0"
     
     /// Helper function to create the Project for this ExampleApp
     public static func app(
         name: String,
         dependencies: [TargetDependency] = [],
+        infoPlist: InfoPlist? = nil,
+        sources: ProjectDescription.SourceFilesList? = nil,
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return self.project(
@@ -20,6 +22,8 @@ extension Project {
             product: .app,
             bundleID: bundleID + "\(name)",
             dependencies: dependencies,
+            infoPlist: infoPlist,
+            sources: sources,
             resources: resources
         )
     }
@@ -28,12 +32,14 @@ extension Project {
 extension Project {
     public static func framework(name: String,
                                  dependencies: [TargetDependency] = [],
+                                 sources: ProjectDescription.SourceFilesList? = nil,
                                  resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return .project(name: name,
                         product: .framework,
                         bundleID: bundleID + ".\(name)",
                         dependencies: dependencies,
+                        sources: sources,
                         resources: resources)
     }
     
@@ -43,6 +49,8 @@ extension Project {
         bundleID: String,
         schemes: [Scheme] = [],
         dependencies: [TargetDependency] = [],
+        infoPlist: InfoPlist? = nil,
+        sources: ProjectDescription.SourceFilesList? = nil,
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return Project(
@@ -54,8 +62,8 @@ extension Project {
                     product: product,
                     bundleId: bundleID,
                     deploymentTarget: .iOS(targetVersion: iosVersion, devices: [.iphone, .ipad]),
-                    infoPlist: .file(path: .relativeToRoot("Supporting Files/Info.plist")),
-                    sources: ["Sources/**"],
+                    infoPlist: infoPlist,
+                    sources: sources,
                     resources: resources,
                     dependencies: dependencies
                 )

@@ -10,6 +10,8 @@ import ProjectDescriptionHelpers
 
 let project = Project.app(name: Module.app.name,
                           dependencies: [
-                            Module.designSystem,
+                            Module.feature,
                           ].map(\.project),
+                          infoPlist: .file(path: "Support/Info.plist"),
+                          sources: .default,
                           resources: .default)
