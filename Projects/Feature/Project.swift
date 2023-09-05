@@ -2,13 +2,13 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by 이범준 on 2023/08/22.
+//  Created by 이범준 on 2023/08/23.
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = Project.framework(name: Module.designSystem.name,
-                                dependencies: [Module.thirdParty.project],
+let project = Project.framework(name: Module.feature.name,
+                                dependencies: [Module.service.project] + [Module.designSystem.project],
                                 sources: .default,
                                 resources: .default)
