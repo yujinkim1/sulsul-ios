@@ -11,4 +11,5 @@ import ProjectDescriptionHelpers
 let project = Project.framework(name: Module.feature.name,
                                 dependencies: [Module.service.project] + [Module.designSystem.project],
                                 sources: .default,
+                                scripts: [.SwiftLintShell],
                                 resources: .default)

@@ -15,6 +15,7 @@ extension Project {
         dependencies: [TargetDependency] = [],
         infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
+        scripts: [TargetScript] = [],
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return self.project(
@@ -24,6 +25,7 @@ extension Project {
             dependencies: dependencies,
             infoPlist: infoPlist,
             sources: sources,
+            scripts: scripts,
             resources: resources
         )
     }
@@ -33,6 +35,7 @@ extension Project {
     public static func framework(name: String,
                                  dependencies: [TargetDependency] = [],
                                  sources: ProjectDescription.SourceFilesList? = nil,
+                                 scripts: [TargetScript] = [],
                                  resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return .project(name: name,
@@ -40,6 +43,7 @@ extension Project {
                         bundleID: bundleID + ".\(name)",
                         dependencies: dependencies,
                         sources: sources,
+                        scripts: scripts,
                         resources: resources)
     }
     
@@ -51,6 +55,7 @@ extension Project {
         dependencies: [TargetDependency] = [],
         infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
+        scripts: [TargetScript] = [],
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
         return Project(
@@ -65,6 +70,7 @@ extension Project {
                     infoPlist: infoPlist,
                     sources: sources,
                     resources: resources,
+                    scripts: scripts,
                     dependencies: dependencies
                 )
             ],
