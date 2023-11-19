@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TouchableView: UIView {
+public final class TouchableView: UIView {
     fileprivate var impactFeedbackGenerator: UIImpactFeedbackGenerator?
     
     convenience init(_ vibrate: Bool = false) {
@@ -23,7 +23,7 @@ final class TouchableView: UIView {
         super.init(frame: frame)
     }
     
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         super.point(inside: point, with: event)
 
         /// x: 10, y: 15 만큼 영역 증가

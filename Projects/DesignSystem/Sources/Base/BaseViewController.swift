@@ -7,8 +7,8 @@
 
 import UIKit
 
-public class BaseViewController: UIViewController {
-    public override func viewDidLoad() {
+open class BaseViewController: UIViewController {
+    open override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
@@ -22,11 +22,11 @@ public class BaseViewController: UIViewController {
         deinitialize()
     }
     
-    func addViews() {}
+    open func addViews() {}
     
-    func makeConstraints() {}
+    open func makeConstraints() {}
     
-    func setupIfNeeded() {}
+    open func setupIfNeeded() {}
     
-    func deinitialize() {}
+    open func deinitialize() {}
 }

@@ -8,16 +8,16 @@
 import Foundation
 import Alamofire
 
-final class DeviceUtil {
+public final class DeviceUtil {
     static let shared = DeviceUtil()
     
     private init() {}
     
-    func isNetworkConnected() -> Bool {
+    public func isNetworkConnected() -> Bool {
         return NetworkReachabilityManager()?.isReachable ?? false
     }
     
-    func languageCode() -> String {
+    public func languageCode() -> String {
         if #available(iOS 16, *) {
             return Locale.current.language.languageCode?.identifier ?? "en"
         } else {

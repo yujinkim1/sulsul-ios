@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class UIStyleUtil {
+public final class UIStyleUtil {
     static let shared = UIStyleUtil()
     
     private init() {}
