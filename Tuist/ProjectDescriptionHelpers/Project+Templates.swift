@@ -84,5 +84,6 @@ public extension TargetDependency {
     static let snapKit: TargetDependency = .external(name: "SnapKit")
     static let swinject: TargetDependency = .external(name: "Swinject")
     static let then: TargetDependency = .external(name: "Then")
+    static let kakaoSDK: TargetDependency = .external(name: "KakaoSDK")
 }
 
