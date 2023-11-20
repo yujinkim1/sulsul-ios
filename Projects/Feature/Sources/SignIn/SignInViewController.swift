@@ -122,8 +122,9 @@ public class SignInViewController: BaseViewController {
         continueWithGoogle.setOpaqueTapGestureRecognizer {
             print("구글 로그인 버튼 탭")
         }
-        continueWithApple.setOpaqueTapGestureRecognizer {
+        continueWithApple.setOpaqueTapGestureRecognizer { [weak self] in
             print("애플 로그인 버튼 탭")
+            self?.viewModel?.continueWithAppleDidTap()
         }
     }
 
