@@ -12,6 +12,7 @@ import Then
 import UIKit
 
 public class SignInViewController: BaseViewController {
+    var viewModel: SignInViewModel?
 
     private lazy var topContainerView = UIView()
 
@@ -58,6 +59,8 @@ public class SignInViewController: BaseViewController {
         makeConstraints()
         setupIfNeeded()
         view.backgroundColor = UIColor(r: 32, g: 32, b: 32, alpha: 1)
+
+        viewModel = SignInViewModel()
     }
 
     override public func addViews() {
@@ -112,8 +115,9 @@ public class SignInViewController: BaseViewController {
     }
 
     override public func setupIfNeeded() {
-        continueWithKakao.setOpaqueTapGestureRecognizer {
+        continueWithKakao.setOpaqueTapGestureRecognizer { [weak self] in
             print("카카오 로그인 버튼 탭")
+            self?.viewModel?.continueWithKakaoDidTap()
         }
         continueWithGoogle.setOpaqueTapGestureRecognizer {
             print("구글 로그인 버튼 탭")
@@ -124,4 +128,3 @@ public class SignInViewController: BaseViewController {
     }
 
 }
-

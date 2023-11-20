@@ -5,6 +5,8 @@
 //  Created by 이범준 on 2023/08/23.
 //
 
+import KakaoSDKCommon
+
 import UIKit
 
 @main
@@ -14,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        KakaoSDK.initSDK(appKey: "3fcd336396b571c494495d0e9b42bccd")
         return true
     }
 
