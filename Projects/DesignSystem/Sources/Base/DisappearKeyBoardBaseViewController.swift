@@ -11,15 +11,16 @@ import Then
 
 open class DisappearKeyBoardBaseViewController: BaseViewController {
     
-//    var coordinator: AuthBaseCoordinator?
+    //    var coordinator: AuthBaseCoordinator?
     
     private var submitButtonBottomConstraint: Constraint?
     
-    public lazy var submitTouchableLabel = TouchableView().then {
-        
-        
-        $0.backgroundColor = .red
-        
+    public lazy var submitTouchableLabel = IndicatorTouchableView().then {
+        $0.text = "다음"
+        $0.textColor = .green
+        $0.backgroundColor = .link
+        $0.layer.cornerRadius = moderateScale(number: 6)
+        $0.clipsToBounds = true
     }
     
     open override func addViews() {

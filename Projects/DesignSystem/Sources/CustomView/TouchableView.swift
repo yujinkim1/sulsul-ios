@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class TouchableView: UIView {
+public class TouchableView: UIView {
     fileprivate var impactFeedbackGenerator: UIImpactFeedbackGenerator?
     
     convenience init(_ vibrate: Bool = false) {
