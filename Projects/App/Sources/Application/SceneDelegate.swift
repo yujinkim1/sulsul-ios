@@ -8,7 +8,6 @@
 import Feature
 import UIKit
 
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -17,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = TestViewController()
+        window?.rootViewController = InputBirthDayViewController()
         window?.windowScene = windowScene
         window?.makeKeyAndVisible()
         
