@@ -7,29 +7,33 @@
 
 import UIKit
 import Service
+import Combine
 
 public final class NetworkTestViewController: UIViewController {
-    
-//    
-//    NetworkWrapper.shared.postAuthTask(stringURL: stringURL, parameters: parameters) { result in
-//        switch result {
-//        case .success(let responseData):
-//            if let data = try? JSONDecoder().decode(CoinnessAuthToken.self, from: responseData) {
-//                
-//                KeychainKeys.setTokens(accessToken: data.accessToken, refreshToken: data.refreshToken)
-//                LogDebug("---------RefreshToken: \(data)")
-//                promise(.success(()))
-//            }
-//            promise(.failure(HTTPError.typeMismatchError))
-//            
-//        case .failure(let error):
-//            promise(.failure(error))
-//            if let errorCode = error.getErrorCode(), errorCode == 401 || (errorCode == 403 && error.getError() == "PERMANENT_BLOCK") {
-//                KeychainKeys.removeTokens()
-//            }
-//            LogError(error)
-//        }
-//    }
-    
-    
+    private let jsonDecoder = JSONDecoder()
+    public override func viewDidLoad() {
+        print("화면 시작")
+        NetworkWrapper.shared.getBasicTask(stringURL: "/v1/pairings") { result in
+            switch result {
+            case .success(let responseData):
+                if let adData = try? self.jsonDecoder.decode(AdModel.self, from: responseData) {
+                    print(responseData)
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+
+}
+
+struct AdModel: Codable {
+    var pairings: [Pairing]
+}
+struct Pairing: Codable {
+    var id: Int?
+    var type: String?
+    var name: String?
+    var image: String?
+    var description: String?
 }

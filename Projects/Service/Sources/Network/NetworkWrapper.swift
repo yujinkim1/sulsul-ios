@@ -9,13 +9,12 @@ import Foundation
 import Alamofire
 
 public struct NetworkWrapper {
-    static let shared = NetworkWrapper()
-    var apiDomain =  ""
-    private var chartDomain = ""
+    public static let shared = NetworkWrapper()
+    var apiDomain =  "http://sulsul-env.eba-gvmvk4bq.ap-northeast-2.elasticbeanstalk.com"
     private let jsonDecoder = JSONDecoder()
     
  
-    func getBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
+    public func getBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
         var defaultHeader = configureHeader()
         header?.forEach { defaultHeader[$0.name] = $0.value }
         

@@ -12,7 +12,6 @@ open class BaseViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        LogDebug(self)
         addViews()
         makeConstraints()
         setupIfNeeded()

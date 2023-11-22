@@ -29,4 +29,10 @@ public final class TestViewController: BaseViewController {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+    public override func setupIfNeeded() {
+        testTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            let vc = TestKeyboardDisappearViewController()
+            self?.present(vc, animated: false)
+        }
+    }
 }
