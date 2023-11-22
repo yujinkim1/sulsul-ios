@@ -9,9 +9,9 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.app(name: Module.app.name,
-                          dependencies: [
-                            Module.feature,
-                          ].map(\.project),
+                          dependencies: [Module.feature.project,
+                                         .package(product: "CocoaLumberjack"),
+                                         .package(product: "CocoaLumberjackSwift")],
                           infoPlist: .file(path: "Support/Info.plist"),
                           sources: .default,
                           scripts: [.SwiftLintShell],

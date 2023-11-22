@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-struct NetworkWrapper {
+public struct NetworkWrapper {
     static let shared = NetworkWrapper()
     var apiDomain =  ""
     private var chartDomain = ""

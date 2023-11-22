@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-public final class InputBirthDayViewController: DisappearKeyBoardBaseViewController {
+public final class TestKeyboardDisappearViewController: DisappearKeyBoardBaseViewController {
     
     private lazy var birthDayTextField = UITextField().then({
         $0.layer.borderColor = UIColor.purple.cgColor
