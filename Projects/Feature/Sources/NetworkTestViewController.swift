@@ -17,14 +17,13 @@ public final class NetworkTestViewController: UIViewController {
             switch result {
             case .success(let responseData):
                 if let adData = try? self.jsonDecoder.decode(AdModel.self, from: responseData) {
-                    print(responseData)
+                    print(adData.pairings)
                 }
             case .failure(let error):
                 print(error)
             }
         }
     }
-
 }
 
 struct AdModel: Codable {
