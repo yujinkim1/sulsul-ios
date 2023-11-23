@@ -16,7 +16,7 @@ public final class NetworkTestViewController: UIViewController {
         NetworkWrapper.shared.getBasicTask(stringURL: "/v1/pairings") { result in
             switch result {
             case .success(let responseData):
-                if let adData = try? self.jsonDecoder.decode(AdModel.self, from: responseData) {
+                if let adData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
                     print(adData.pairings)
                 }
             case .failure(let error):
@@ -24,15 +24,4 @@ public final class NetworkTestViewController: UIViewController {
             }
         }
     }
-}
-
-struct AdModel: Codable {
-    var pairings: [Pairing]
-}
-struct Pairing: Codable {
-    var id: Int?
-    var type: String?
-    var name: String?
-    var image: String?
-    var description: String?
 }
