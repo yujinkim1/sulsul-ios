@@ -75,6 +75,10 @@ extension SignInViewModel: ASAuthorizationControllerDelegate {
             print("User Identifier: \(userIdentifier)")
             print("Full Name: \(fullName?.givenName ?? "nil") \(fullName?.familyName ?? "nil")")
             print("Email: \(email ?? "nil")")
+            if let token = credential.identityToken,
+               let tokenToString = String(data: token, encoding: .utf8) {
+                print("token: \(tokenToString)")
+            }
         }
     }
 
