@@ -1,15 +1,15 @@
 //
-//  HomeViewController.swift
+//  TransferViewController.swift
 //  Feature
 //
-//  Created by 이범준 on 2023/11/22.
+//  Created by 이범준 on 2023/11/23.
 //
 
 import UIKit
 import DesignSystem
 
-final class HomeViewController: BaseViewController {
-    var coordinator: HomeBaseCoordinator?
+final class TransferViewController: BaseViewController {
+    var coordinator: TransferBaseCoordinator?
     
     override func viewDidLoad() {
         super.viewDidLoad()
