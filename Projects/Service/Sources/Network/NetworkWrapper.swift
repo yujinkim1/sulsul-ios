@@ -13,7 +13,6 @@ public struct NetworkWrapper {
     var apiDomain =  "http://sulsul-env.eba-gvmvk4bq.ap-northeast-2.elasticbeanstalk.com"
     private let jsonDecoder = JSONDecoder()
     
- 
     public func getBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
         var defaultHeader = configureHeader()
         header?.forEach { defaultHeader[$0.name] = $0.value }

@@ -30,7 +30,6 @@ public class SelectDrinkViewController: BaseViewController {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.isScrollEnabled = true
-//        $0.scrollIndicatorInsets = UIEdgeInsets(top: -2, left: 0, bottom: 0, right: 4)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = true
         collectionView.showsHorizontalScrollIndicator = false
@@ -42,7 +41,7 @@ public class SelectDrinkViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .purple400
+        view.backgroundColor = DesignSystemAsset.gray050.color
         addViews()
         makeConstraints()
         bind()
@@ -124,5 +123,3 @@ extension SelectDrinkViewController: UICollectionViewDelegateFlowLayout {
         return sectionInsets.left
     }
 }
-
-
