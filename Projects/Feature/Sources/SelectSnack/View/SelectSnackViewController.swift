@@ -1,0 +1,174 @@
+//
+//  SelectSnackViewController.swift
+//  Feature
+//
+//  Created by 김유진 on 2023/12/03.
+//
+
+import DesignSystem
+import UIKit
+
+public final class SelectSnackViewController: BaseViewController {
+    
+    private lazy var superViewInset = moderateScale(number: 20)
+    
+    private lazy var topHeaderView = UIView()
+    
+    private lazy var backButton = UIButton().then {
+        $0.setImage(UIImage(named: "common_backArrow"), for: .normal)
+        $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
+    }
+    
+    private lazy var noFindSnackButton = UIButton().then {
+        $0.setTitle("찾는 안주가 없어요", for: .normal)
+        $0.titleLabel?.font = Font.semiBold(size: 14)
+        $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
+    }
+    
+    private lazy var searchBarView = SearchBarView()
+    
+    private lazy var questionNumberLabel = UILabel().then {
+        $0.font = Font.bold(size: 18)
+        $0.text = "Q2."
+        $0.textColor = DesignSystemAsset.white.color
+    }
+    
+    private lazy var snackTitleLabel = UILabel().then {
+        $0.font = Font.bold(size: 32)
+        $0.text = "함께 먹는 안주"
+        $0.textColor = DesignSystemAsset.white.color
+    }
+    
+    private lazy var selectLimitView = SelectLimitToolTipView()
+    
+    private lazy var selectedCountLabel = UILabel().then {
+        $0.font = Font.medium(size: 14)
+        $0.textColor = DesignSystemAsset.gray300.color
+        $0.text = "0개 선택됨"
+        
+        let fullText = $0.text ?? ""
+        let attribtuedString = NSMutableAttributedString(string: fullText)
+        let range = (fullText as NSString).range(of: "0개")
+        attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
+        $0.attributedText = attribtuedString
+    }
+    
+    private lazy var snackCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout()).then {
+        $0.backgroundColor = .white
+    }
+    
+    private lazy var nextButtonBackgroundView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+        $0.layer.shadowColor = DesignSystemAsset.black.color.cgColor
+        $0.layer.shadowOpacity = 40
+        $0.layer.shadowRadius = 40
+    }
+    
+    private lazy var nextButton = UIButton().then {
+        $0.addTarget(self, action: #selector(didTabNextButton), for: .touchUpInside)
+        $0.backgroundColor = DesignSystemAsset.gray300.color
+        $0.titleLabel?.font = Font.bold(size: 16)
+        $0.titleLabel?.textColor = .white
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.setTitle("다음", for: .normal)
+    }
+    
+    public override func viewDidLoad() {
+        view.backgroundColor = DesignSystemAsset.black.color
+        addViews()
+        makeConstraints()
+    }
+    
+    public override func addViews() {
+        view.addSubview(topHeaderView)
+        view.addSubview(questionNumberLabel)
+        view.addSubview(snackTitleLabel)
+        view.addSubview(selectedCountLabel)
+        view.addSubview(selectLimitView)
+        view.addSubview(searchBarView)
+        view.addSubview(snackCollectionView)
+        view.addSubview(nextButtonBackgroundView)
+        
+        topHeaderView.addSubview(backButton)
+        topHeaderView.addSubview(noFindSnackButton)
+        nextButtonBackgroundView.addSubview(nextButton)
+    }
+    
+    public override func makeConstraints() {
+        topHeaderView.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 52))
+            $0.width.centerX.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        backButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(moderateScale(number: 24))
+            $0.leading.equalToSuperview().inset(superViewInset)
+        }
+        
+        noFindSnackButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(superViewInset)
+        }
+        
+        questionNumberLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(superViewInset)
+            $0.top.equalTo(topHeaderView.snp.bottom)
+        }
+        
+        snackTitleLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(superViewInset)
+            $0.top.equalTo(questionNumberLabel.snp.bottom)
+        }
+        
+        selectedCountLabel.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(superViewInset)
+            $0.top.equalTo(topHeaderView.snp.bottom).offset(moderateScale(number: 36))
+        }
+        
+        selectLimitView.snp.makeConstraints {
+            $0.bottom.equalTo(selectedCountLabel.snp.top)
+            $0.trailing.equalToSuperview().inset(superViewInset)
+            $0.height.equalTo(moderateScale(number: 26))
+            $0.width.equalTo(moderateScale(number: 108))
+        }
+        
+        searchBarView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(superViewInset)
+            $0.top.equalTo(snackTitleLabel.snp.bottom).offset(moderateScale(number: 32))
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 48))
+        }
+        
+        snackCollectionView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            $0.leading.trailing.equalToSuperview().inset(superViewInset)
+            $0.top.equalTo(searchBarView.snp.bottom).offset(moderateScale(number: 16))
+        }
+        
+        nextButtonBackgroundView.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 89))
+            $0.width.bottom.centerX.equalToSuperview()
+        }
+        
+        nextButton.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 50))
+            $0.leading.trailing.equalToSuperview().inset(superViewInset)
+            $0.centerX.equalToSuperview()
+        }
+    }
+    
+    @objc private func didTabBackButton() {
+        
+    }
+    
+    @objc private func didTabNoFindSnackButton() {
+        
+    }
+    
+    @objc private func didTabNextButton() {
+        
+    }
+}
