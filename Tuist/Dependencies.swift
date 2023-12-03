@@ -7,14 +7,19 @@
 
 import ProjectDescription
 
+import ProjectDescription
+import ProjectDescriptionHelpers
+
 let dependencies = Dependencies(
-    carthage: [],
-    swiftPackageManager: [
+    carthage: nil,
+    swiftPackageManager: SwiftPackageManagerDependencies(
+        [
             .alamofire,
             .snapKit,
             .then,
             .swinject
-    ],
+        ]
+    ),
     platforms: [.iOS]
 )
 
