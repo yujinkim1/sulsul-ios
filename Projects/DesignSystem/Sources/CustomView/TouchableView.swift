@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class TouchableView: UIView {
+public class TouchableView: UIView {
     fileprivate var impactFeedbackGenerator: UIImpactFeedbackGenerator?
     
     convenience init(_ vibrate: Bool = false) {
@@ -38,7 +38,7 @@ public final class TouchableView: UIView {
         addGestureRecognizer(gesture)
     }
     
-    func setOpaqueTapGestureRecognizer(onTapped: @escaping () -> Void) {
+    public func setOpaqueTapGestureRecognizer(onTapped: @escaping () -> Void) {
         let gesture = TapGestureRecognizer(target: self, action: #selector(effect(gesture:)))
         gesture.onTapped = onTapped
         addGestureRecognizer(gesture)

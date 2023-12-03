@@ -12,13 +12,13 @@ open class BaseViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        
         addViews()
         makeConstraints()
         setupIfNeeded()
     }
     
     deinit {
+        LogDebug("🌈 deinit ---> \(self)")
         deinitialize()
     }
     

@@ -9,6 +9,11 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.framework(name: Module.designSystem.name,
-                                dependencies: [Module.thirdParty.project],
+                                packages: [.remote(url: "https://github.com/CocoaLumberjack/CocoaLumberjack.git",
+                                            requirement: .upToNextMajor(from: "3.8.0"))
+                                ],
+                                dependencies: [Module.thirdParty.project,
+                                               .package(product: "CocoaLumberjack"),
+                                               .package(product: "CocoaLumberjackSwift")],
                                 sources: .default,
                                 resources: .default)
