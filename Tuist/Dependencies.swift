@@ -6,15 +6,18 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let dependencies = Dependencies(
-    carthage: [],
-    swiftPackageManager: [
+    carthage: nil,
+    swiftPackageManager: SwiftPackageManagerDependencies(
+        [
             .alamofire,
             .snapKit,
             .then,
             .swinject
-    ],
+        ]
+    ),
     platforms: [.iOS]
 )
 
@@ -28,3 +31,4 @@ public extension Package {
     static let swinject: Package = .remote(url: "https://github.com/Swinject/Swinject",
                                            requirement: .upToNextMajor(from: "2.8.3"))
 }
+
