@@ -16,6 +16,10 @@ let dependencies = Dependencies(
             .snapKit,
             .then,
             .swinject
+        ],
+        productTypes: [
+            "Alamofire": .framework,
+            "Then": .framework
         ]
     ),
     platforms: [.iOS]
@@ -23,7 +27,7 @@ let dependencies = Dependencies(
 
 public extension Package {
     static let alamofire: Package = .remote(url: "https://github.com/Alamofire/Alamofire",
-                                            requirement: .branch("master"))
+                                            requirement: .upToNextMajor(from: "5.8.1"))
     static let snapKit: Package = .remote(url: "https://github.com/SnapKit/SnapKit.git",
                                           requirement: .upToNextMajor(from: "5.0.1"))
     static let then: Package = .remote(url: "https://github.com/devxoul/Then",
