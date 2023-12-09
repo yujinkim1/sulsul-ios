@@ -8,6 +8,9 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
+import ProjectDescription
+import ProjectDescriptionHelpers
+
 let dependencies = Dependencies(
     carthage: nil,
     swiftPackageManager: SwiftPackageManagerDependencies(
