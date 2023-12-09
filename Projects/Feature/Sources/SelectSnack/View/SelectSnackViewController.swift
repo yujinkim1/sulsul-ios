@@ -5,11 +5,14 @@
 //  Created by 김유진 on 2023/12/03.
 //
 
+import Combine
 import DesignSystem
 import UIKit
 
 public final class SelectSnackViewController: BaseViewController {
-    
+    private lazy var viewModel = SelectSnackViewModel()
+    private lazy var cancelBag = Set<AnyCancellable>()
+    private lazy var snackArray = [Pairing]()
     private lazy var superViewInset = moderateScale(number: 20)
     
     private lazy var topHeaderView = UIView()
@@ -53,15 +56,21 @@ public final class SelectSnackViewController: BaseViewController {
         $0.attributedText = attribtuedString
     }
     
-    private lazy var snackCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout()).then {
-        $0.backgroundColor = .white
+    private lazy var snackTableView = UITableView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+        $0.register(SnackTableViewCell.self, forCellReuseIdentifier: SnackTableViewCell.reuseIdentifier)
+        $0.delegate = self
+        $0.dataSource = self
+        $0.separatorStyle = .none
+        $0.rowHeight = moderateScale(number: 48)
     }
     
     private lazy var nextButtonBackgroundView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.layer.shadowColor = DesignSystemAsset.black.color.cgColor
-        $0.layer.shadowOpacity = 40
-        $0.layer.shadowRadius = 40
+        $0.layer.shadowOffset = CGSize(width: 0, height: -40)
+        $0.layer.shadowOpacity = 1
+        $0.layer.shadowRadius = 20
     }
     
     private lazy var nextButton = UIButton().then {
@@ -73,10 +82,30 @@ public final class SelectSnackViewController: BaseViewController {
         $0.setTitle("다음", for: .normal)
     }
     
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+        
+        bind()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     public override func viewDidLoad() {
         view.backgroundColor = DesignSystemAsset.black.color
+
         addViews()
         makeConstraints()
+    }
+    
+    private func bind() {
+        viewModel.snackPublisher().sink { [weak self] snackModel in
+            if let snacks = snackModel.pairings {
+                self?.snackArray = snacks
+                self?.snackTableView.reloadData()
+            }
+        }.store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -86,7 +115,7 @@ public final class SelectSnackViewController: BaseViewController {
         view.addSubview(selectedCountLabel)
         view.addSubview(selectLimitView)
         view.addSubview(searchBarView)
-        view.addSubview(snackCollectionView)
+        view.addSubview(snackTableView)
         view.addSubview(nextButtonBackgroundView)
         
         topHeaderView.addSubview(backButton)
@@ -141,9 +170,9 @@ public final class SelectSnackViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 48))
         }
         
-        snackCollectionView.snp.makeConstraints {
+        snackTableView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            $0.bottom.equalTo(nextButtonBackgroundView.snp.top).offset(moderateScale(number: -25))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
             $0.top.equalTo(searchBarView.snp.bottom).offset(moderateScale(number: 16))
         }
@@ -170,5 +199,31 @@ public final class SelectSnackViewController: BaseViewController {
     
     @objc private func didTabNextButton() {
         
+    }
+}
+
+extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return snackArray.count
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackTableViewCell.reuseIdentifier, for: indexPath) as? SnackTableViewCell else { return UITableViewCell() }
+        
+        cell.selectionStyle = .none
+        cell.bind(snack: snackArray[indexPath.row])
+        
+        return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if snackArray[indexPath.row].isSelect == true {
+            snackArray[indexPath.row].isSelect = false
+            
+        } else if snackArray.filter({ $0.isSelect == true }).count < 5 {
+            snackArray[indexPath.row].isSelect = true
+        }
+        
+        snackTableView.reloadData()
     }
 }

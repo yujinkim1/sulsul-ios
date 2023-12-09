@@ -10,10 +10,12 @@ import Foundation
 struct PairingModel: Decodable {
     var pairings: [Pairing]?
 }
+
 struct Pairing: Decodable {
     var id: Int?
     var type: String?
     var name: String?
     var image: String?
     var description: String?
+    var isSelect: Bool?
 }
