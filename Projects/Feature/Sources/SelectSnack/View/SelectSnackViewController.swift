@@ -62,7 +62,7 @@ public final class SelectSnackViewController: BaseViewController {
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
-        $0.rowHeight = moderateScale(number: 48)
+        $0.rowHeight = moderateScale(number: 52)
     }
     
     private lazy var nextButtonBackgroundView = UIView().then {
@@ -234,7 +234,7 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
         
         selectedCountLabel.attributedText = attribtuedString
         selectedCountLabel.textColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
-        selectedCountLabel.textColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
+        nextButton.backgroundColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
         
         snackTableView.reloadData()
     }
