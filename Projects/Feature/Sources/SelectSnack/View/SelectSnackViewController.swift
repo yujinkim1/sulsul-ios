@@ -224,6 +224,18 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
             snackArray[indexPath.row].isSelect = true
         }
         
+        let snackSelectCount = snackArray.filter({ $0.isSelect == true }).count
+        let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
+        
+        let fullText = "\(snackSelectCount)개 선택됨"
+        let attribtuedString = NSMutableAttributedString(string: fullText)
+        let range = (fullText as NSString).range(of: "\(snackSelectCount)개")
+        attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
+        
+        selectedCountLabel.attributedText = attribtuedString
+        selectedCountLabel.textColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
+        selectedCountLabel.textColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
+        
         snackTableView.reloadData()
     }
 }
