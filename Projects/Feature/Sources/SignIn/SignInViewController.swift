@@ -6,9 +6,6 @@
 //
 
 import DesignSystem
-import SnapKit
-import Then
-
 import UIKit
 
 public class SignInViewController: BaseViewController {
@@ -58,7 +55,7 @@ public class SignInViewController: BaseViewController {
         addViews()
         makeConstraints()
         setupIfNeeded()
-        view.backgroundColor = UIColor(r: 32, g: 32, b: 32, alpha: 1)
+        view.backgroundColor = DesignSystemAsset.black.color
 
         viewModel = SignInViewModel()
     }

@@ -33,6 +33,7 @@ extension Project {
 
 extension Project {
     public static func framework(name: String,
+                                 packages: [ProjectDescription.Package] = [],
                                  dependencies: [TargetDependency] = [],
                                  sources: ProjectDescription.SourceFilesList? = nil,
                                  scripts: [TargetScript] = [],
@@ -41,6 +42,7 @@ extension Project {
         return .project(name: name,
                         product: .framework,
                         bundleID: bundleID + ".\(name)",
+                        packages: packages,
                         dependencies: dependencies,
                         sources: sources,
                         scripts: scripts,
@@ -51,6 +53,7 @@ extension Project {
         name: String,
         product: Product,
         bundleID: String,
+        packages: [ProjectDescription.Package] = [],
         schemes: [Scheme] = [],
         dependencies: [TargetDependency] = [],
         infoPlist: InfoPlist = .default,
@@ -60,6 +63,7 @@ extension Project {
     ) -> Project {
         return Project(
             name: name,
+            packages: packages,
             targets: [
                 Target(
                     name: name,
