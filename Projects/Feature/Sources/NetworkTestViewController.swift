@@ -13,7 +13,7 @@ public final class NetworkTestViewController: UIViewController {
     private let jsonDecoder = JSONDecoder()
     public override func viewDidLoad() {
         print("화면 시작")
-        NetworkWrapper.shared.getBasicTask(stringURL: "/v1/pairings") { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/pairings") { result in
             switch result {
             case .success(let responseData):
                 if let adData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
