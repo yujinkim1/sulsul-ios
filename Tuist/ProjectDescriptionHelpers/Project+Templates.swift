@@ -89,4 +89,3 @@ public extension TargetDependency {
     static let swinject: TargetDependency = .external(name: "Swinject")
     static let then: TargetDependency = .external(name: "Then")
 }
-

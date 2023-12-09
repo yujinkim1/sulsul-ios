@@ -21,7 +21,7 @@ final class SelectDrinkViewModel {
     }
     
     func sendPairingsValue() {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/v1/pairings") { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/pairings") { result in
             switch result {
             case .success(let responseData):
                 if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
