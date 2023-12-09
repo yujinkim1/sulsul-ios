@@ -49,11 +49,4 @@ public extension UIViewController {
         // Start the animation
         animator.startAnimation()
     }
-
-    func showPopUp(title: String? = nil,
-                   message: String? = nil) {
-        let singleButtonAlertViewController = SingleButtonAlertViewController(titleText: title,
-                                                      messageText: message)
-        present(singleButtonAlertViewController, animated: false)
-    }
 }

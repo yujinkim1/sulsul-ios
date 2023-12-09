@@ -21,16 +21,18 @@ final class SelectDrinkViewModel {
     }
     
     func sendPairingsValue() {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/pairings") { result in
-            switch result {
-            case .success(let responseData):
-                if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                    self.pairingsValue.send(pairingsData)
-                } else {
-                    print("디코딩 모델 에러")
+        if let encodedURL = "/pairings?type=술".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+            NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { result in
+                switch result {
+                case .success(let responseData):
+                    if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
+                        self.pairingsValue.send(pairingsData)
+                    } else {
+                        print("디코딩 모델 에러")
+                    }
+                case .failure(let error):
+                    print(error)
                 }
-            case .failure(let error):
-                print(error)
             }
         }
     }

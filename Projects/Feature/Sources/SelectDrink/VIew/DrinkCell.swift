@@ -14,7 +14,8 @@ final class DrinkCell: BaseCollectionViewCell<String> {
     
     private lazy var containerView = UIView().then({
         $0.backgroundColor = .clear
-        $0.layer.borderColor = UIColor(red: 0 / 255.0, green: 0 / 255.0, blue: 0 / 255.0, alpha: 1.0).cgColor
+        $0.layer.borderColor = DesignSystemAsset.gray500.color.cgColor
+        $0.layer.cornerRadius = 12
         $0.layer.borderWidth = 1
     })
     
@@ -22,7 +23,8 @@ final class DrinkCell: BaseCollectionViewCell<String> {
         $0.image = UIImage(systemName: "circle.fill")
     })
     private lazy var drinkNameLabel = UILabel().then({
-        $0.text = "1"
+        $0.font = Font.bold(size: 16)
+        $0.textColor = DesignSystemAsset.gray500.color
     })
     
     override init(frame: CGRect) {
@@ -46,12 +48,13 @@ final class DrinkCell: BaseCollectionViewCell<String> {
             constraints.edges.equalToSuperview()
         }
         drinkImageView.snp.makeConstraints { constraints in
+            constraints.top.equalToSuperview().offset(moderateScale(number: 15.39))
             constraints.centerX.equalToSuperview()
-            constraints.centerY.equalToSuperview()
+            constraints.size.equalTo(moderateScale(number: 80))
         }
         drinkNameLabel.snp.makeConstraints { constraints in
-            constraints.top.equalTo(drinkImageView.snp.bottom)
             constraints.centerX.equalToSuperview()
+            constraints.bottom.equalToSuperview().offset(moderateScale(number: -15.39))
         }
     }
     

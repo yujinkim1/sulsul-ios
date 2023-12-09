@@ -35,8 +35,7 @@ public final class TestKeyboardDisappearViewController: DisappearKeyBoardBaseVie
         
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let selfRef = self else { return }
-            print("확인 버튼 클릭")
-            selfRef.showPopUp(title: "테스트", message: "테스트입니다")
+            selfRef.showAlertView(withType: .oneButton, title: "테스트", description: "테스트입니다", submitCompletion: nil, cancelCompletion: nil)
         }
     }
 }
