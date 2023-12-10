@@ -15,9 +15,8 @@ public class SignInViewController: BaseViewController {
 
     private lazy var titleLabel = UILabel().then({
         $0.numberOfLines = 2
-        $0.textColor = .white
-        // $0.font = .setFont(size: 32, family: .Bold)
-        $0.font = .boldSystemFont(ofSize: 32)
+        $0.textColor = DesignSystemColors.Color.white
+        $0.font = DesignSystemFontFamily.Pretendard.bold.font(size: 32)
         $0.text = "만나서\n반가워요! :)"
     })
 
@@ -114,14 +113,14 @@ public class SignInViewController: BaseViewController {
     override public func setupIfNeeded() {
         continueWithKakao.setOpaqueTapGestureRecognizer { [weak self] in
             print("카카오 로그인 버튼 탭")
-            self?.viewModel?.continueWithKakaoDidTap()
+            self?.viewModel?.continueWithKakao()
         }
         continueWithGoogle.setOpaqueTapGestureRecognizer {
             print("구글 로그인 버튼 탭")
         }
         continueWithApple.setOpaqueTapGestureRecognizer { [weak self] in
             print("애플 로그인 버튼 탭")
-            self?.viewModel?.continueWithAppleDidTap()
+            self?.viewModel?.continueWithApple()
         }
     }
 
