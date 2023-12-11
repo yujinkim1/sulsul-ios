@@ -18,4 +18,5 @@ struct Pairing: Decodable {
     var image: String?
     var description: String?
     var isSelect: Bool?
+    var highlightedText: String?
 }

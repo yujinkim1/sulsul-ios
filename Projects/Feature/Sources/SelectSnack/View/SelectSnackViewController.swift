@@ -9,10 +9,15 @@ import Combine
 import DesignSystem
 import UIKit
 
+protocol SearchSnack: AnyObject {
+    func searchSnackWith(_ searchText: String)
+}
+
 public final class SelectSnackViewController: BaseViewController {
     private lazy var viewModel = SelectSnackViewModel()
     private lazy var cancelBag = Set<AnyCancellable>()
     private lazy var snackArray = [Pairing]()
+    private lazy var snackSearchArray = [Pairing]()
     private lazy var superViewInset = moderateScale(number: 20)
     
     private lazy var topHeaderView = UIView()
@@ -28,7 +33,7 @@ public final class SelectSnackViewController: BaseViewController {
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
-    private lazy var searchBarView = SearchBarView()
+    private lazy var searchBarView = SearchBarView(delegate: self)
     
     private lazy var questionNumberLabel = UILabel().then {
         $0.font = Font.bold(size: 18)
@@ -103,6 +108,7 @@ public final class SelectSnackViewController: BaseViewController {
         viewModel.snackPublisher().sink { [weak self] snackModel in
             if let snacks = snackModel.pairings {
                 self?.snackArray = snacks
+                self?.snackSearchArray = snacks
                 self?.snackTableView.reloadData()
             }
         }.store(in: &cancelBag)
@@ -204,27 +210,27 @@ public final class SelectSnackViewController: BaseViewController {
 
 extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return snackArray.count
+        return snackSearchArray.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackTableViewCell.reuseIdentifier, for: indexPath) as? SnackTableViewCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
-        cell.bind(snack: snackArray[indexPath.row])
+        cell.bind(snack: snackSearchArray[indexPath.row])
         
         return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if snackArray[indexPath.row].isSelect == true {
-            snackArray[indexPath.row].isSelect = false
+        if snackSearchArray[indexPath.row].isSelect == true {
+            snackSearchArray[indexPath.row].isSelect = false
             
-        } else if snackArray.filter({ $0.isSelect == true }).count < 5 {
-            snackArray[indexPath.row].isSelect = true
+        } else if snackSearchArray.filter({ $0.isSelect == true }).count < 5 {
+            snackSearchArray[indexPath.row].isSelect = true
         }
         
-        let snackSelectCount = snackArray.filter({ $0.isSelect == true }).count
+        let snackSelectCount = snackSearchArray.filter({ $0.isSelect == true }).count
         let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
         
         let fullText = "\(snackSelectCount)개 선택됨"
@@ -237,5 +243,21 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
         nextButton.backgroundColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
         
         snackTableView.reloadData()
+    }
+}
+
+extension SelectSnackViewController: SearchSnack {
+    func searchSnackWith(_ searchText: String) {
+        if searchText == "" {
+            snackSearchArray = snackArray
+        } else {
+            snackSearchArray = snackArray.filter({ $0.name!.contains(searchText) })
+            snackSearchArray.indices.forEach { snackSearchArray[$0].highlightedText = searchText }
+        }
+        
+        UIView.transition(with: snackTableView,
+                          duration: 0.2,
+                          options: .transitionCrossDissolve,
+                          animations: { self.snackTableView.reloadData() })
     }
 }

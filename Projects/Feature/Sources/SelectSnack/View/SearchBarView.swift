@@ -10,6 +10,8 @@ import UIKit
 
 final class SearchBarView: UIView {
     
+    private weak var delegate: SearchSnack?
+    
     private lazy var backgroundView = UIView().then {
         $0.layer.borderWidth = 1
         $0.layer.cornerRadius = moderateScale(number: 8)
@@ -20,13 +22,15 @@ final class SearchBarView: UIView {
     }
     
     private lazy var searchTextField = UITextField().then {
+        $0.addTarget(self, action: #selector(handleTextFieldDidChange), for: .editingChanged)
         $0.placeholder = "안주이름을 검색해보세요"
         $0.textColor = .white
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(delegate: SearchSnack) {
+        super.init(frame: .zero)
         
+        self.delegate = delegate
         backgroundColor = DesignSystemAsset.black.color
         
         addViews()
@@ -39,6 +43,12 @@ final class SearchBarView: UIView {
     
     override func layoutSubviews() {
         backgroundView.layer.borderColor = DesignSystemAsset.gray400.color.cgColor
+    }
+    
+    @objc private func handleTextFieldDidChange() {
+        if let searchText = searchTextField.text {
+            delegate?.searchSnackWith(searchText)
+        }
     }
 }
 

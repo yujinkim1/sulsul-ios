@@ -39,7 +39,20 @@ final class SnackTableViewCell: UITableViewCell {
     }
     
     func bind(snack: Pairing) {
-        snackNameLabel.text = snack.name
+        if let snackName = snack.name {
+            if let highlightedText = snack.highlightedText {
+                
+                let attributedString = NSMutableAttributedString(string: snackName)
+                let highlightRange = (snackName as NSString).range(of: highlightedText)
+                let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
+                
+                attributedString.addAttribute(.foregroundColor, value: yellowColor, range: highlightRange)
+                snackNameLabel.attributedText = attributedString
+            } else {
+                snackNameLabel.text = snack.name
+            }
+        }
+        
         checkImageView.isHidden = !(snack.isSelect ?? false)
         cellBackgroundView.isHidden = !(snack.isSelect ?? false)
     }
