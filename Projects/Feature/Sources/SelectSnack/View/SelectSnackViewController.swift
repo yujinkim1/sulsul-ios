@@ -16,7 +16,7 @@ protocol SearchSnack: AnyObject {
 public final class SelectSnackViewController: BaseViewController {
     private lazy var viewModel = SelectSnackViewModel()
     private lazy var cancelBag = Set<AnyCancellable>()
-    private lazy var snackArray = [Pairing]()
+    private lazy var allSnackArray = [Pairing]()
     private lazy var snackSearchArray = [Pairing]()
     private lazy var superViewInset = moderateScale(number: 20)
     
@@ -107,7 +107,7 @@ public final class SelectSnackViewController: BaseViewController {
     private func bind() {
         viewModel.snackPublisher().sink { [weak self] snackModel in
             if let snacks = snackModel.pairings {
-                self?.snackArray = snacks
+                self?.allSnackArray = snacks
                 self?.snackSearchArray = snacks
                 self?.snackTableView.reloadData()
             }
@@ -223,11 +223,15 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let selectedSnackIndex = (allSnackArray.firstIndex { $0.name == snackSearchArray[indexPath.row].name }) else { return }
+        
         if snackSearchArray[indexPath.row].isSelect == true {
             snackSearchArray[indexPath.row].isSelect = false
+            allSnackArray[selectedSnackIndex].isSelect = false
             
         } else if snackSearchArray.filter({ $0.isSelect == true }).count < 5 {
             snackSearchArray[indexPath.row].isSelect = true
+            allSnackArray[selectedSnackIndex].isSelect = true
         }
         
         let snackSelectCount = snackSearchArray.filter({ $0.isSelect == true }).count
@@ -249,9 +253,9 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
 extension SelectSnackViewController: SearchSnack {
     func searchSnackWith(_ searchText: String) {
         if searchText == "" {
-            snackSearchArray = snackArray
+            snackSearchArray = allSnackArray
         } else {
-            snackSearchArray = snackArray.filter({ $0.name!.contains(searchText) })
+            snackSearchArray = allSnackArray.filter({ $0.name!.contains(searchText) })
             snackSearchArray.indices.forEach { snackSearchArray[$0].highlightedText = searchText }
         }
         
