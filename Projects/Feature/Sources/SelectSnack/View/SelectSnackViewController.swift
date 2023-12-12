@@ -16,8 +16,7 @@ protocol SearchSnack: AnyObject {
 public final class SelectSnackViewController: BaseViewController {
     private lazy var viewModel = SelectSnackViewModel()
     private lazy var cancelBag = Set<AnyCancellable>()
-    private lazy var allSnackArray = [Pairing]()
-    private lazy var snackSearchArray = [Pairing]()
+    
     private lazy var superViewInset = moderateScale(number: 20)
     
     private lazy var topHeaderView = UIView()
@@ -61,12 +60,14 @@ public final class SelectSnackViewController: BaseViewController {
         $0.attributedText = attribtuedString
     }
     
-    private lazy var snackTableView = UITableView().then {
+    private lazy var snackTableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.register(SnackTableViewCell.self, forCellReuseIdentifier: SnackTableViewCell.reuseIdentifier)
+        $0.register(SnackSortHeaderView.self, forHeaderFooterViewReuseIdentifier: SnackSortHeaderView.id)
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
+        $0.sectionFooterHeight = 0
         $0.rowHeight = moderateScale(number: 52)
     }
     
@@ -90,7 +91,9 @@ public final class SelectSnackViewController: BaseViewController {
     public init() {
         super.init(nibName: nil, bundle: nil)
         
-        bind()
+        viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
+            self?.snackTableView.reloadData()
+        }.store(in: &cancelBag)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -102,16 +105,6 @@ public final class SelectSnackViewController: BaseViewController {
 
         addViews()
         makeConstraints()
-    }
-    
-    private func bind() {
-        viewModel.snackPublisher().sink { [weak self] snackModel in
-            if let snacks = snackModel.pairings {
-                self?.allSnackArray = snacks
-                self?.snackSearchArray = snacks
-                self?.snackTableView.reloadData()
-            }
-        }.store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -209,56 +202,69 @@ public final class SelectSnackViewController: BaseViewController {
 }
 
 extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource {
+    public func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.snackSectionModels().count
+    }
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return snackSearchArray.count
+        return viewModel.snackSectionModels()[section].cellModels.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackTableViewCell.reuseIdentifier, for: indexPath) as? SnackTableViewCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
-        cell.bind(snack: snackSearchArray[indexPath.row])
+        cell.bind(snack: viewModel.snackSectionModels()[indexPath.section].cellModels[indexPath.row])
         
         return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let selectedSnackIndex = (allSnackArray.firstIndex { $0.name == snackSearchArray[indexPath.row].name }) else { return }
+        let selectedSnackCellModel = viewModel.snackSectionModels()[indexPath.section].cellModels[indexPath.row]
         
-        if snackSearchArray[indexPath.row].isSelect == true {
-            snackSearchArray[indexPath.row].isSelect = false
-            allSnackArray[selectedSnackIndex].isSelect = false
+        if selectedSnackCellModel.isSelect == true {
+            viewModel.changeSelectedState(isSelect: false, indexPath: indexPath)
             
-        } else if snackSearchArray.filter({ $0.isSelect == true }).count < 5 {
-            snackSearchArray[indexPath.row].isSelect = true
-            allSnackArray[selectedSnackIndex].isSelect = true
+        } else if viewModel.selectedSnackCount() < 5 {
+            viewModel.changeSelectedState(isSelect: true, indexPath: indexPath)
         }
         
-        let snackSelectCount = snackSearchArray.filter({ $0.isSelect == true }).count
+        let selectedSnackCount = viewModel.selectedSnackCount()
         let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
-        
-        let fullText = "\(snackSelectCount)개 선택됨"
+
+        let fullText = "\(selectedSnackCount)개 선택됨"
         let attribtuedString = NSMutableAttributedString(string: fullText)
-        let range = (fullText as NSString).range(of: "\(snackSelectCount)개")
+        let range = (fullText as NSString).range(of: "\(selectedSnackCount)개")
         attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
-        
+
         selectedCountLabel.attributedText = attribtuedString
-        selectedCountLabel.textColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
-        nextButton.backgroundColor = snackSelectCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
-        
+        selectedCountLabel.textColor = selectedSnackCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
+        nextButton.backgroundColor = selectedSnackCount > 0 ? yellowColor : DesignSystemAsset.gray300.color
+
         snackTableView.reloadData()
+    }
+    
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SnackSortHeaderView.id) as? SnackSortHeaderView else { return nil }
+        
+        header.bind(viewModel.snackSectionModels()[section].headerModel)
+        
+        return header
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return moderateScale(number: 22)
     }
 }
 
 extension SelectSnackViewController: SearchSnack {
     func searchSnackWith(_ searchText: String) {
         if searchText == "" {
-            snackSearchArray = allSnackArray
+            viewModel.setWithInitSnackData()
         } else {
-            snackSearchArray = allSnackArray.filter({ $0.name!.contains(searchText) })
-            snackSearchArray.indices.forEach { snackSearchArray[$0].highlightedText = searchText }
+            viewModel.setWithSearchResult(searchText)
         }
-        
+
         UIView.transition(with: snackTableView,
                           duration: 0.2,
                           options: .transitionCrossDissolve,

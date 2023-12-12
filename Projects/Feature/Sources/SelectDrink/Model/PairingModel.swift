@@ -14,9 +14,20 @@ struct PairingModel: Decodable {
 struct Pairing: Decodable {
     var id: Int?
     var type: String?
+    var subtype: String?
     var name: String?
     var image: String?
     var description: String?
     var isSelect: Bool?
     var highlightedText: String?
+}
+
+struct SnackSectionModel {
+    var cellModels: [Pairing]
+    var headerModel: SnackHeader
+}
+
+struct SnackHeader {
+    let snackHeaderTitle: String
+    let snackHeaderImage: String
 }
