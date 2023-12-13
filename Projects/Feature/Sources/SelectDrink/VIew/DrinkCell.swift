@@ -8,12 +8,11 @@
 import UIKit
 import DesignSystem
 
-final class DrinkCell: BaseCollectionViewCell<String> {
+final class DrinkCell: BaseCollectionViewCell<Pairing> {
     
     static let reuseIdentifer = "DrinkCell"
     
     private lazy var containerView = UIView().then({
-        $0.backgroundColor = .clear
         $0.layer.borderColor = DesignSystemAsset.gray500.color.cgColor
         $0.layer.cornerRadius = 12
         $0.layer.borderWidth = 1
@@ -58,9 +57,18 @@ final class DrinkCell: BaseCollectionViewCell<String> {
         }
     }
     
-    func setDrinkData(image: String, name: String) {
-        print(image)
-        print(name)
-        drinkNameLabel.text = name
+    override func bind(_ model: Pairing) {
+        super.bind(model)
+        print(model)
+        drinkNameLabel.text = model.name
     }
+    
+    func cellIsTapped() {
+        if containerView.backgroundColor == DesignSystemAsset.main.color {
+            containerView.backgroundColor = .clear
+        } else {
+            containerView.backgroundColor = DesignSystemAsset.main.color
+        }
+    }
+
 }

@@ -26,12 +26,12 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         $0.textColor = DesignSystemAsset.gray100.color
     })
     private lazy var countLabel = UILabel().then({
-        $0.text = "1개"
+        $0.text = "0"
         $0.font = Font.bold(size: 20)
         $0.textColor = DesignSystemAsset.gray300.color
     })
     private lazy var selectLabel = UILabel().then({
-        $0.text = "선택됨"
+        $0.text = "개 선택됨"
         $0.font = Font.bold(size: 14)
         $0.textColor = DesignSystemAsset.gray300.color
     })
@@ -39,7 +39,8 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     private lazy var drinkCollectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = .zero
-        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.minimumLineSpacing = 16
+        flowLayout.minimumInteritemSpacing = 16
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.isScrollEnabled = true
@@ -94,7 +95,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         drinkCollectionView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 32))
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(moderateScale(number: 470))
+            $0.bottom.equalTo(submitTouchableLabel.snp.top)
         }
     }
     private func bind() {
@@ -102,6 +103,20 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             .sink { [weak self] result in
                 self?.dataSource = result.pairings ?? []
                 self?.drinkCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.countSelectedDrinkPublisher()
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                if result != "0" {
+                    self.countLabel.textColor = DesignSystemAsset.main.color
+                    self.submitTouchableLabel.backgroundColor = DesignSystemAsset.main.color
+                } else {
+                    self.countLabel.textColor = DesignSystemAsset.gray300.color
+                    self.submitTouchableLabel.backgroundColor = DesignSystemAsset.gray100.color
+                }
+                self.countLabel.text = result
             }
             .store(in: &cancelBag)
     }
@@ -118,29 +133,25 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DrinkCell.reuseIdentifer, for: indexPath) as? DrinkCell else { return UICollectionViewCell() }
-        cell.setDrinkData(image: "", name: dataSource[indexPath.row].name ?? "")
+        cell.model = dataSource[indexPath.row]
         return cell
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.didTapCell(at: indexPath)
-    }
-    
-    private func didTapCell(at indexPath: IndexPath) {
-        
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? DrinkCell {
+            guard let model = selectedCell.model else { return }
+            viewModel.drinkIsSelected(model)
+            selectedCell.cellIsTapped()
+        }
     }
 }
 
 extension SelectDrinkViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.bounds.width
         let numberOfItemsPerRow: CGFloat = 2
-        let numberOfRows: CGFloat = 3
-        let availableWidth = width
-        let availableHeight = collectionView.bounds.height
-        let itemWidth = floor(availableWidth / numberOfItemsPerRow)
-        let itemHeight = floor(availableHeight / numberOfRows)
-
+        let itemWidth = (collectionView.bounds.width - 16 * (numberOfItemsPerRow - 1)) / numberOfItemsPerRow
+        let itemHeight: CGFloat = moderateScale(number: 146)
+        
         return CGSize(width: itemWidth, height: itemHeight)
     }
 }

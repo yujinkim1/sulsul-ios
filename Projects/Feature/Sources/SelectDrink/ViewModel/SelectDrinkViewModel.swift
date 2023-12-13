@@ -10,8 +10,13 @@ import Combine
 import Service
 
 final class SelectDrinkViewModel {
+    
     private let jsonDecoder = JSONDecoder()
-    private let pairingsValue = PassthroughSubject<PairingModel, Never>()
+    private var cancelBag = Set<AnyCancellable>()
+    private let kindOfDrinks = PassthroughSubject<PairingModel, Never>()
+    private var selectedDrink = [Pairing]()
+    private var countSelectedDrink = PassthroughSubject<String, Never>()
+    
     init() {
         bind()
     }
@@ -26,7 +31,7 @@ final class SelectDrinkViewModel {
                 switch result {
                 case .success(let responseData):
                     if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                        self.pairingsValue.send(pairingsData)
+                        self.kindOfDrinks.send(pairingsData)
                     } else {
                         print("디코딩 모델 에러")
                     }
@@ -38,6 +43,19 @@ final class SelectDrinkViewModel {
     }
     
     func pairingsValuePublisher() -> AnyPublisher<PairingModel, Never> {
-        return pairingsValue.eraseToAnyPublisher()
+        return kindOfDrinks.eraseToAnyPublisher()
+    }
+    
+    func drinkIsSelected(_ model: Pairing) {
+        if let index = selectedDrink.firstIndex(where: { $0.id == model.id }) {
+            selectedDrink.remove(at: index)
+        } else {
+            selectedDrink.append(model)
+        }
+        countSelectedDrink.send(String(selectedDrink.count))
+    }
+    
+    func countSelectedDrinkPublisher() -> AnyPublisher<String, Never> {
+        return countSelectedDrink.eraseToAnyPublisher()
     }
 }
