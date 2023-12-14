@@ -69,6 +69,7 @@ public final class SelectSnackViewController: BaseViewController {
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.register(SnackTableViewCell.self, forCellReuseIdentifier: SnackTableViewCell.reuseIdentifier)
         $0.register(SnackSortHeaderView.self, forHeaderFooterViewReuseIdentifier: SnackSortHeaderView.id)
+        $0.register(SnackFooterLineView.self, forHeaderFooterViewReuseIdentifier: SnackFooterLineView.id)
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
@@ -273,6 +274,16 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
         header.bind(viewModel.snackSectionModels()[section].headerModel)
         
         return header
+    }
+    
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: SnackFooterLineView.id) as? SnackFooterLineView else { return nil }
+
+        return footer
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return moderateScale(number: 33)
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
