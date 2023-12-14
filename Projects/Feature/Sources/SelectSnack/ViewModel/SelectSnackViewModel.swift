@@ -14,6 +14,7 @@ final class SelectSnackViewModel {
     
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
+    private lazy var searchResultCountData = PassthroughSubject<Int, Never>()
     private lazy var initSectionModels = [SnackSectionModel]()
     private lazy var sectionModels = [SnackSectionModel]()
     private lazy var cellModels = [Pairing]()
@@ -115,6 +116,8 @@ final class SelectSnackViewModel {
         }
         
         searchResultSectionModels.removeAll(where: { $0.cellModels.count == 0 })
+        let serachResultCount = searchResultSectionModels.map { $0.cellModels.count }.reduce(0, +)
+        searchResultCountData.send(serachResultCount)
         
         sectionModels = searchResultSectionModels
     }
@@ -133,6 +136,10 @@ final class SelectSnackViewModel {
     
     func setCompletedSnackDataPublisher() -> AnyPublisher<Void, Never> {
         return setCompletedSnackData.eraseToAnyPublisher()
+    }
+    
+    func searchResultCountDataPublisher() -> AnyPublisher<Int, Never> {
+        return searchResultCountData.eraseToAnyPublisher()
     }
 }
 

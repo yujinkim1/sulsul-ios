@@ -32,6 +32,11 @@ public final class SelectSnackViewController: BaseViewController {
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
+    private lazy var resultEmptyView = SearchResultEmptyView().then {
+        $0.addSnackButton.addTarget(self, action: #selector(didTabAddSnackButton), for: .touchUpInside)
+        $0.isHidden = true
+    }
+    
     private lazy var searchBarView = SearchBarView(delegate: self)
     
     private lazy var questionNumberLabel = UILabel().then {
@@ -93,7 +98,14 @@ public final class SelectSnackViewController: BaseViewController {
         
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.snackTableView.reloadData()
-        }.store(in: &cancelBag)
+        }
+        .store(in: &cancelBag)
+        
+        viewModel.searchResultCountDataPublisher().sink { [weak self] searchResultCount in
+            self?.resultEmptyView.isHidden = !(searchResultCount == 0)
+            self?.snackTableView.isHidden = searchResultCount == 0
+        }
+        .store(in: &cancelBag)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -102,6 +114,7 @@ public final class SelectSnackViewController: BaseViewController {
     
     public override func viewDidLoad() {
         view.backgroundColor = DesignSystemAsset.black.color
+        overrideUserInterfaceStyle = .dark
 
         addViews()
         makeConstraints()
@@ -109,6 +122,7 @@ public final class SelectSnackViewController: BaseViewController {
     
     public override func addViews() {
         view.addSubview(topHeaderView)
+        view.addSubview(resultEmptyView)
         view.addSubview(questionNumberLabel)
         view.addSubview(snackTitleLabel)
         view.addSubview(selectedCountLabel)
@@ -127,6 +141,11 @@ public final class SelectSnackViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 52))
             $0.width.centerX.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        resultEmptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBarView.snp.bottom)
+            $0.width.centerX.bottom.equalToSuperview()
         }
         
         backButton.snp.makeConstraints {
@@ -186,6 +205,10 @@ public final class SelectSnackViewController: BaseViewController {
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    @objc private func didTabAddSnackButton() {
+        
     }
     
     @objc private func didTabBackButton() {
@@ -260,6 +283,9 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
 extension SelectSnackViewController: SearchSnack {
     func searchSnackWith(_ searchText: String) {
         if searchText == "" {
+            self.resultEmptyView.isHidden = true
+            self.snackTableView.isHidden = false
+            
             viewModel.setWithInitSnackData()
         } else {
             viewModel.setWithSearchResult(searchText)
