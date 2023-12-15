@@ -7,13 +7,15 @@
 
 import Alamofire
 import AuthenticationServices
-import Combine
 import Foundation
 import KakaoSDKAuth
 import KakaoSDKUser
 import Service
 
 final class SignInViewModel: NSObject {
+    
+    private lazy var jsonDecoder = JSONDecoder()
+    
     override public init() {
         super.init()
     }
@@ -39,9 +41,9 @@ extension SignInViewModel {
         
         func endpoint() -> String {
             switch self {
-            case .apple: return "auth/sign-in/apple"
-            case .google: return "auth/sign-in/google"
-            case .kakao: return "auth/sign-in/kakao"
+            case .apple: return "/auth/sign-in/apple"
+            case .google: return "/auth/sign-in/google"
+            case .kakao: return "/auth/sign-in/kakao"
             }
         }
     }
@@ -87,7 +89,14 @@ extension SignInViewModel {
                     NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
                         switch result {
                         case .success(let responseData):
-                            print(responseData)
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                                let accessToken = data.accessToken
+                                let tokenType = data.tokenType
+                                let expiresIn = data.expiresIn
+                                print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
+                                
+                                KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                            }
                         case .failure(let error):
                             print(error)
                         }
@@ -104,7 +113,14 @@ extension SignInViewModel {
                 NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
                     switch result {
                     case .success(let responseData):
-                        print(responseData)
+                        if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                            let accessToken = data.accessToken
+                            let tokenType = data.tokenType
+                            let expiresIn = data.expiresIn
+                            print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
+                            
+                            KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                        }
                     case .failure(let error):
                         print(error)
                     }
@@ -114,26 +130,35 @@ extension SignInViewModel {
     }
 }
 
-// MARK: - Authentication Services 델리게이트
+// MARK: - Apple Authentication Services 델리게이트
 
 extension SignInViewModel: ASAuthorizationControllerDelegate {
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        if let credential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            let userIdentifier = credential.user
-            let fullName = credential.fullName
-            let email = credential.email
-
-            print("User Identifier: \(userIdentifier)")
-            print("Full Name: \(fullName?.givenName ?? "nil") \(fullName?.familyName ?? "nil")")
-            print("Email: \(email ?? "nil")")
-            if let token = credential.identityToken,
-               let tokenToString = String(data: token, encoding: .utf8) {
-                print("token: \(tokenToString)")
+    internal func authorizationController(controller: ASAuthorizationController,
+                                          didCompleteWithAuthorization authorization: ASAuthorization) {
+        guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+              let identityToken = credential.identityToken,
+              let idToken = String(data: identityToken, encoding: .utf8) else { return }
+        
+        let url = SignInType.apple.endpoint()
+        let parameters: Parameters = ["id_token": idToken]
+        NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
+            switch result {
+            case .success(let responseData):
+                if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                    let accessToken = data.accessToken
+                    let tokenType = data.tokenType
+                    let expiresIn = data.expiresIn
+                    print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
+                    
+                    KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                }
+            case .failure(let error):
+                print(error)
             }
         }
     }
 
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        print("Sign in with Apple 실패: \(error.localizedDescription)")
+    internal func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        print("[!] Authorization Services: \(error.localizedDescription)")
     }
 }
