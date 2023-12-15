@@ -15,7 +15,7 @@ final class SelectDrinkViewModel {
     private var cancelBag = Set<AnyCancellable>()
     private let kindOfDrinks = PassthroughSubject<PairingModel, Never>()
     private var selectedDrink = [Pairing]()
-    private var countSelectedDrink = PassthroughSubject<String, Never>()
+    private var countSelectedDrink = PassthroughSubject<Int, Never>()
     
     init() {
         bind()
@@ -52,10 +52,10 @@ final class SelectDrinkViewModel {
         } else {
             selectedDrink.append(model)
         }
-        countSelectedDrink.send(String(selectedDrink.count))
+        countSelectedDrink.send(selectedDrink.count)
     }
     
-    func countSelectedDrinkPublisher() -> AnyPublisher<String, Never> {
+    func countSelectedDrinkPublisher() -> AnyPublisher<Int, Never> {
         return countSelectedDrink.eraseToAnyPublisher()
     }
 }

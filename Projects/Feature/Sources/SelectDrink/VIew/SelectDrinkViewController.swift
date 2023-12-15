@@ -10,6 +10,9 @@ import DesignSystem
 import Combine
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
+    
+    private let maxSelectNmber = 4
+    private var selectIsPossible: Bool = true
     private let viewModel = SelectDrinkViewModel()
     private var dataSource: [Pairing] = []
     var cancelBag = Set<AnyCancellable>()
@@ -109,14 +112,14 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         viewModel.countSelectedDrinkPublisher()
             .sink { [weak self] result in
                 guard let self = self else { return }
-                if result != "0" {
+                if result != 0 {
                     self.countLabel.textColor = DesignSystemAsset.main.color
                     self.submitTouchableLabel.backgroundColor = DesignSystemAsset.main.color
                 } else {
                     self.countLabel.textColor = DesignSystemAsset.gray300.color
                     self.submitTouchableLabel.backgroundColor = DesignSystemAsset.gray100.color
                 }
-                self.countLabel.text = result
+                self.countLabel.text = String(result)
             }
             .store(in: &cancelBag)
     }
