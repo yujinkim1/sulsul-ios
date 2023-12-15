@@ -15,4 +15,5 @@ let project = Project.app(name: Module.app.name,
                           infoPlist: .file(path: "Support/Info.plist"),
                           sources: .default,
                           scripts: [.SwiftLintShell],
-                          resources: .default)
+                          resources: .default,
+                          entitlements: "App.entitlements")

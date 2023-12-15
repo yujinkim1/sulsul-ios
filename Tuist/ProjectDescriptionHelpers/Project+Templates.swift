@@ -6,8 +6,9 @@ import ProjectDescription
 /// See https://docs.tuist.io/guides/helpers/
 
 extension Project {
-    static let bundleID = "bumjun.SulSul-iOS"
+    static let bundleID = "com.SulSul-iOS"
     static let iosVersion = "15.0"
+    static let baseSettings: SettingsDictionary = .baseSettings
     
     /// Helper function to create the Project for this ExampleApp
     public static func app(
@@ -16,7 +17,9 @@ extension Project {
         infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
         scripts: [TargetScript] = [],
-        resources: ProjectDescription.ResourceFileElements? = nil
+        resources: ProjectDescription.ResourceFileElements? = nil,
+        settings: Settings? = nil,
+        entitlements: ProjectDescription.Path? = nil
     ) -> Project {
         return self.project(
             name: name,
@@ -26,7 +29,9 @@ extension Project {
             infoPlist: infoPlist,
             sources: sources,
             scripts: scripts,
-            resources: resources
+            resources: resources,
+            settings: baseSettings,
+            entitlements: entitlements
         )
     }
 }
@@ -59,7 +64,9 @@ extension Project {
         infoPlist: InfoPlist = .default,
         sources: ProjectDescription.SourceFilesList? = nil,
         scripts: [TargetScript] = [],
-        resources: ProjectDescription.ResourceFileElements? = nil
+        resources: ProjectDescription.ResourceFileElements? = nil,
+        settings: SettingsDictionary? = nil,
+        entitlements: ProjectDescription.Path? = nil
     ) -> Project {
         return Project(
             name: name,
@@ -74,6 +81,7 @@ extension Project {
                     infoPlist: infoPlist,
                     sources: sources,
                     resources: resources,
+                    entitlements: entitlements,
                     scripts: scripts,
                     dependencies: dependencies
                 )
@@ -91,3 +99,11 @@ public extension TargetDependency {
     static let kakaoSDK: TargetDependency = .external(name: "KakaoSDK")
 }
 
+public extension SettingsDictionary {
+    static let baseSettings: Self = [
+        "OTHER_LDFLAGS": [
+            "$(inherited)",
+            "-ObjC"
+        ]
+    ]
+}
