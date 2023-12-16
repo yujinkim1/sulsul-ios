@@ -6,6 +6,7 @@
 //
 
 import DesignSystem
+import GoogleSignIn
 import UIKit
 
 public class SignInViewController: BaseViewController {
@@ -117,6 +118,14 @@ public class SignInViewController: BaseViewController {
         }
         continueWithGoogle.setOpaqueTapGestureRecognizer {
             print("구글 로그인 버튼 탭")
+            let configuration = GIDConfiguration(clientID: "78471557734-vab1c2tk22mhkal1gg5v32p97qb1a0ra.apps.googleusercontent.com")
+            GIDSignIn.sharedInstance.configuration = configuration
+            GIDSignIn.sharedInstance.signIn(withPresenting: self) { user, error in
+                if let error = error { return }
+                guard let user = user else { return }
+
+                print(user)
+            }
         }
         continueWithApple.setOpaqueTapGestureRecognizer { [weak self] in
             print("애플 로그인 버튼 탭")

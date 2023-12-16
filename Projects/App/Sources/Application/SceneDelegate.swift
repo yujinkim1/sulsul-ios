@@ -5,8 +5,10 @@
 //  Created by 이범준 on 2023/08/23.
 //
 
+// import GoogleSignIn
 import KakaoSDKAuth
 import Feature
+import Service
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -19,9 +21,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
+        
+//        if let accessToken = KeychainStore.shared.read(label: "accessToken") {
+//            let viewController = SelectDrinkViewController()
+//            window?.rootViewController = viewController
+//        } else {
+//            let viewController = SignInViewController()
+//            window?.rootViewController = viewController
+//        }
+        
         mainCoordinator = MainCoordinator()
 //        window?.rootViewController = mainCoordinator?.start()
-        window?.rootViewController = SelectDrinkViewController()
+        window?.rootViewController = SignInViewController()
         window?.makeKeyAndVisible()
     }
 
@@ -30,6 +41,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if AuthApi.isKakaoTalkLoginUrl(url) {
                 _ = AuthController.handleOpenUrl(url: url)
             }
+//            _ = GIDSignIn.sharedInstance.handle(url)
         }
     }
 
