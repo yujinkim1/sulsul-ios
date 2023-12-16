@@ -10,10 +10,12 @@ import ProjectDescriptionHelpers
 
 let project = Project.app(name: Module.app.name,
                           dependencies: [Module.feature.project,
+//                                         .package(product: "GoogleSignIn"),
                                          .package(product: "CocoaLumberjack"),
                                          .package(product: "CocoaLumberjackSwift")],
                           infoPlist: .file(path: "Support/Info.plist"),
                           sources: .default,
                           scripts: [.SwiftLintShell],
                           resources: .default,
+                          settings: .settings(base: ["OTHER_LDFLAGS": .string("-all_load")]),
                           entitlements: "App.entitlements")

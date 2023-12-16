@@ -8,7 +8,6 @@ import ProjectDescription
 extension Project {
     static let bundleID = "com.SulSul-iOS"
     static let iosVersion = "15.0"
-    static let baseSettings: SettingsDictionary = .baseSettings
     
     /// Helper function to create the Project for this ExampleApp
     public static func app(
@@ -24,13 +23,13 @@ extension Project {
         return self.project(
             name: name,
             product: .app,
-            bundleID: bundleID + "\(name)",
+            bundleID: bundleID,
             dependencies: dependencies,
             infoPlist: infoPlist,
             sources: sources,
             scripts: scripts,
             resources: resources,
-            settings: baseSettings,
+            settings: settings,
             entitlements: entitlements
         )
     }
@@ -42,7 +41,8 @@ extension Project {
                                  dependencies: [TargetDependency] = [],
                                  sources: ProjectDescription.SourceFilesList? = nil,
                                  scripts: [TargetScript] = [],
-                                 resources: ProjectDescription.ResourceFileElements? = nil
+                                 resources: ProjectDescription.ResourceFileElements? = nil,
+                                 settings: Settings? = nil
     ) -> Project {
         return .project(name: name,
                         product: .framework,
@@ -51,7 +51,8 @@ extension Project {
                         dependencies: dependencies,
                         sources: sources,
                         scripts: scripts,
-                        resources: resources)
+                        resources: resources,
+                        settings: settings)
     }
     
     public static func project(
@@ -65,7 +66,7 @@ extension Project {
         sources: ProjectDescription.SourceFilesList? = nil,
         scripts: [TargetScript] = [],
         resources: ProjectDescription.ResourceFileElements? = nil,
-        settings: SettingsDictionary? = nil,
+        settings: Settings? = nil,
         entitlements: ProjectDescription.Path? = nil
     ) -> Project {
         return Project(
@@ -83,7 +84,8 @@ extension Project {
                     resources: resources,
                     entitlements: entitlements,
                     scripts: scripts,
-                    dependencies: dependencies
+                    dependencies: dependencies,
+                    settings: settings
                 )
             ],
             schemes: schemes
@@ -97,13 +99,4 @@ public extension TargetDependency {
     static let swinject: TargetDependency = .external(name: "Swinject")
     static let then: TargetDependency = .external(name: "Then")
     static let kakaoSDK: TargetDependency = .external(name: "KakaoSDK")
-}
-
-public extension SettingsDictionary {
-    static let baseSettings: Self = [
-        "OTHER_LDFLAGS": [
-            "$(inherited)",
-            "-ObjC"
-        ]
-    ]
 }
