@@ -122,15 +122,15 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     public override func addViews() {
-        view.addSubview(topHeaderView)
-        view.addSubview(resultEmptyView)
-        view.addSubview(questionNumberLabel)
-        view.addSubview(snackTitleLabel)
-        view.addSubview(selectedCountLabel)
-        view.addSubview(selectLimitView)
-        view.addSubview(searchBarView)
-        view.addSubview(snackTableView)
-        view.addSubview(nextButtonBackgroundView)
+        view.addSubviews([topHeaderView,
+                          resultEmptyView,
+                          questionNumberLabel,
+                          snackTitleLabel,
+                          selectedCountLabel,
+                          selectLimitView,
+                          searchBarView,
+                          snackTableView,
+                          nextButtonBackgroundView])
         
         topHeaderView.addSubview(backButton)
         topHeaderView.addSubview(noFindSnackButton)
