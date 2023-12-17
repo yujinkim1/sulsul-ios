@@ -33,6 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainCoordinator = MainCoordinator()
 //        window?.rootViewController = mainCoordinator?.start()
         window?.rootViewController = SignInViewController()
+//        window?.rootViewController = SelectSnackViewController()
         window?.makeKeyAndVisible()
     }
 
