@@ -59,8 +59,10 @@ final class SelectSnackViewModel {
         changedSectionModels[indexPath.section].cellModels[indexPath.row].isSelect = isSelect
         changedCellModels[changedCellModelIndex].isSelect = isSelect
         
+        
         sectionModels = changedSectionModels
         cellModels = changedCellModels
+        print("|| 변경 값 : \(sectionModels[indexPath.section].cellModels[indexPath.row].isSelect)")
     }
     
     // MARK: Output Method
@@ -85,8 +87,11 @@ final class SelectSnackViewModel {
             sectionModel.cellModels.enumerated().forEach { index, cellModel in
                 
                 if cellModel.name.contains(searchText) {
-                    guard let searchindex = searchResultSectionModels[section].cellModels.firstIndex(where: { $0.name == cellModel.name }) else { return }
+                    guard let searchindex = searchResultSectionModels[section].cellModels.firstIndex(where: { $0.name == cellModel.name }),
+                          let selectStatus = cellModels.first(where: { $0.name == cellModel.name })?.isSelect else { return }
+                    
                     searchResultSectionModels[section].cellModels[searchindex].highlightedText = searchText
+                    searchResultSectionModels[section].cellModels[searchindex].isSelect = selectStatus
                 } else {
                     searchResultSectionModels[section].cellModels.removeAll(where: { $0.name == cellModel.name })
                 }
