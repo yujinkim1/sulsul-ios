@@ -11,58 +11,36 @@ import Service
 
 final class SelectSnackViewModel {
     private lazy var jsonDecoder = JSONDecoder()
+    private lazy var mapper = SnackModelMapper()
     
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
     private lazy var searchResultCountData = PassthroughSubject<Int, Never>()
     private lazy var initSectionModels = [SnackSectionModel]()
     private lazy var sectionModels = [SnackSectionModel]()
-    private lazy var cellModels = [Pairing]()
+    private lazy var cellModels = [SnackModel]()
     
     init() {
         requestSnackList()
     }
     
-    private func requestSnackList() {
-        if let encodedURL = "/pairings?type=안주".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-            NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { [weak self] result in
-                guard let selfRef = self else { return }
-                
-                switch result {
-                case .success(let responseData):
-                    if let pairingsData = try? selfRef.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                        selfRef.initSectionModels = selfRef.makeSectionModelsWith(pairingsData)
-                        selfRef.sectionModels = selfRef.initSectionModels
-                        selfRef.setCompletedSnackData.send(())
-                        selfRef.cellModels = pairingsData.pairings ?? []
-                    } else {
-                        print("[/pairings] Fail Decode")
-                    }
-                case .failure(let error):
-                    print("[/pairings] Fail : \(error)")
-                }
-            }
-        }
-    }
-    
-    private func makeSectionModelsWith(_ pairingModels: PairingModel) -> [SnackSectionModel] {
-        guard let snackArray = pairingModels.pairings,
-              var currentSection = snackArray.first?.subtype else { return [] }
+    private func makeSectionModelsWith(_ snackModels: [SnackModel]) -> [SnackSectionModel] {
+        guard var currentSection = snackModels.first?.subtype else { return [] }
         
         var sectionModels: [SnackSectionModel] = []
-        var cellModelsOfSameSection: [Pairing] = []
+        var cellModelsOfSameSection: [SnackModel] = []
         
-        snackArray.enumerated().forEach { index, snack in
+        snackModels.enumerated().forEach { index, snack in
             if snack.subtype == currentSection {
                 cellModelsOfSameSection.append(snack)
             } else {
-                let beforeCellModel = snackArray[index - 1]
-                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype ?? "", snackHeaderImage: beforeCellModel.image ?? "")
+                let beforeCellModel = snackModels[index - 1]
+                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: beforeCellModel.image)
                 let completedSectionModel: SnackSectionModel = .init(cellModels: cellModelsOfSameSection, headerModel: headerModel)
                 
                 sectionModels.append(completedSectionModel)
                 
-                currentSection = snack.subtype ?? ""
+                currentSection = snack.subtype
                 cellModelsOfSameSection = [snack]
             }
         }
@@ -106,7 +84,7 @@ final class SelectSnackViewModel {
         initSectionModels.enumerated().forEach { section, sectionModel in
             sectionModel.cellModels.enumerated().forEach { index, cellModel in
                 
-                if let snackName = cellModel.name, snackName.contains(searchText) {
+                if cellModel.name.contains(searchText) {
                     guard let searchindex = searchResultSectionModels[section].cellModels.firstIndex(where: { $0.name == cellModel.name }) else { return }
                     searchResultSectionModels[section].cellModels[searchindex].highlightedText = searchText
                 } else {
@@ -122,11 +100,15 @@ final class SelectSnackViewModel {
         sectionModels = searchResultSectionModels
     }
     
-    func snackSectionModels() -> [SnackSectionModel] {
-        return sectionModels
+    func snackSectionModelCount() -> Int {
+        sectionModels.count
     }
     
-    func snackCellModels() -> [Pairing] {
+    func snackSectionModel(in sectionIndex: Int) -> SnackSectionModel {
+        return sectionModels[sectionIndex]
+    }
+    
+    func snackCellModels() -> [SnackModel] {
         return cellModels
     }
     
@@ -143,3 +125,28 @@ final class SelectSnackViewModel {
     }
 }
 
+extension SelectSnackViewModel {
+    private func requestSnackList() {
+        if let encodedURL = "/pairings?type=안주".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+            NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { [weak self] result in
+                guard let selfRef = self else { return }
+                
+                switch result {
+                case .success(let responseData):
+                    if let pairingsData = try? selfRef.jsonDecoder.decode(PairingModel.self, from: responseData) {
+                        let mappedData = selfRef.mapper.snackModel(from: pairingsData.pairings ?? [])
+                        
+                        selfRef.initSectionModels = selfRef.makeSectionModelsWith(mappedData)
+                        selfRef.sectionModels = selfRef.initSectionModels
+                        selfRef.setCompletedSnackData.send(())
+                        selfRef.cellModels = mappedData
+                    } else {
+                        print("[/pairings] Fail Decode")
+                    }
+                case .failure(let error):
+                    print("[/pairings] Fail : \(error)")
+                }
+            }
+        }
+    }
+}

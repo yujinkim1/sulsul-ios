@@ -227,24 +227,24 @@ public final class SelectSnackViewController: BaseViewController {
 
 extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.snackSectionModels().count
+        return viewModel.snackSectionModelCount()
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.snackSectionModels()[section].cellModels.count
+        return viewModel.snackSectionModel(in: section).cellModels.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackTableViewCell.reuseIdentifier, for: indexPath) as? SnackTableViewCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
-        cell.bind(snack: viewModel.snackSectionModels()[indexPath.section].cellModels[indexPath.row])
+        cell.bind(snack: viewModel.snackSectionModel(in: indexPath.section).cellModels[indexPath.row])
         
         return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedSnackCellModel = viewModel.snackSectionModels()[indexPath.section].cellModels[indexPath.row]
+        let selectedSnackCellModel = viewModel.snackSectionModel(in: indexPath.section).cellModels[indexPath.row]
         
         if selectedSnackCellModel.isSelect == true {
             viewModel.changeSelectedState(isSelect: false, indexPath: indexPath)
@@ -271,7 +271,7 @@ extension SelectSnackViewController: UITableViewDelegate, UITableViewDataSource 
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SnackSortHeaderView.id) as? SnackSortHeaderView else { return nil }
         
-        header.bind(viewModel.snackSectionModels()[section].headerModel)
+        header.bind(viewModel.snackSectionModel(in: section).headerModel)
         
         return header
     }
