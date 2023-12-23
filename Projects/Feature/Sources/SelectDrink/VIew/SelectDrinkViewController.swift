@@ -14,7 +14,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     private let maxSelectNmber = 4
     private var selectIsPossible: Bool = true
     private let viewModel = SelectDrinkViewModel()
-    private var dataSource: [Pairing] = []
+   
     var cancelBag = Set<AnyCancellable>()
     private lazy var containerView = UIView()
     
@@ -102,24 +102,10 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         }
     }
     private func bind() {
-        viewModel.pairingsValuePublisher()
+        viewModel.currentSelectedDrinkPublisher()
             .sink { [weak self] result in
-                self?.dataSource = result.pairings ?? []
-                self?.drinkCollectionView.reloadData()
-            }
-            .store(in: &cancelBag)
-        
-        viewModel.countSelectedDrinkPublisher()
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                if result != 0 {
-                    self.countLabel.textColor = DesignSystemAsset.main.color
-                    self.submitTouchableLabel.backgroundColor = DesignSystemAsset.main.color
-                } else {
-                    self.countLabel.textColor = DesignSystemAsset.gray300.color
-                    self.submitTouchableLabel.backgroundColor = DesignSystemAsset.gray100.color
-                }
-                self.countLabel.text = String(result)
+                print(result)
+                self?.countLabel.text = String(result)
             }
             .store(in: &cancelBag)
     }
@@ -131,35 +117,31 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
 extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return viewModel.dataSourceCount()
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DrinkCell.reuseIdentifer, for: indexPath) as? DrinkCell else { return UICollectionViewCell() }
-        cell.model = dataSource[indexPath.row]
+        
+        let model = viewModel.getDataSource(indexPath.row)
+        cell.model = model
+        if model.isSelect {
+            cell.containerView.backgroundColor = .blue
+        } else {
+            cell.containerView.backgroundColor = .red
+        }
+        
         return cell
+        
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let selectedCell = collectionView.cellForItem(at: indexPath) as? DrinkCell {
-            guard let model = selectedCell.model else { return }
-            if viewModel.getSelectedDrinkCount() > 2 {
-                if selectedCell.cellTapCheck == true {
-                    selectedCell.cellIsTapped()
-                    viewModel.drinkIsSelected(model)
-                } else {
-                    self.showAlertView(withType: .oneButton,
-                                       title: "3초과",
-                                       description: "ㅇㅇ",
-                                       submitCompletion: nil,
-                                       cancelCompletion: nil)
-                }
-            } else {
-                viewModel.drinkIsSelected(model)
-                selectedCell.cellIsTapped()
-            }
+            viewModel.selectDataSource(indexPath.row)
+            collectionView.reloadData()
         }
     }
+
 }
 
 extension SelectDrinkViewController: UICollectionViewDelegateFlowLayout {

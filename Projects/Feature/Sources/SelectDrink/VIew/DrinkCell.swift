@@ -8,13 +8,26 @@
 import UIKit
 import DesignSystem
 
-final class DrinkCell: BaseCollectionViewCell<PairingCellModel> {
+final class DrinkCell: BaseCollectionViewCell<SnackModel> {
     
     static let reuseIdentifer = "DrinkCell"
     
-    var cellTapCheck: Bool = false
+    override var isSelected: Bool {
+        didSet {
+            updateSelection()
+        }
+    }
+
+
+    private func updateSelection() {
+        if isSelected {
+            containerView.backgroundColor = .red
+        } else {
+            containerView.backgroundColor = .blue
+        }
+    }
     
-    private lazy var containerView = UIView().then({
+    lazy var containerView = UIView().then({
         $0.layer.borderColor = DesignSystemAsset.gray500.color.cgColor
         $0.layer.cornerRadius = 12
         $0.layer.borderWidth = 1
@@ -32,6 +45,7 @@ final class DrinkCell: BaseCollectionViewCell<PairingCellModel> {
         super.init(frame: frame)
         addViews()
         makeConstraints()
+        /*update*/()
     }
     
     required init?(coder: NSCoder) {
@@ -41,7 +55,6 @@ final class DrinkCell: BaseCollectionViewCell<PairingCellModel> {
     override func prepareForReuse() {
         super.prepareForReuse()
         // 셀이 재사용될 때 초기화 작업 수행
-        cellTapCheck = false
     }
     
     private func addViews() {
@@ -65,19 +78,9 @@ final class DrinkCell: BaseCollectionViewCell<PairingCellModel> {
         }
     }
     
-    override func bind(_ model: PairingCellModel) {
+    override func bind(_ model: SnackModel) {
         super.bind(model)
-        print(model)
         drinkNameLabel.text = model.name
     }
-    
-    func cellIsTapped() {
-        if containerView.backgroundColor == DesignSystemAsset.main.color {
-            containerView.backgroundColor = .clear
-            cellTapCheck = false
-        } else {
-            containerView.backgroundColor = DesignSystemAsset.main.color
-            cellTapCheck = true
-        }
-    }
+
 }

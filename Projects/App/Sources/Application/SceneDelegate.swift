@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.windowScene = windowScene
         mainCoordinator = MainCoordinator()
 //        window?.rootViewController = mainCoordinator?.start()
-        window?.rootViewController = SelectSnackViewController()
+        window?.rootViewController = SelectDrinkViewController()
         window?.makeKeyAndVisible()
     }
 
