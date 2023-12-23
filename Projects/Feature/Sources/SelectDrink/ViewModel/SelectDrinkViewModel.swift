@@ -17,12 +17,21 @@ final class SelectDrinkViewModel {
     private var selectedDrink = [Pairing]()
     private var countSelectedDrink = PassthroughSubject<Int, Never>()
     
+    
+    private var canSelectedValue: Bool = true
+    
+    var selectDrinkCount: Int = 0
+    
     init() {
         bind()
     }
     
+    
+    cell 모델 바꾸기 ㄱㄱ
+    
     private func bind() {
         sendPairingsValue()
+
     }
     
     func sendPairingsValue() {
@@ -47,15 +56,28 @@ final class SelectDrinkViewModel {
     }
     
     func drinkIsSelected(_ model: Pairing) {
+        
         if let index = selectedDrink.firstIndex(where: { $0.id == model.id }) {
             selectedDrink.remove(at: index)
         } else {
             selectedDrink.append(model)
         }
-        countSelectedDrink.send(selectedDrink.count)
+        if selectedDrink.count < 4 {
+            countSelectedDrink.send(selectedDrink.count)
+        } else {
+            canSelectedValue = false
+        }
     }
     
     func countSelectedDrinkPublisher() -> AnyPublisher<Int, Never> {
         return countSelectedDrink.eraseToAnyPublisher()
+    }
+    
+    func getSelectedDrinkCount() -> Int {
+        return selectedDrink.count
+    }
+    
+    func getCanSelectedValue() -> Bool {
+        return canSelectedValue
     }
 }

@@ -143,8 +143,21 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let selectedCell = collectionView.cellForItem(at: indexPath) as? DrinkCell {
             guard let model = selectedCell.model else { return }
-            viewModel.drinkIsSelected(model)
-            selectedCell.cellIsTapped()
+            if viewModel.getSelectedDrinkCount() > 2 {
+                if selectedCell.cellTapCheck == true {
+                    selectedCell.cellIsTapped()
+                    viewModel.drinkIsSelected(model)
+                } else {
+                    self.showAlertView(withType: .oneButton,
+                                       title: "3초과",
+                                       description: "ㅇㅇ",
+                                       submitCompletion: nil,
+                                       cancelCompletion: nil)
+                }
+            } else {
+                viewModel.drinkIsSelected(model)
+                selectedCell.cellIsTapped()
+            }
         }
     }
 }

@@ -8,9 +8,11 @@
 import UIKit
 import DesignSystem
 
-final class DrinkCell: BaseCollectionViewCell<Pairing> {
+final class DrinkCell: BaseCollectionViewCell<PairingCellModel> {
     
     static let reuseIdentifer = "DrinkCell"
+    
+    var cellTapCheck: Bool = false
     
     private lazy var containerView = UIView().then({
         $0.layer.borderColor = DesignSystemAsset.gray500.color.cgColor
@@ -36,6 +38,12 @@ final class DrinkCell: BaseCollectionViewCell<Pairing> {
         fatalError()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        // 셀이 재사용될 때 초기화 작업 수행
+        cellTapCheck = false
+    }
+    
     private func addViews() {
         addSubview(containerView)
         containerView.addSubviews([drinkImageView,
@@ -57,7 +65,7 @@ final class DrinkCell: BaseCollectionViewCell<Pairing> {
         }
     }
     
-    override func bind(_ model: Pairing) {
+    override func bind(_ model: PairingCellModel) {
         super.bind(model)
         print(model)
         drinkNameLabel.text = model.name
@@ -66,9 +74,10 @@ final class DrinkCell: BaseCollectionViewCell<Pairing> {
     func cellIsTapped() {
         if containerView.backgroundColor == DesignSystemAsset.main.color {
             containerView.backgroundColor = .clear
+            cellTapCheck = false
         } else {
             containerView.backgroundColor = DesignSystemAsset.main.color
+            cellTapCheck = true
         }
     }
-
 }
