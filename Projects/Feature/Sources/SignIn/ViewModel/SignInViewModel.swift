@@ -8,7 +8,7 @@
 import Alamofire
 import AuthenticationServices
 import Foundation
-//import GoogleSignIn
+import GoogleSignIn
 import KakaoSDKAuth
 import KakaoSDKUser
 import Service
@@ -29,8 +29,8 @@ final class SignInViewModel: NSObject {
         signin(type: .kakao)
     }
 
-    public func continueWithGoogle() {
-        signin(type: .google)
+    public func continueWithGoogle(id: String, item: String) {
+        signin(type: .google, id: id, item: item)
     }
 }
 
@@ -49,12 +49,12 @@ extension SignInViewModel {
         }
     }
     
-    private func signin(type: SignInType) {
+    private func signin(type: SignInType, id: String = "", item: String = "") {
         switch type {
         case .apple:
             appleAuthenticationAdapter()
         case .google:
-            googleAuthenticationAdapter()
+            googleAuthenticationAdapter(id: id, item: item)
         case .kakao:
             kakaoAuthenticationAdapter()
         }
@@ -75,8 +75,28 @@ extension SignInViewModel {
         authorizationController.performRequests()
     }
     
-    private func googleAuthenticationAdapter() {
-        // GoogleSignIn 패키지 오류 해결 이후 적용
+    private func googleAuthenticationAdapter(id: String, item: String) {
+        let url = SignInType.google.endpoint()
+        let parameters: Parameters = [
+            "google_client_id": id,
+            "id_token": item
+        ]
+        
+        NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
+            switch result {
+            case .success(let responseData):
+                if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                    let accessToken = data.accessToken
+                    let tokenType = data.tokenType
+                    let expiresIn = data.expiresIn
+                    
+                    KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                    print("구글 로그인 성공")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
     private func kakaoAuthenticationAdapter() {
@@ -94,7 +114,6 @@ extension SignInViewModel {
                                 let accessToken = data.accessToken
                                 let tokenType = data.tokenType
                                 let expiresIn = data.expiresIn
-                                print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
                                 
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                             }
@@ -118,7 +137,6 @@ extension SignInViewModel {
                             let accessToken = data.accessToken
                             let tokenType = data.tokenType
                             let expiresIn = data.expiresIn
-                            print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
                             
                             KeychainStore.shared.create(item: accessToken, label: "accessToken")
                         }
@@ -149,7 +167,6 @@ extension SignInViewModel: ASAuthorizationControllerDelegate {
                     let accessToken = data.accessToken
                     let tokenType = data.tokenType
                     let expiresIn = data.expiresIn
-                    print("[>] accessToken: \(accessToken)/n[>] tokenType: \(tokenType)/n[>] expiresIn: \(expiresIn)")
                     
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
                 }

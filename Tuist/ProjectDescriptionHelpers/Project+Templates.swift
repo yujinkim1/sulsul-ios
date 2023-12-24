@@ -14,6 +14,7 @@ extension Project {
         name: String,
         dependencies: [TargetDependency] = [],
         infoPlist: InfoPlist = .default,
+        packages: [ProjectDescription.Package] = [],
         sources: ProjectDescription.SourceFilesList? = nil,
         scripts: [TargetScript] = [],
         resources: ProjectDescription.ResourceFileElements? = nil,
@@ -24,6 +25,7 @@ extension Project {
             name: name,
             product: .app,
             bundleID: bundleID,
+            packages: packages,
             dependencies: dependencies,
             infoPlist: infoPlist,
             sources: sources,
@@ -45,7 +47,7 @@ extension Project {
                                  settings: Settings? = nil
     ) -> Project {
         return .project(name: name,
-                        product: .framework,
+                        product: .staticFramework,
                         bundleID: bundleID + ".\(name)",
                         packages: packages,
                         dependencies: dependencies,
@@ -67,7 +69,7 @@ extension Project {
         scripts: [TargetScript] = [],
         resources: ProjectDescription.ResourceFileElements? = nil,
         settings: Settings? = nil,
-        entitlements: ProjectDescription.Path? = nil
+        entitlements: ProjectDescription.Path? = ""
     ) -> Project {
         return Project(
             name: name,
@@ -82,7 +84,7 @@ extension Project {
                     infoPlist: infoPlist,
                     sources: sources,
                     resources: resources,
-                    entitlements: entitlements,
+                    entitlements: .file(path: entitlements ?? ""),
                     scripts: scripts,
                     dependencies: dependencies,
                     settings: settings
