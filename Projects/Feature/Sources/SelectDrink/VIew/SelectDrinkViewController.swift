@@ -38,6 +38,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         $0.font = Font.bold(size: 14)
         $0.textColor = DesignSystemAsset.gray300.color
     })
+    private lazy var selectLimitView = SelectLimitToolTipView()
     
     private lazy var drinkCollectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -70,7 +71,8 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                                    titleLabel,
                                    countLabel,
                                    selectLabel,
-                                   drinkCollectionView])
+                                   drinkCollectionView,
+                                   selectLimitView])
     }
     
     public override func makeConstraints() {
@@ -91,6 +93,12 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             $0.trailing.equalTo(selectLabel.snp.leading)
             $0.bottom.equalTo(titleLabel.snp.bottom)
         }
+        selectLimitView.snp.makeConstraints {
+            $0.bottom.equalTo(countLabel.snp.top)
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 19))
+            $0.height.equalTo(moderateScale(number: 26))
+            $0.width.equalTo(moderateScale(number: 108))
+        }
         selectLabel.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.centerY.equalTo(countLabel.snp.centerY)
@@ -102,10 +110,22 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         }
     }
     private func bind() {
+        viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
+            self?.drinkCollectionView.reloadData()
+        }
+        .store(in: &cancelBag)
+        
         viewModel.currentSelectedDrinkPublisher()
             .sink { [weak self] result in
-                print(result)
-                self?.countLabel.text = String(result)
+                if result == 999 {
+                    self?.showAlertView(withType: .oneButton,
+                                        title: "3개 이상",
+                                        description: "ㅇㅇ",
+                                        submitCompletion: nil,
+                                        cancelCompletion: nil)
+                } else {
+                    self?.countLabel.text = String(result)
+                }
             }
             .store(in: &cancelBag)
     }
@@ -136,10 +156,8 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let selectedCell = collectionView.cellForItem(at: indexPath) as? DrinkCell {
-            viewModel.selectDataSource(indexPath.row)
-            collectionView.reloadData()
-        }
+        viewModel.selectDataSource(indexPath.row)
+        collectionView.reloadData()
     }
 
 }
