@@ -11,11 +11,9 @@ import Combine
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
-    private let maxSelectNmber = 4
-    private var selectIsPossible: Bool = true
-    private let viewModel = SelectDrinkViewModel()
-   
     var cancelBag = Set<AnyCancellable>()
+    private let viewModel = SelectDrinkViewModel()
+
     private lazy var containerView = UIView()
     
     private lazy var numberLabel = UILabel().then({
@@ -26,7 +24,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     private lazy var titleLabel = UILabel().then({
         $0.text = "주로 마시는 술"
         $0.font = Font.bold(size: 32)
-        $0.textColor = DesignSystemAsset.gray100.color
+        $0.textColor = DesignSystemAsset.gray900.color
     })
     private lazy var countLabel = UILabel().then({
         $0.text = "0"
@@ -78,8 +76,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     public override func makeConstraints() {
         super.makeConstraints()
         containerView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview()
+            $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.bottom.equalTo(nextButtonBackgroundView.snp.top)
         }
         numberLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -105,8 +104,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         }
         drinkCollectionView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 32))
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(submitTouchableLabel.snp.top)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     private func bind() {
@@ -119,16 +117,19 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             .sink { [weak self] result in
                 if result == 999 {
                     self?.showAlertView(withType: .oneButton,
-                                        title: "3개 이상",
-                                        description: "ㅇㅇ",
+                                        title: "선택 불가",
+                                        description: "3개 이상 선택할 수 없어요.",
                                         submitCompletion: nil,
                                         cancelCompletion: nil)
                 } else {
                     self?.countLabel.text = String(result)
+                    self?.countLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
+                    self?.selectLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
                 }
             }
             .store(in: &cancelBag)
     }
+    
     public override func setupIfNeeded() {
         
     }
@@ -145,21 +146,15 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
         
         let model = viewModel.getDataSource(indexPath.row)
         cell.model = model
-        if model.isSelect {
-            cell.containerView.backgroundColor = .blue
-        } else {
-            cell.containerView.backgroundColor = .red
-        }
+        cell.setSelectColor(model.isSelect)
         
         return cell
-        
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         viewModel.selectDataSource(indexPath.row)
         collectionView.reloadData()
     }
-
 }
 
 extension SelectDrinkViewController: UICollectionViewDelegateFlowLayout {

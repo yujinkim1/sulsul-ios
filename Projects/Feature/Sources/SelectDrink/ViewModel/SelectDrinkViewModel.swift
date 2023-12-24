@@ -12,7 +12,7 @@ import Service
 final class SelectDrinkViewModel {
     
     private let jsonDecoder = JSONDecoder()
-    private lazy var mapper = SnackModelMapper()
+    private let mapper = SnackModelMapper()
     private var cancelBag = Set<AnyCancellable>()
     private var dataSource = [SnackModel]()
     
@@ -21,10 +21,6 @@ final class SelectDrinkViewModel {
     
     init() {
         sendPairingsValue()
-    }
-    
-    private func bind() {
-        
     }
     
     func sendPairingsValue() {
@@ -36,7 +32,6 @@ final class SelectDrinkViewModel {
                         let mappedData = self.mapper.snackModel(from: pairingsData.pairings ?? [])
                         self.dataSource = mappedData
                         self.setCompletedDrinkData.send(())
-                        print(self.dataSource)
                     } else {
                         print("디코딩 모델 에러")
                     }
@@ -48,7 +43,6 @@ final class SelectDrinkViewModel {
     }
     
     func dataSourceCount() -> Int {
-        print(dataSource.count)
         return dataSource.count
     }
     

@@ -15,6 +15,14 @@ open class SelectTasteBaseViewController: BaseViewController {
     
     lazy var topView = BaseTopView()
     
+    public lazy var nextButtonBackgroundView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+        $0.layer.shadowColor = DesignSystemAsset.black.color.cgColor
+        $0.layer.shadowOffset = CGSize(width: 0, height: -40)
+        $0.layer.shadowOpacity = 1
+        $0.layer.shadowRadius = 20
+    }
+    
     public lazy var submitTouchableLabel = IndicatorTouchableView().then {
         $0.text = "다음"
         $0.textColor = DesignSystemAsset.gray200.color
@@ -25,7 +33,8 @@ open class SelectTasteBaseViewController: BaseViewController {
     
     open override func addViews() {
         view.addSubviews([topView,
-                          submitTouchableLabel])
+                          nextButtonBackgroundView])
+        nextButtonBackgroundView.addSubview(submitTouchableLabel)
     }
     
     open override func makeConstraints() {
@@ -33,6 +42,11 @@ open class SelectTasteBaseViewController: BaseViewController {
             $0.top.equalToSuperview().inset(getSafeAreaTop())
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 40))
+        }
+        
+        nextButtonBackgroundView.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 89))
+            $0.width.bottom.centerX.equalToSuperview()
         }
         
         submitTouchableLabel.snp.makeConstraints {

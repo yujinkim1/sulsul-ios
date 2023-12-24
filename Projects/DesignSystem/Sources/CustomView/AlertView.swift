@@ -20,7 +20,7 @@ final class AlertView: UIView {
     }
     
     private lazy var containerView = UIView().then {
-        $0.backgroundColor = .white
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = moderateScale(number: 16)
         $0.clipsToBounds = true
     }
@@ -48,8 +48,8 @@ final class AlertView: UIView {
     private lazy var titleStackView = UIStackView().then {
         $0.spacing = moderateScale(number: 12)
         $0.axis = .vertical
-        $0.backgroundColor = .white
-        $0.alignment = .center
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.alignment = .leading
         $0.isLayoutMarginsRelativeArrangement = true
         $0.layoutMargins = .init(top: moderateScale(number: 24),
                                  left: moderateScale(number: 24),
@@ -67,7 +67,7 @@ final class AlertView: UIView {
     private lazy var descriptionLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.regular(size: 16)
-        $0.textAlignment = .center
+        $0.textAlignment = .left
         $0.numberOfLines = 0
     }
     
