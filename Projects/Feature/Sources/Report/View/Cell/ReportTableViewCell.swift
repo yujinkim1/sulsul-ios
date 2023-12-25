@@ -8,6 +8,7 @@
 import UIKit
 import DesignSystem
 
+
 final class ReportTableViewCell: UITableViewCell {
     static let reuseIdentifier = "ReportTableViewCell"
     
@@ -17,8 +18,7 @@ final class ReportTableViewCell: UITableViewCell {
         $0.isHidden = true
     }
     
-    private lazy var snackNameLabel = UILabel().then {
-        $0.text = "🤬 아아 테스트 용이여어어어"
+    private lazy var titleLabel = UILabel().then {
         $0.font = Font.bold(size: 18)
         $0.textColor = .white
     }
@@ -39,31 +39,39 @@ final class ReportTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind() {
-        
-//        checkImageView.isHidden =
-//        cellBackgroundView.isHidden = !snack.isSelect
+    func bind(_ title: String) {
+        titleLabel.text = title
     }
     
     private func layout() {
         contentView.addSubview(cellBackgroundView)
-        contentView.addSubview(snackNameLabel)
+        contentView.addSubview(titleLabel)
         contentView.addSubview(checkImageView)
         
         cellBackgroundView.snp.makeConstraints {
-            $0.bottom.width.centerX.equalToSuperview()
+            $0.bottom.width.centerY.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 48))
         }
         
-        snackNameLabel.snp.makeConstraints {
-            $0.centerY.equalToSuperview().offset(moderateScale(number: 2))
+        titleLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview().inset(moderateScale(number: 12))
         }
         
         checkImageView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(moderateScale(number: 8))
-            $0.centerY.equalToSuperview().offset(moderateScale(number: 2))
+            $0.centerY.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 24))
         }
+    }
+    
+    func hiddenCellComponet() {
+        cellBackgroundView.isHidden = true
+        checkImageView.isHidden = true
+    }
+    
+    func showCellComponent() {
+        cellBackgroundView.isHidden = false
+        checkImageView.isHidden = false
     }
 }
