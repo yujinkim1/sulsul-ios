@@ -62,6 +62,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         makeConstraints()
         bind()
     }
+    
     public override func addViews() {
         super.addViews()
         view.addSubview(containerView)
