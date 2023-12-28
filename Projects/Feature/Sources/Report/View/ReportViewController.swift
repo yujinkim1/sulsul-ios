@@ -9,11 +9,14 @@ import UIKit
 import SnapKit
 import DesignSystem
 
-public class ReportViewController: BaseViewController {
+public final class ReportViewController: BaseViewController {
     
     private let viewModel: ReportViewModel = ReportViewModel()
     
-    var buttonBottomConstraint: Constraint?
+    private var buttonBottomConstraint: Constraint?
+    private let textViewPlaceHolder = "텍스트를 입력하세요"
+    private let maxTextCount: Int = 100
+    
     private lazy var superViewInset = moderateScale(number: 20)
     
     private lazy var topHeaderView = UIView()
@@ -45,6 +48,33 @@ public class ReportViewController: BaseViewController {
         $0.rowHeight = moderateScale(number: 52)
     }
     
+    private lazy var etcReportTextView = UITextView().then({
+        $0.backgroundColor = .clear
+        $0.layer.cornerRadius = moderateScale(number: 8)
+        $0.layer.borderWidth = moderateScale(number: 1)
+        $0.layer.borderColor = DesignSystemAsset.gray400.color.cgColor
+        $0.textContainerInset = UIEdgeInsets(top: 12.0, left: 12.0, bottom: 12.0, right: 12.0)
+        $0.font = Font.semiBold(size: 16)
+        $0.text = textViewPlaceHolder
+        $0.textColor = DesignSystemAsset.gray900.color
+        $0.delegate = self
+    })
+    
+    // MARK: - 임시로 넣어둔거 나중에 기획 변경되면 수정
+    private lazy var textCountLabel = UILabel().then({
+        $0.font = Font.semiBold(size: 16)
+        $0.textColor = DesignSystemAsset.gray900.color
+        $0.text = "0/\(maxTextCount)"
+    })
+
+    private lazy var etcReportLabel = UILabel().then({
+        $0.font = Font.regular(size: 14)
+        $0.text = "- 신고 내용은 자세히 적을수록 좋아요!\n- 허위사실이나 악의적인 목적으로 작성된 내용은 처리되지 않을 수 있습니다."
+        $0.lineBreakMode = .byWordWrapping
+        $0.textColor = DesignSystemAsset.gray400.color
+        $0.numberOfLines = 0
+    })
+    
     public lazy var submitTouchableLabel = IndicatorTouchableView().then {
         $0.text = "다음"
         $0.textColor = DesignSystemAsset.gray200.color
@@ -68,6 +98,9 @@ public class ReportViewController: BaseViewController {
                           titleLabel,
                           subTitleLabel,
                           reportTableView,
+                          etcReportTextView,
+                          etcReportLabel,
+                          textCountLabel,
                           submitTouchableLabel])
         topHeaderView.addSubview(backButton)
     }
@@ -96,7 +129,21 @@ public class ReportViewController: BaseViewController {
         reportTableView.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(moderateScale(number: 16))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
-            $0.bottom.equalTo(submitTouchableLabel.snp.top).offset(moderateScale(number: -16))
+            $0.height.equalTo(moderateScale(number: 272))
+        }
+        etcReportTextView.snp.makeConstraints {
+            $0.top.equalTo(reportTableView.snp.bottom).offset(moderateScale(number: 8))
+            $0.leading.trailing.equalToSuperview().inset(superViewInset)
+            $0.height.equalTo(moderateScale(number: 120))
+        }
+        textCountLabel.snp.makeConstraints {
+            $0.bottom.equalTo(etcReportTextView.snp.bottom)
+            $0.trailing.equalTo(etcReportTextView.snp.trailing)
+        }
+        etcReportLabel.snp.makeConstraints {
+            $0.top.equalTo(etcReportTextView.snp.bottom)
+            $0.leading.trailing.equalToSuperview().inset(superViewInset)
+            $0.height.equalTo(moderateScale(number: 66))
         }
         submitTouchableLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
@@ -116,6 +163,16 @@ public class ReportViewController: BaseViewController {
     
     @objc private func didTabBackButton() {
         
+    }
+    
+    @objc
+    private func didTapTextView(_ sender: Any) {
+        view.endEditing(true)
+    }
+
+    private func updateCountLabel(characterCount: Int) {
+        textCountLabel.text = "\(characterCount)/\(maxTextCount)"
+        textCountLabel.asColor(targetString: "\(characterCount)", color: characterCount == 0 ? .lightGray : .blue)
     }
 }
 
@@ -145,5 +202,34 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         // 선택된 셀 뷰모델에 저장하고 있다가 제출 누르면 서버 전송되도록
+    }
+}
+
+extension ReportViewController: UITextViewDelegate {
+    public func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.text == textViewPlaceHolder {
+            textView.text = nil
+            textView.textColor = DesignSystemAsset.gray900.color
+        }
+    }
+
+    public func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            textView.text = textViewPlaceHolder
+            textView.textColor = DesignSystemAsset.gray400.color
+            updateCountLabel(characterCount: 0)
+        }
+    }
+
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        let inputString = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let oldString = textView.text, let newRange = Range(range, in: oldString) else { return true }
+        let newString = oldString.replacingCharacters(in: newRange, with: inputString).trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let characterCount = newString.count
+        guard characterCount <= maxTextCount else { return false }
+        updateCountLabel(characterCount: characterCount)
+
+        return true
     }
 }
