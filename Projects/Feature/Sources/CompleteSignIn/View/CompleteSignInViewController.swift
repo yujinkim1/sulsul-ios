@@ -2,7 +2,10 @@
 //  CompleteSignInViewController.swift
 //  Feature
 //
-//  Created by Yujin Kim on 2023-12-24.
+//  Created by Yujin Kim on 2023-12-19.
 //
 
-import Foundation
+import DesignSystem
+import UIKit
+
+public final class CompleteSignInViewController: BaseViewController {}

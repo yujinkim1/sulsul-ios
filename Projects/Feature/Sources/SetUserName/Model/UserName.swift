@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserName: Equatable {
+struct UserName: Decodable {
     let value: String
     
     enum CodingKeys: String, CodingKey {
