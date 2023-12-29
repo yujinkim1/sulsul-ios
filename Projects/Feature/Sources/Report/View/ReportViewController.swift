@@ -107,6 +107,13 @@ public class ReportViewController: BaseViewController {
         }
     }
     
+    public override func setupIfNeeded() {
+        submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            print("클릭된")
+            self?.showToastMessageView(toastType: .error, title: "ㅎ이ㅏ멀;ㅐ야러ㅔㅁㄷ")
+        }
+    }
+    
     @objc private func didTabBackButton() {
         
     }

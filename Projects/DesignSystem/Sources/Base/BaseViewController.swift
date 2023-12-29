@@ -42,9 +42,9 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(alertView)
     }
     
-    open func showToastMessageView(title: String) {
+    open func showToastMessageView(toastType: ToastType, title: String) {
         let toastView = ToastMessageView()
-        toastView.bind(title: title)
+        toastView.bind(toastType: toastType, title: title)
         view.addSubview(toastView)
         view.bringSubviewToFront(toastView)
         UIView.animate(withDuration: 1, delay: 0.5, options: .curveEaseOut, animations: { [weak self] in
