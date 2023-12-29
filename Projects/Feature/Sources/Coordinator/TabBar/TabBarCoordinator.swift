@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import DesignSystem
 
 enum TabType: Int {
     case home
@@ -31,23 +32,23 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     func start() -> UIViewController {
         let homeVC = homeCoordinator.start()
         homeCoordinator.parentCoordinator = self
-        homeVC.tabBarItem = UITabBarItem(title: "홈", image: nil, selectedImage: nil)
         
+        homeVC.tabBarItem = UITabBarItem(title: "홈", image: UIImage(named: "tabBar_home"), selectedImage: UIImage(named: "tabBar_selectHome"))
         let benefitVC = benefitCoordinator.start()
         benefitCoordinator.parentCoordinator = self
-        benefitVC.tabBarItem = UITabBarItem(title: "혜택", image: nil, selectedImage: nil)
+        benefitVC.tabBarItem = UITabBarItem(title: "랭킹", image: UIImage(named: "tabBar_ranking"), selectedImage: UIImage(named: "tabBar_selectRanking"))
         
         let transferVC = transferCoordinator.start()
         transferCoordinator.parentCoordinator = self
-        transferVC.tabBarItem = UITabBarItem(title: "송금", image: nil, selectedImage: nil)
+        transferVC.tabBarItem = UITabBarItem(title: "새 피드 작성", image: UIImage(named: "tabBar_newFeed"), selectedImage: nil)
         
         let transferHistoryVC = transferHistoryCoordinator.start()
         transferHistoryCoordinator.parentCoordinator = self
-        transferHistoryVC.tabBarItem = UITabBarItem(title: "내역", image: nil, selectedImage: nil)
+        transferHistoryVC.tabBarItem = UITabBarItem(title: "피드", image: UIImage(named: "tabBar_feed"), selectedImage: UIImage(named: "tabBar_selectFeed"))
         
         let moreVC = moreCoordinator.start()
         moreCoordinator.parentCoordinator = self
-        moreVC.tabBarItem = UITabBarItem(title: "더보기", image: nil, selectedImage: nil)
+        moreVC.tabBarItem = UITabBarItem(title: "마이페이지", image: UIImage(named: "tabBar_profile"), selectedImage: UIImage(named: "tabBar_selectProfile"))
         
         let rootTabBar = rootViewController as? UITabBarController
         rootTabBar?.delegate = self
@@ -57,7 +58,8 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
                                        transferHistoryVC,
                                        moreVC]
         
-        rootTabBar?.tabBar.tintColor = .orange
+        rootTabBar?.tabBar.tintColor = DesignSystemAsset.main.color
+        rootTabBar?.tabBar.backgroundColor = DesignSystemAsset.black.color
         rootTabBar?.tabBar.layer.borderColor = UIColor.black.cgColor
         rootTabBar?.tabBar.layer.borderWidth = 1
         
