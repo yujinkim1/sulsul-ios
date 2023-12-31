@@ -13,22 +13,34 @@ public enum SettingType {
     case toggle
 }
 
-public final class SettingView: UIView {
+final class SettingView: UIView {
     
     private var settingType: SettingType = .arrow
     
-    private lazy var containerView = UIView()
+    lazy var containerView = TouchableView()
 
     private lazy var titleLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
     }
     
-    private lazy var arrowTouchableImageView = TouchableImageView
+    private lazy var arrowTouchableImageView = UIImageView().then({
+        $0.image = UIImage(named: "common_rightArrow")
+        $0.isHidden = true
+    })
+    
+    private lazy var settingToggle = UISwitch().then({
+        $0.isHidden = true
+    })
+    
+    convenience init(settingType: SettingType, title: String) {
+        self.init()
+        self.settingType = settingType
+        titleLabel.text = title
+    }
 
     init() {
         super.init(frame: UIScreen.main.bounds)
-        
         addViews()
         makeConstraints()
     }
@@ -38,19 +50,28 @@ public final class SettingView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind(settingType: SettingType?, title: String) {
-        guard let settingType = settingType else { return }
-        titleLabel.text = title
-        self.settingType = settingType
-    }
-    
     private func addViews() {
         addSubviews([containerView])
-        containerView.addSubviews([toastImageView,
-                                    titleLabel])
+        containerView.addSubviews([titleLabel,
+                                   arrowTouchableImageView,
+                                   settingToggle])
     }
     
     private func makeConstraints() {
-
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        titleLabel.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 10))
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
+        }
+        arrowTouchableImageView.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel.snp.centerY)
+            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+        }
+        settingToggle.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel.snp.centerY)
+            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+        }
     }
 }

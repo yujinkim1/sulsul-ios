@@ -7,10 +7,10 @@
 
 import UIKit
 
-final class TouchableImageView: UIImageView {
-    var isEffectSet: Bool = true
+public final class TouchableImageView: UIImageView {
+    public var isEffectSet: Bool = true
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         isUserInteractionEnabled = true
     }
@@ -20,7 +20,7 @@ final class TouchableImageView: UIImageView {
         isUserInteractionEnabled = true
     }
     
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         super.point(inside: point, with: event)
         
         /// x: 10, y: 15 만큼 영역 증가
