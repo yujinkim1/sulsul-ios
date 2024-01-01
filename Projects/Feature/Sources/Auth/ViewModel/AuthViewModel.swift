@@ -1,5 +1,5 @@
 //
-//  SignInViewModel.swift
+//  AuthViewModel.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2023-11-20.
@@ -13,7 +13,7 @@ import KakaoSDKAuth
 import KakaoSDKUser
 import Service
 
-final class SignInViewModel: NSObject {
+final class AuthViewModel: NSObject {
     
     private lazy var jsonDecoder = JSONDecoder()
     
@@ -36,7 +36,7 @@ final class SignInViewModel: NSObject {
 
 // MARK: - SignInType
 
-extension SignInViewModel {
+extension AuthViewModel {
     enum SignInType {
         case apple, google, kakao
         
@@ -63,7 +63,7 @@ extension SignInViewModel {
 
 // MARK: - Authentication
 
-extension SignInViewModel {
+extension AuthViewModel {
     private func appleAuthenticationAdapter() {
         let authorizationAppleIDProvider = ASAuthorizationAppleIDProvider()
         
@@ -151,7 +151,7 @@ extension SignInViewModel {
 
 // MARK: - Apple Authentication Services 델리게이트
 
-extension SignInViewModel: ASAuthorizationControllerDelegate {
+extension AuthViewModel: ASAuthorizationControllerDelegate {
     internal func authorizationController(controller: ASAuthorizationController,
                                           didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,

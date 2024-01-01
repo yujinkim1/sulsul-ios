@@ -1,5 +1,5 @@
 //
-//  SignInViewController.swift
+//  AuthViewController.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2023-11-20.
@@ -9,19 +9,20 @@ import DesignSystem
 import GoogleSignIn
 import UIKit
 
-public class SignInViewController: BaseViewController {
-    var viewModel: SignInViewModel?
+public class AuthViewController: BaseViewController {
+    var viewModel: AuthViewModel?
 
-    private lazy var topContainerView = UIView()
-
-    private lazy var titleLabel = UILabel().then {
-        $0.font = Font.bold(size: 32)
-        $0.numberOfLines = 2
-        $0.textColor = .white
-        $0.text = "만나서\n반가워요! :)"
+    private lazy var topView = UIView().then {
+        $0.frame = .zero
     }
 
-    private lazy var middleContainerView = UIView()
+    private lazy var titleLabel = UILabel().then {
+        $0.setTextLineHeight(height: 40)
+        $0.font = Font.bold(size: 32)
+        $0.numberOfLines = 2
+        $0.text = "만나서\n반가워요! :)"
+        $0.textColor = DesignSystemAsset.gray900.color
+    }
 
     private lazy var kakaoImage = UIImageView().then {
         $0.contentMode = .scaleAspectFit
@@ -50,6 +51,11 @@ public class SignInViewController: BaseViewController {
         $0.addSubview(appleImage)
     }
     
+    private lazy var backButton = UIButton().then {
+        $0.addTarget(self, action: #selector(backButtonDidTap), for: .touchUpInside)
+        $0.setImage(UIImage(named: "left_arrow"), for: .normal)
+    }
+    
     private lazy var termsButton = UIButton().then {
         $0.titleLabel?.textAlignment = .center
         $0.titleLabel?.numberOfLines = 2
@@ -67,15 +73,14 @@ public class SignInViewController: BaseViewController {
         attributedText.addAttribute(.foregroundColor, value: DesignSystemAsset.gray500.color, range: otherTextRange)
         
         $0.setAttributedTitle(attributedText, for: .normal)
-        $0.addTarget(self, action: #selector(termsButtonDidTap(_:)), for: .touchUpInside)
+        $0.addTarget(self, action: #selector(termsButtonDidTap), for: .touchUpInside)
     }
 
     override public func viewDidLoad() {
-        
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         
-        viewModel = SignInViewModel()
+        viewModel = AuthViewModel()
         
         addViews()
         makeConstraints()
@@ -83,29 +88,27 @@ public class SignInViewController: BaseViewController {
     }
 
     override public func addViews() {
-        view.addSubviews([topContainerView, middleContainerView, termsButton])
-        topContainerView.addSubview(titleLabel)
-        middleContainerView.addSubviews([continueWithKakao, continueWithGoogle, continueWithApple])
+        view.addSubviews([topView, continueWithKakao, continueWithGoogle, continueWithApple, termsButton])
+        topView.addSubviews([backButton, titleLabel])
     }
 
     override public func makeConstraints() {
-        topContainerView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(moderateScale(number: 32))
+        topView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(moderateScale(number: 152))
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(152)
         }
-        middleContainerView.snp.makeConstraints {
-            $0.top.equalTo(topContainerView.snp.bottom).offset(moderateScale(number: 239))
-            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
-            $0.bottom.equalToSuperview()
+        backButton.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.equalToSuperview().inset(moderateScale(number: 16))
+            $0.size.equalTo(moderateScale(number: 24))
         }
         titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -20))
+            $0.leading.equalTo(backButton)
+            $0.top.equalTo(backButton.snp.bottom).offset(moderateScale(number: 16))
         }
         continueWithKakao.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(topView.snp.bottom).offset(moderateScale(number: 239))
             $0.centerX.equalToSuperview()
             $0.width.equalTo(280)
             $0.height.equalTo(48)
@@ -167,6 +170,11 @@ public class SignInViewController: BaseViewController {
 
 // MARK: - @objc
 
-extension SignInViewController {
-    @objc private func termsButtonDidTap(_ button: UIButton) {}
+extension AuthViewController {
+    @objc private func backButtonDidTap() {
+        #warning("이전 화면으로 이동하는 것을 구현해야 해요.")
+    }
+    @objc private func termsButtonDidTap() {
+        #warning("서비스 약관, 개인정보 처리방침 뷰어로 이동해야 해요.")
+    }
 }
