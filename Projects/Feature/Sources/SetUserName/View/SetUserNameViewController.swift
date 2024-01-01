@@ -87,9 +87,9 @@ public final class SetUserNameViewController: BaseViewController {
         $0.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
         $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
         $0.titleLabel?.font = Font.bold(size: 16)
-        $0.titleLabel?.textColor = .black
         $0.layer.cornerRadius = CGFloat(12)
         $0.setTitle("다음", for: .normal)
+        $0.setTitleColor(DesignSystemAsset.gray200.color, for: .normal)
         $0.isEnabled = true
     }
     
@@ -98,13 +98,25 @@ public final class SetUserNameViewController: BaseViewController {
         overrideUserInterfaceStyle = .dark
         
         viewModel = SelectUserNameViewModel()
+        viewModel?.requestRandomNickname()
         
+        bind()
         addViews()
         makeConstraints()
         
-        bind()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
         
-        viewModel?.requestRandomNickname()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     public override func addViews() {
@@ -162,6 +174,10 @@ public final class SetUserNameViewController: BaseViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(moderateScale(number: 50))
         }
+    }
+    
+    public override func deinitialize() {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -292,5 +308,40 @@ extension SetUserNameViewController {
         updateNextButton(true)
     }
     
-    @objc private func nextButtonDidTap() {}
+    @objc private func nextButtonDidTap() {
+        #warning("다음 화면으로 이동하는 것을 구현해야 해요.")
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        
+        let keyboardHeight = view.convert(keyboardFrame, to: nil).size.height
+        
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            self?.nextButton.snp.remakeConstraints {
+                $0.leading.trailing.bottom.equalToSuperview()
+                $0.height.equalTo(moderateScale(number: 50))
+            }
+            self?.nextButton.layer.cornerRadius = CGFloat(0)
+            self?.nextButton.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight)
+            self?.resetButton.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight)
+            self?.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            self?.nextButton.snp.remakeConstraints {
+                $0.leading.equalToSuperview().offset(20)
+                $0.trailing.equalToSuperview().offset(-20)
+                $0.bottom.equalTo(self?.view.safeAreaLayoutGuide ?? 0)
+                $0.height.equalTo(moderateScale(number: 50))
+            }
+            self?.nextButton.layer.cornerRadius = CGFloat(12)
+            self?.nextButton.transform = .identity
+            self?.resetButton.transform = .identity
+            self?.view.layoutIfNeeded()
+        }
+    }
 }
