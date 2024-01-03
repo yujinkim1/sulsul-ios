@@ -15,6 +15,7 @@ final class AddSnackViewModel {
     // MARK: Output
     private lazy var goNextPage = PassthroughSubject<Void, Never>()
     private lazy var updateSelectedSnackSort = PassthroughSubject<String, Never>()
+    private lazy var userNickName = CurrentValueSubject<String, Never>("000")
     private lazy var snackSortModels: [SnackSortModel] = [.init(name: "패스트푸드", isSelect: false),
                                                           .init(name: "고기류", isSelect: false),
                                                           .init(name: "생선류", isSelect: false),
@@ -23,6 +24,10 @@ final class AddSnackViewModel {
                                                           .init(name: "탕류", isSelect: false),
                                                           .init(name: "튀김류", isSelect: false),
                                                           .init(name: "마른안주/과일", isSelect: false)]
+    
+    init(userId: Int) {
+        requestGETNameOf(userId)
+    }
     
     // MARK: Input Method
     func updateSelectStatus(in index: IndexPath) {
@@ -69,6 +74,23 @@ extension AddSnackViewModel {
                 self?.goNextPage.send(())
             case .failure(let error):
                 print("[/pairings/requests] Fail : \(error)")
+            }
+        }
+    }
+    
+    private func requestGETNameOf(_ id: Int) {
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(id)") { [weak self] result in
+            guard let selfRef = self else { return }
+            
+            switch result {
+            case .success(let responseData):
+                if let userData = try? selfRef.jsonDecoder.decode(UserModel.self, from: responseData) {
+                    self?.userNickName.send(userData.nickname)
+                } else {
+                    print("[/users/id] Fail Decode")
+                }
+            case .failure(let error):
+                print("[/users/id] Fail : \(error)")
             }
         }
     }

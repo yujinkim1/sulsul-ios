@@ -15,7 +15,7 @@ protocol UpdateSnackSortName: AnyObject {
 
 public class AddSnackViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
-    private lazy var viewModel = AddSnackViewModel()
+    private lazy var viewModel = AddSnackViewModel(userId: 0)
     
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow")?.withTintColor(DesignSystemAsset.gray900.color), for: .normal)
