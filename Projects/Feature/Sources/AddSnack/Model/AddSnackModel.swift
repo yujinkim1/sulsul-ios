@@ -11,3 +11,9 @@ struct SnackSortModel {
     let name: String
     var isSelect: Bool
 }
+
+struct AddSnackRequestModel {
+    let type: String
+    let subtype: String
+    let name: String
+}

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 import DesignSystem
 
 protocol UpdateSnackSortName: AnyObject {
@@ -13,6 +14,7 @@ protocol UpdateSnackSortName: AnyObject {
 }
 
 public class AddSnackViewController: BaseViewController {
+    private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = AddSnackViewModel()
     
     private lazy var backButton = UIButton().then {
@@ -99,6 +101,7 @@ public class AddSnackViewController: BaseViewController {
         $0.titleLabel?.font = Font.bold(size: 16)
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
+        $0.addTarget(self, action: #selector(tabSubmitButton), for: .touchUpInside)
     }
     
     public override func viewDidLoad() {
@@ -106,12 +109,27 @@ public class AddSnackViewController: BaseViewController {
         
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
+        
+        bind()
+    }
+    
+    private func bind() {
+        viewModel.shouldGoNextPage()
+            .sink { [weak self] _ in
+                // TODO: 다음 화면으로 화면전환
+            }.store(in: &cancelBag)
     }
     
     @objc private func tapSelectCategoryContainerButton() {
         let vc = SnackBottomSheetViewController(viewModel: viewModel, delegate: self)
         vc.modalPresentationStyle = .overFullScreen
         present(vc, animated: false)
+    }
+    
+    @objc private func tabSubmitButton() {
+        let snackName = snackWriteTextField.text ?? ""
+        let snackSort = selectedCategoryLabel.text!.contains("카테고리") ? nil : selectedCategoryLabel.text
+        viewModel.submitAddedSnack(snackName, snackSort)
     }
     
     public override func addViews() {
