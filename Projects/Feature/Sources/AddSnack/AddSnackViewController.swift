@@ -73,6 +73,7 @@ public class AddSnackViewController: BaseViewController {
     private lazy var selectCategoryContainerButton = UIButton().then {
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = moderateScale(number: 8)
+        $0.addTarget(self, action: #selector(tapSelectCategoryContainerButton), for: .touchUpInside)
     }
     
     private lazy var selectedCategoryLabel = UILabel().then {
@@ -98,6 +99,12 @@ public class AddSnackViewController: BaseViewController {
         
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
+    }
+    
+    @objc private func tapSelectCategoryContainerButton() {
+        let vc = SnackBottomSheetViewController()
+        vc.modalPresentationStyle = .overFullScreen
+        present(vc, animated: false)
     }
     
     public override func addViews() {

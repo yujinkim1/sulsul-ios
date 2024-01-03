@@ -11,7 +11,9 @@ open class BaseViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.overrideUserInterfaceStyle = .dark
         view.backgroundColor = .white
+        
         addViews()
         makeConstraints()
         setupIfNeeded()
