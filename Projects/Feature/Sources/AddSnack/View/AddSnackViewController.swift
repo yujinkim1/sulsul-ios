@@ -8,7 +8,13 @@
 import UIKit
 import DesignSystem
 
+protocol UpdateSnackSortName: AnyObject {
+    func updateSnackSortName(to name: String)
+}
+
 public class AddSnackViewController: BaseViewController {
+    private lazy var viewModel = AddSnackViewModel()
+    
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow")?.withTintColor(DesignSystemAsset.gray900.color), for: .normal)
     }
@@ -83,7 +89,8 @@ public class AddSnackViewController: BaseViewController {
     }
     
     private lazy var categoryArrowImageView = UIImageView().then {
-        $0.image = UIImage(named: "common_downTriangle")?.withTintColor(DesignSystemAsset.gray400.color)
+        $0.image = UIImage(named: "common_downTriangle")?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var submitButton = UIButton().then {
@@ -102,7 +109,7 @@ public class AddSnackViewController: BaseViewController {
     }
     
     @objc private func tapSelectCategoryContainerButton() {
-        let vc = SnackBottomSheetViewController()
+        let vc = SnackBottomSheetViewController(viewModel: viewModel, delegate: self)
         vc.modalPresentationStyle = .overFullScreen
         present(vc, animated: false)
     }
@@ -216,6 +223,14 @@ public class AddSnackViewController: BaseViewController {
             $0.leading.equalTo(backButton)
             $0.centerX.bottom.equalToSuperview()
         }
+    }
+}
+
+extension AddSnackViewController: UpdateSnackSortName {
+    func updateSnackSortName(to name: String) {
+        selectedCategoryLabel.text = name
+        selectedCategoryLabel.textColor = DesignSystemAsset.gray900.color
+        categoryArrowImageView.tintColor = DesignSystemAsset.gray900.color
     }
 }
 

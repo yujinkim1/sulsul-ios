@@ -5,10 +5,15 @@
 //  Created by 김유진 on 2024/01/03.
 //
 
+import Combine
 import UIKit
 import DesignSystem
 
 final class SnackBottomSheetViewController: BaseViewController {
+    private var cancelBag = Set<AnyCancellable>()
+    private let viewModel: AddSnackViewModel!
+    private let delegate: UpdateSnackSortName?
+    
     private let bottomHeight: CGFloat = moderateScale(number: 462)
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!
@@ -28,11 +33,38 @@ final class SnackBottomSheetViewController: BaseViewController {
         $0.layer.cornerRadius = moderateScale(number: 3)
     }
     
+    private lazy var bottomSheetTitleLabel = UILabel().then {
+        $0.text = "카테고리 선택"
+        $0.font = Font.bold(size: 24)
+        $0.textColor = DesignSystemAsset.gray900.color
+    }
+    
+    private lazy var snackSortTableView = UITableView().then {
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.register(SnackSortTableViewCell.self, forCellReuseIdentifier: SnackSortTableViewCell.reuseIdentifier)
+        $0.delegate = self
+        $0.dataSource = self
+        $0.separatorStyle = .none
+        $0.rowHeight = moderateScale(number: 48)
+    }
+    
+    init(viewModel: AddSnackViewModel, delegate: UpdateSnackSortName) {
+        self.viewModel = viewModel
+        self.delegate = delegate
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     
         view.backgroundColor = .clear
         
+        bind()
         setupGestureRecognizer()
     }
     
@@ -42,11 +74,23 @@ final class SnackBottomSheetViewController: BaseViewController {
         showBottomSheet()
     }
     
+    private func bind() {
+        viewModel.shoudUpdateSelectedSnackSort()
+            .sink { [weak self] selectedSortName in
+                self?.delegate?.updateSnackSortName(to: selectedSortName)
+                self?.hideBottomSheetAndGoBack()
+            }.store(in: &cancelBag)
+    }
+    
     override func addViews() {
         view.addSubview(dimmedBackView)
         view.addSubview(bottomSheetView)
         
-        bottomSheetView.addSubview(grabView)
+        bottomSheetView.addSubviews([
+            grabView,
+            bottomSheetTitleLabel,
+            snackSortTableView
+        ])
     }
     
     override func makeConstraints() {
@@ -70,6 +114,35 @@ final class SnackBottomSheetViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 6))
             $0.centerX.equalToSuperview()
         }
+        
+        bottomSheetTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(grabView.snp.bottom).offset(moderateScale(number: 8))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 24))
+        }
+        
+        snackSortTableView.snp.makeConstraints {
+            $0.top.equalTo(bottomSheetTitleLabel.snp.bottom).offset(moderateScale(number: 8))
+            $0.leading.trailing.bottom.equalToSuperview().inset(moderateScale(number: 12))
+        }
+    }
+}
+
+extension SnackBottomSheetViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.snackSorts().count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackSortTableViewCell.reuseIdentifier,
+                                                       for: indexPath) as? SnackSortTableViewCell else { return UITableViewCell() }
+        cell.selectionStyle = .none
+        cell.bind(viewModel.snackSort(in: indexPath))
+        
+        cell.cellBackButton.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.viewModel.updateSelectStatus(in: indexPath)
+        }
+        
+        return cell
     }
 }
 
