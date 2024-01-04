@@ -38,7 +38,6 @@ final class IntroViewController: BaseViewController, MainBaseCoordinated {
     
     override func setupIfNeeded() {
         startButton.setOpaqueTapGestureRecognizer { [weak self] in
-            print("클릭")
             self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.auth(.profileInput(.selectDrink))), userData: nil)
         }
     }

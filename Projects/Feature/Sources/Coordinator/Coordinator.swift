@@ -100,7 +100,7 @@ enum HomeScene {
 enum ProfileInputScene {
 //    case nickName
     case selectDrink
-//    case selectSnack
+    case selectSnack
 }
 
 enum ProfileManagementScene {

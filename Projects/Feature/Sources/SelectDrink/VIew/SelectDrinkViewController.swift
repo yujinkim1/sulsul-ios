@@ -144,7 +144,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     public override func setupIfNeeded() {
-        
+        submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+        }
     }
 }
 
