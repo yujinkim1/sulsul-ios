@@ -30,17 +30,20 @@ final class AddSnackViewModel {
     }
     
     // MARK: Input Method
-    func updateSelectStatus(in index: IndexPath) {
-        if let beforeSelectedModelIndex = snackSortModels.firstIndex(where: { $0.isSelect == true }) {
-            snackSortModels[beforeSelectedModelIndex].isSelect = false
-        }
+    func toggleSelectStatus(in index: IndexPath) {
+        let updatedSelection = !snackSortModels[index.row].isSelect
         
-        snackSortModels[index.row].isSelect = true
-        updateSelectedSnackSort.send(snackSortModels[index.row].name)
+        snackSortModels.indices.forEach { snackSortModels[$0].isSelect = false }
+        snackSortModels[index.row].isSelect = updatedSelection
     }
     
     func submitAddedSnack(_ name: String, _ sort: String?) {
         requestPOSTaddSnack(.init(type: "술", subtype: sort ?? "", name: name))
+    }
+    
+    func sendUpdateSelectedSnackSort() {
+        let selectedSnackSort = snackSortModels.first(where: { $0.isSelect == true })?.name ?? "카테고리를 선택해주세요"
+        updateSelectedSnackSort.send(selectedSnackSort)
     }
     
     // MARK: Output Method
@@ -52,12 +55,12 @@ final class AddSnackViewModel {
         return snackSortModels[index.row]
     }
     
-    func shoudUpdateSelectedSnackSort() -> AnyPublisher<String, Never> {
-        return updateSelectedSnackSort.eraseToAnyPublisher()
+    func goNextPagePublisher() -> AnyPublisher<Void, Never> {
+        return goNextPage.eraseToAnyPublisher()
     }
     
-    func shouldGoNextPage() -> AnyPublisher<Void, Never> {
-        return goNextPage.eraseToAnyPublisher()
+    func updateSelectedSnackSortPublisher() -> AnyPublisher<String, Never> {
+        return updateSelectedSnackSort.eraseToAnyPublisher()
     }
 }
 

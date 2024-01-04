@@ -12,7 +12,6 @@ import DesignSystem
 final class SnackBottomSheetViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel: AddSnackViewModel!
-    private let delegate: UpdateSnackSortName?
     
     private let bottomHeight: CGFloat = moderateScale(number: 462)
 
@@ -48,9 +47,8 @@ final class SnackBottomSheetViewController: BaseViewController {
         $0.rowHeight = moderateScale(number: 48)
     }
     
-    init(viewModel: AddSnackViewModel, delegate: UpdateSnackSortName) {
+    init(viewModel: AddSnackViewModel) {
         self.viewModel = viewModel
-        self.delegate = delegate
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -64,7 +62,6 @@ final class SnackBottomSheetViewController: BaseViewController {
     
         view.backgroundColor = .clear
         
-        bind()
         setupGestureRecognizer()
     }
     
@@ -72,14 +69,6 @@ final class SnackBottomSheetViewController: BaseViewController {
         super.viewDidAppear(animated)
         
         showBottomSheet()
-    }
-    
-    private func bind() {
-        viewModel.shoudUpdateSelectedSnackSort()
-            .sink { [weak self] selectedSortName in
-                self?.delegate?.updateSnackSortName(to: selectedSortName)
-                self?.hideBottomSheetAndGoBack()
-            }.store(in: &cancelBag)
     }
     
     override func addViews() {
@@ -139,7 +128,12 @@ extension SnackBottomSheetViewController: UITableViewDelegate, UITableViewDataSo
         cell.bind(viewModel.snackSort(in: indexPath))
         
         cell.cellBackButton.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.viewModel.updateSelectStatus(in: indexPath)
+            guard let selfRef = self else { return }
+            
+            selfRef.viewModel.toggleSelectStatus(in: indexPath)
+            selfRef.viewModel.sendUpdateSelectedSnackSort()
+            
+            selfRef.hideBottomSheetAndGoBack()
         }
         
         return cell

@@ -9,10 +9,6 @@ import UIKit
 import Combine
 import DesignSystem
 
-protocol UpdateSnackSortName: AnyObject {
-    func updateSnackSortName(to name: String)
-}
-
 public class AddSnackViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = AddSnackViewModel(userId: 0)
@@ -114,14 +110,23 @@ public class AddSnackViewController: BaseViewController {
     }
     
     private func bind() {
-        viewModel.shouldGoNextPage()
+        viewModel.goNextPagePublisher()
             .sink { [weak self] _ in
                 // TODO: 다음 화면으로 화면전환
+            }.store(in: &cancelBag)
+        
+        viewModel.updateSelectedSnackSortPublisher()
+            .sink { [weak self] selectedSnackSort in
+                
+                let isTextPlaceHolder = selectedSnackSort.contains("카테고리")
+                self?.selectedCategoryLabel.text = selectedSnackSort
+                self?.selectedCategoryLabel.textColor = isTextPlaceHolder ? DesignSystemAsset.gray400.color : DesignSystemAsset.gray900.color
+                self?.categoryArrowImageView.tintColor = isTextPlaceHolder ? DesignSystemAsset.gray400.color : DesignSystemAsset.gray900.color
             }.store(in: &cancelBag)
     }
     
     @objc private func tapSelectCategoryContainerButton() {
-        let vc = SnackBottomSheetViewController(viewModel: viewModel, delegate: self)
+        let vc = SnackBottomSheetViewController(viewModel: viewModel)
         vc.modalPresentationStyle = .overFullScreen
         present(vc, animated: false)
     }
@@ -241,14 +246,6 @@ public class AddSnackViewController: BaseViewController {
             $0.leading.equalTo(backButton)
             $0.centerX.bottom.equalToSuperview()
         }
-    }
-}
-
-extension AddSnackViewController: UpdateSnackSortName {
-    func updateSnackSortName(to name: String) {
-        selectedCategoryLabel.text = name
-        selectedCategoryLabel.textColor = DesignSystemAsset.gray900.color
-        categoryArrowImageView.tintColor = DesignSystemAsset.gray900.color
     }
 }
 
