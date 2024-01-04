@@ -94,6 +94,7 @@ public class AddSnackViewController: BaseViewController {
     private lazy var submitButton = UIButton().then {
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.setTitle("제출하기", for: .normal)
+        $0.isEnabled = false
         $0.titleLabel?.font = Font.bold(size: 16)
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
@@ -268,9 +269,11 @@ extension AddSnackViewController: UITextFieldDelegate {
     
     @objc func textFieldDidChange(_ textField: UITextField) {
         if textField.text == "" {
+            submitButton.isEnabled = false
             submitButton.backgroundColor = DesignSystemAsset.gray100.color
-        } else if textField.text != "" && submitButton.backgroundColor != UIColor.yellow {
-            submitButton.backgroundColor = UIColor.yellow
+        } else if textField.text != "" && submitButton.backgroundColor != DesignSystemAsset.yellow050.color {
+            submitButton.isEnabled = true
+            submitButton.backgroundColor = DesignSystemAsset.yellow050.color
         }
     }
     
