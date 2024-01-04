@@ -22,7 +22,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     var rootViewController: UIViewController = UITabBarController()
     
 //    var commonCoordinator: CommonBaseCoordinator = CommonCoordinator()
-//    var authCoordinator: AuthBaseCoordinator = AuthCoordinator()
+    var authCoordinator: AuthBaseCoordinator = AuthCoordinator()
     var homeCoordinator: HomeBaseCoordinator = HomeCoordinator()
     var benefitCoordinator: BenefitBaseCoordinator = BenefitCoordinator()
     var transferCoordinator: TransferBaseCoordinator = TransferCoordinator()
@@ -66,8 +66,8 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         currentFlowManager = CurrentFlowManager()
         currentFlowManager?.currentCoordinator = homeCoordinator
         
-//        authCoordinator.parentCoordinator = self
-//        authCoordinator.currentFlowManager = currentFlowManager
+        authCoordinator.parentCoordinator = self
+        authCoordinator.currentFlowManager = currentFlowManager
 //        
 //        commonCoordinator.parentCoordinator = self
 //        commonCoordinator.currentFlowManager = currentFlowManager
@@ -99,6 +99,8 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
 //            startAuthFlow(tabBarFlow, userData: userData)
 //        case .common:
 //            startCommonFlow(tabBarFlow, userData: userData)
+        case .auth(_):
+            startAuthFlow(tabBarFlow, userData: userData)
         }
     }
     
@@ -132,9 +134,9 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         moreCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
-//    private func startAuthFlow(_ flow: Flow, userData: [String: Any]?) {
-//        authCoordinator.moveTo(appFlow: flow, userData: userData)
-//    }
+    private func startAuthFlow(_ flow: Flow, userData: [String: Any]?) {
+        authCoordinator.moveTo(appFlow: flow, userData: userData)
+    }
 //    
 //    private func startCommonFlow(_ flow: Flow, userData: [String: Any]?) {
 //        commonCoordinator.moveTo(appFlow: flow, userData: userData)

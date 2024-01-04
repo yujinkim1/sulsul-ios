@@ -11,8 +11,20 @@ import Combine
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
+    var coordinator: AuthBaseCoordinator?
     var cancelBag = Set<AnyCancellable>()
-    private let viewModel = SelectDrinkViewModel()
+    private let viewModel: SelectDrinkViewModel
+    
+    init(viewModel: SelectDrinkViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     private lazy var containerView = UIView()
     
@@ -77,9 +89,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     public override func makeConstraints() {
         super.makeConstraints()
         containerView.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(topView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.bottom.equalTo(nextButtonBackgroundView.snp.top)
+            $0.bottom.equalTo(nextButtonBackgroundView.snp.top).offset(moderateScale(number: -25))
         }
         numberLabel.snp.makeConstraints {
             $0.top.equalToSuperview()

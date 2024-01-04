@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class BaseTopView: UIView {
+public final class BaseTopView: UIView {
     lazy var backTouchableView = TouchableView()
     
     private lazy var backImageView = UIImageView().then {

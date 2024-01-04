@@ -38,12 +38,12 @@ extension Flow {
 }
 
 enum AppFlow: Flow {
-//    case intro
+    case intro
     case tabBar(TabBarFlow)
 }
 
 enum TabBarFlow: Flow {
-//    case auth(AuthFlow)
+    case auth(AuthFlow)
 //    case common
     case home(HomeScene)
     case benefit
@@ -53,15 +53,19 @@ enum TabBarFlow: Flow {
 }
 
 enum AuthFlow: Flow {
-    case login
-    case signUp(SignUpScene)
-    case findEmail(FindEmailScene)
-    case findPassword(FindPasswordScene)
+//    case login(LoginScene)
+//    case signUp(SignUpScene)
+//    case findEmail(FindEmailScene)
+//    case findPassword(FindPasswordScene)
     case profileInput(ProfileInputScene)
 }
 
 enum MoreFlow: Flow {
     case profile(ProfileManagementScene)
+}
+
+enum LoginScene {
+    case main
 }
 
 enum SignUpScene {
@@ -94,11 +98,9 @@ enum HomeScene {
 }
 
 enum ProfileInputScene {
-    case name
-    case national
-    case birthDay
-    case occupation
-    case address
+//    case nickName
+    case selectDrink
+//    case selectSnack
 }
 
 enum ProfileManagementScene {

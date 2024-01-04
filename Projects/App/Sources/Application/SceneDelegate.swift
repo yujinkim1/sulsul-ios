@@ -19,8 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
         mainCoordinator = MainCoordinator()
-//        window?.rootViewController = mainCoordinator?.start()
-        window?.rootViewController = SelectDrinkViewController()
+        window?.rootViewController = mainCoordinator?.start()
         window?.makeKeyAndVisible()
     }
 

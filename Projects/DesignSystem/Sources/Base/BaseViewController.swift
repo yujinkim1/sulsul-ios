@@ -12,6 +12,8 @@ open class BaseViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = DesignSystemAsset.black.color
+        navigationController?.isNavigationBarHidden = true
+        
         addViews()
         makeConstraints()
         setupIfNeeded()
