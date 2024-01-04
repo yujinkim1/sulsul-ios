@@ -8,7 +8,7 @@
 import UIKit
 
 open class BaseCollectionViewCell<M>: UICollectionViewCell {
-    var model: M? {
+    open var model: M? {
         didSet {
             if let model = model {
                 bind(model)
@@ -25,5 +25,5 @@ open class BaseCollectionViewCell<M>: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind(_ model: M) {}
+    open func bind(_ model: M) {}
 }

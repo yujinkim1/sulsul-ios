@@ -31,4 +31,16 @@ open class BaseViewController: UIViewController {
     open func setupIfNeeded() {}
     
     open func deinitialize() {}
+    
+    open func showAlertView(withType type: AlertType,
+                       title: String,
+                       description: String?,
+                       submitCompletion: (() -> Void)?,
+                       cancelCompletion: (() -> Void)?) {
+        let alertView = AlertView(alertType: type)
+        alertView.bind(title: title, description: description, submitCompletion: submitCompletion, cancelCompletion: cancelCompletion)
+        
+        view.addSubview(alertView)
+        view.bringSubviewToFront(alertView)
+    }
 }

@@ -142,7 +142,7 @@ extension SelectSnackViewModel {
                         
                         selfRef.initSectionModels = selfRef.makeSectionModelsWith(mappedData)
                         selfRef.sectionModels = selfRef.initSectionModels
-                        selfRef.setCompletedSnackData.send(())
+                        selfRef.setCompletedSnackData.send(()) 
                         selfRef.cellModels = mappedData
                     } else {
                         print("[/pairings] Fail Decode")

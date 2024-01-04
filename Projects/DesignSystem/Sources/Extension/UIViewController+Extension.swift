@@ -49,5 +49,4 @@ public extension UIViewController {
         // Start the animation
         animator.startAnimation()
     }
-
 }

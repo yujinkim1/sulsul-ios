@@ -11,19 +11,19 @@ public final class IndicatorTouchableView: TouchableView {
     private let indicator = UIActivityIndicatorView()
     private let label = UILabel()
     
-    var text: String? {
+    public var text: String? {
         didSet {
             label.text = text
         }
     }
     
-    var font: UIFont? {
+    public var font: UIFont? {
         didSet {
             label.font = font
         }
     }
     
-    var textColor: UIColor? {
+    public var textColor: UIColor? {
         didSet {
             label.textColor = textColor
         }
