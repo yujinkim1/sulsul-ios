@@ -38,23 +38,20 @@ final class SnackTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind(snack: Pairing) {
-        if let snackName = snack.name {
-            if let highlightedText = snack.highlightedText {
-                
-                let attributedString = NSMutableAttributedString(string: snackName)
-                let highlightRange = (snackName as NSString).range(of: highlightedText)
-                let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
-                
-                attributedString.addAttribute(.foregroundColor, value: yellowColor, range: highlightRange)
-                snackNameLabel.attributedText = attributedString
-            } else {
-                snackNameLabel.text = snack.name
-            }
+    func bind(snack: SnackModel) {
+        if snack.highlightedText != ""  {
+            let attributedString = NSMutableAttributedString(string: snack.name)
+            let highlightRange = (snack.name as NSString).range(of: snack.highlightedText)
+            let yellowColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
+            
+            attributedString.addAttribute(.foregroundColor, value: yellowColor, range: highlightRange)
+            snackNameLabel.attributedText = attributedString
+        } else {
+            snackNameLabel.text = snack.name
         }
         
-        checkImageView.isHidden = !(snack.isSelect ?? false)
-        cellBackgroundView.isHidden = !(snack.isSelect ?? false)
+        checkImageView.isHidden = !snack.isSelect
+        cellBackgroundView.isHidden = !snack.isSelect
     }
     
     private func layout() {

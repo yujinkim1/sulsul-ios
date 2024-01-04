@@ -21,13 +21,3 @@ struct Pairing: Decodable {
     var isSelect: Bool?
     var highlightedText: String?
 }
-
-struct SnackSectionModel {
-    var cellModels: [Pairing]
-    var headerModel: SnackHeader
-}
-
-struct SnackHeader {
-    let snackHeaderTitle: String
-    let snackHeaderImage: String
-}

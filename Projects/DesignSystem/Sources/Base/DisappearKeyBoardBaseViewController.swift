@@ -17,20 +17,20 @@ open class DisappearKeyBoardBaseViewController: BaseViewController {
     
     public lazy var submitTouchableLabel = IndicatorTouchableView().then {
         $0.text = "다음"
-        $0.textColor = .green
-        $0.backgroundColor = .link
-        $0.layer.cornerRadius = moderateScale(number: 6)
+        $0.textColor = DesignSystemAsset.gray200.color
+        $0.backgroundColor = DesignSystemAsset.main.color
+        $0.layer.cornerRadius = moderateScale(number: 12)
         $0.clipsToBounds = true
     }
     
     open override func addViews() {
         view.addSubviews([submitTouchableLabel])
     }
-    
+
     open override func makeConstraints() {
         submitTouchableLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.height.equalTo(moderateScale(number: 48))
+            $0.height.equalTo(moderateScale(number: 52))
             
             let offset = getSafeAreaBottom() + moderateScale(number: 20)
             submitButtonBottomConstraint = $0.bottom.equalToSuperview().inset(offset).constraint

@@ -9,7 +9,7 @@ import DesignSystem
 import GoogleSignIn
 import UIKit
 
-public class AuthViewController: BaseViewController {
+public final class AuthViewController: BaseViewController {
     var viewModel: AuthViewModel?
 
     private lazy var topView = UIView().then {
