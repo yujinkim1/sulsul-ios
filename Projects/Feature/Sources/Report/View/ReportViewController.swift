@@ -57,6 +57,7 @@ public final class ReportViewController: BaseViewController {
         $0.font = Font.semiBold(size: 16)
         $0.text = textViewPlaceHolder
         $0.textColor = DesignSystemAsset.gray900.color
+        $0.isHidden = true
         $0.delegate = self
     })
     
@@ -64,6 +65,7 @@ public final class ReportViewController: BaseViewController {
     private lazy var textCountLabel = UILabel().then({
         $0.font = Font.semiBold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
+        $0.isHidden = true
         $0.text = "0/\(maxTextCount)"
     })
 
@@ -72,6 +74,7 @@ public final class ReportViewController: BaseViewController {
         $0.text = "- 신고 내용은 자세히 적을수록 좋아요!\n- 허위사실이나 악의적인 목적으로 작성된 내용은 처리되지 않을 수 있습니다."
         $0.lineBreakMode = .byWordWrapping
         $0.textColor = DesignSystemAsset.gray400.color
+        $0.isHidden = true
         $0.numberOfLines = 0
     })
     
@@ -155,8 +158,18 @@ public final class ReportViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillShow(_:)),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHide(_:)),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+        
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            print("클릭된")
+    
             self?.showToastMessageView(toastType: .error, title: "ㅎ이ㅏ멀;ㅐ야러ㅔㅁㄷ")
         }
     }
@@ -165,9 +178,23 @@ public final class ReportViewController: BaseViewController {
         
     }
     
+    public override func deinitialize() {
+        NotificationCenter.default.removeObserver(self,
+                                                  name: UIResponder.keyboardWillShowNotification,
+                                                  object: nil)
+        NotificationCenter.default.removeObserver(self,
+                                                  name: UIResponder.keyboardWillHideNotification,
+                                                  object: nil)
+    }
+    
     @objc
-    private func didTapTextView(_ sender: Any) {
-        view.endEditing(true)
+    private func keyboardWillShow(_ notification: NSNotification) {
+        view.frame.origin.y -= 300
+    }
+    
+    @objc
+    private func keyboardWillHide(_ notification: NSNotification) {
+        view.frame.origin.y = 0
     }
 
     private func updateCountLabel(characterCount: Int) {
@@ -192,6 +219,16 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? ReportTableViewCell {
             cell.showCellComponent()
+            if indexPath.row == 4 {
+                // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
+                etcReportTextView.isHidden = false
+                etcReportLabel.isHidden = false
+                textCountLabel.isHidden = false
+            } else {
+                etcReportTextView.isHidden = true
+                etcReportLabel.isHidden = true
+                textCountLabel.isHidden = true
+            }
         }
         
         for visibleIndexPath in tableView.indexPathsForVisibleRows ?? [] {
