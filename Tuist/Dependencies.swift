@@ -18,7 +18,8 @@ let dependencies = Dependencies(
             .alamofire,
             .snapKit,
             .then,
-            .swinject
+            .swinject,
+            .kakaoSDK
         ],
         productTypes: [
             "Alamofire": .framework,
@@ -37,5 +38,6 @@ public extension Package {
                                        requirement: .upToNextMajor(from: "2.7.0"))
     static let swinject: Package = .remote(url: "https://github.com/Swinject/Swinject",
                                            requirement: .upToNextMajor(from: "2.8.3"))
+    static let kakaoSDK: Package = .remote(url: "https://github.com/kakao/kakao-ios-sdk",
+                                           requirement: .upToNextMajor(from: "2.0.0"))
 }
-

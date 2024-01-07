@@ -19,6 +19,7 @@ public final class TestViewController: BaseViewController {
     })
     public override func viewDidLoad() {
         super.viewDidLoad()
+        // view.backgroundColor = .purple400
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.benefit), userData: nil)
         }

@@ -2,7 +2,7 @@
 //  UILabel+Extension.swift
 //  DesignSystem
 //
-//  Created by 김유진 on 2024/01/02.
+//  Created by Yujin Kim on 2023-12-19.
 //
 
 import UIKit
