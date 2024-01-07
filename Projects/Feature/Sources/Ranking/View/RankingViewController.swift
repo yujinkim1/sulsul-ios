@@ -25,15 +25,19 @@ public final class RankingViewController: BaseViewController {
         $0.textColor = DesignSystemAsset.gray600.color
     }
     
-    private lazy var flowLayout = UICollectionViewFlowLayout().then {
-        $0.scrollDirection = .horizontal
-    }
-    
     private lazy var rankingPageTabBarContainerView = UIView().then {
         $0.frame = .zero
     }
     
-    private lazy var rankingPageTabBarView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout).then {
+    private lazy var horizontalFlowLayout = UICollectionViewFlowLayout().then {
+        $0.scrollDirection = .horizontal
+    }
+    
+    private lazy var verticalFlowLayout = UICollectionViewFlowLayout().then {
+        $0.scrollDirection = .vertical
+    }
+    
+    private lazy var rankingPageTabBarView = UICollectionView(frame: .zero, collectionViewLayout: horizontalFlowLayout).then {
         $0.backgroundColor = .clear
         $0.showsHorizontalScrollIndicator = false
         $0.delegate = self
@@ -45,9 +49,13 @@ public final class RankingViewController: BaseViewController {
         $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
     }
     
+    private lazy var rankingPageView = RankingPageCollectionView(frame: .zero, collectionViewLayout: verticalFlowLayout).then {
+        $0.pageTabBarDelegate = self
+    }
+    
     public override func viewDidLoad() {
-        overrideUserInterfaceStyle = .dark
         view.backgroundColor = DesignSystemAsset.black.color
+        overrideUserInterfaceStyle = .dark
         
         addViews()
         makeConstraints()
@@ -55,7 +63,7 @@ public final class RankingViewController: BaseViewController {
     
     public override func addViews() {
         rankingPageTabBarContainerView.addSubview(rankingPageTabBarView)
-        view.addSubviews([titleLabel, weekendLabel, rankingPageTabBarContainerView, indicatorView])
+        view.addSubviews([titleLabel, weekendLabel, rankingPageTabBarContainerView, indicatorView, rankingPageView])
     }
     
     public override func makeConstraints() {
@@ -81,6 +89,11 @@ public final class RankingViewController: BaseViewController {
             $0.width.equalTo(rankingPageTabBarView.snp.width).dividedBy(2)
             $0.top.equalTo(rankingPageTabBarContainerView.snp.bottom)
             $0.leading.equalTo(rankingPageTabBarView)
+        }
+        rankingPageView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 16))
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
 }
@@ -126,13 +139,20 @@ extension RankingViewController: UICollectionViewDelegate {
             self.view.layoutIfNeeded()
         }
         
+        self.rankingPageView.collectionViewLayout.invalidateLayout()
+        self.rankingPageView.reloadData()
+        
         if indexPath.item == 0 {
-            // TODO: RankingDrinkPageView 보여주기
+            self.rankingPageView.register(RankingDrinkCell.self, forCellWithReuseIdentifier: RankingDrinkCell.reuseIdentifier)
+            self.rankingPageView.backgroundColor = .blue
         }
         
         if indexPath.item == 1 {
-            // TODO: RankingCombinationPageView 보여주기
+            self.rankingPageView.register(RankingCombinationCell.self, forCellWithReuseIdentifier: RankingCombinationCell.reuseIdentifier)
+            self.rankingPageView.backgroundColor = .red
         }
+        
+        self.rankingPageView.reloadData()
     }
 }
 
@@ -151,5 +171,14 @@ extension RankingViewController: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 0
+    }
+}
+
+// MARK: - 랭킹 페이지 콜렉션 뷰 델리게이트
+
+extension RankingViewController: PageTabBarDelegate {
+    func scrollToIndex(to index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        rankingPageView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }
