@@ -24,6 +24,14 @@ extension UILabel {
         }
     }
     
+    public func asColor(targetString: String, color: UIColor?) {
+        let fullText = text ?? ""
+        let range = (fullText as NSString).range(of: targetString)
+        let attributedString = NSMutableAttributedString(string: fullText)
+        attributedString.addAttribute(.foregroundColor, value: color as Any, range: range)
+        attributedText = attributedString
+    }
+    
     public func setFontForText(_ targetText: String, withFont font: UIFont) {
          guard let labelText = text, let range = labelText.range(of: targetText) else {
              return

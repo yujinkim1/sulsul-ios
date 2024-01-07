@@ -31,8 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        }
         
         mainCoordinator = MainCoordinator()
-//        window?.rootViewController = mainCoordinator?.start()
-        window?.rootViewController = SelectDrinkViewController()
+        window?.rootViewController = mainCoordinator?.start()
         window?.makeKeyAndVisible()
     }
 

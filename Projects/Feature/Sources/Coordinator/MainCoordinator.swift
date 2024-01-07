@@ -20,10 +20,10 @@ public final class MainCoordinator: MainBaseCoordinator {
         tabBarCoordinator.parentCoordinator = self
         mainTabBar = tabBarCoordinator.start() as? UITabBarController
         
-//        let viewModel = SplashViewModel(usecase: AppContainer.shared.resolve(SplashUsecaseProtocol.self)!)
-        let splashVC = TestViewController()
+        let splashVC = SplashViewController()
         splashVC.coordinator = self
         rootViewController = UINavigationController(rootViewController: splashVC)
+        rootViewController.hidesBottomBarWhenPushed = true
         
         let navigation = rootViewController as? UINavigationController
         navigation?.isNavigationBarHidden = true
@@ -34,19 +34,18 @@ public final class MainCoordinator: MainBaseCoordinator {
         guard let flow = appFlow.appFlow else { return }
         
         switch flow {
-//        case .intro:
-//            startIntroFlow(userData: userData)
+        case .intro:
+            startIntroFlow(userData: userData)
         case .tabBar(let tabBarFlow):
             startTabBarFlow(tabBarFlow, userData: userData)
         }
     }
     
-//    private func startIntroFlow(userData: [String: Any]?) {
-//        let viewModel = IntroViewModel(usecase: AppContainer.shared.resolve(IntroUsecaseProtocol.self)!)
-//        let introVC = IntroViewController(viewModel: viewModel)
-//        introVC.coordinator = self
-//        rootNavigationController?.pushViewController(introVC, animated: true)
-//    }
+    private func startIntroFlow(userData: [String: Any]?) {
+        let introVC = IntroViewController()
+        introVC.coordinator = self
+        rootNavigationController?.pushViewController(introVC, animated: false)
+    }
     
     private func startTabBarFlow(_ tabBarFlow: TabBarFlow, userData: [String: Any]?) {
         guard let mainTabBar = self.mainTabBar else { return }
