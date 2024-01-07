@@ -13,7 +13,7 @@ open class SelectTasteBaseViewController: BaseViewController {
 
     var buttonBottomConstraint: Constraint?
     
-    lazy var topView = BaseTopView()
+    public lazy var topView = BaseTopView()
     
     public lazy var nextButtonBackgroundView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.black.color

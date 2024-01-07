@@ -14,7 +14,9 @@ protocol SearchSnack: AnyObject {
 }
 
 public final class SelectSnackViewController: BaseViewController {
-    private lazy var viewModel = SelectSnackViewModel()
+    
+    var coordinator: AuthBaseCoordinator?
+    private let viewModel: SelectSnackViewModel
     private lazy var cancelBag = Set<AnyCancellable>()
     
     private lazy var superViewInset = moderateScale(number: 20)
@@ -94,7 +96,8 @@ public final class SelectSnackViewController: BaseViewController {
         $0.setTitle("다음", for: .normal)
     }
     
-    public init() {
+    init(viewModel: SelectSnackViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
@@ -109,8 +112,9 @@ public final class SelectSnackViewController: BaseViewController {
         .store(in: &cancelBag)
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     public override func viewDidLoad() {
