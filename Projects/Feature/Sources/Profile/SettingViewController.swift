@@ -55,6 +55,7 @@ public final class SettingViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
     }

@@ -26,12 +26,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            let viewController = SetUserNameViewController()
 //            window?.rootViewController = viewController
 //        } else {
-//            let viewController = SignInViewController()
+//            let viewController = SignInViewController()SettingViewController
 //            window?.rootViewController = viewController
 //        }
         
         mainCoordinator = MainCoordinator()
-        window?.rootViewController = mainCoordinator?.start()
+        window?.rootViewController = ProfileMainViewController()
         window?.makeKeyAndVisible()
     }
 
