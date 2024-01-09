@@ -10,6 +10,8 @@ import Then
 import DesignSystem
 
 public final class ProfileMainViewController: BaseViewController {
+    var coordinator: MoreBaseCoordinator?
+    
     private lazy var topHeaderView = UIView()
     private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
         $0.image = UIImage(named: "common_search")

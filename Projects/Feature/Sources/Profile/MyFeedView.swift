@@ -11,10 +11,13 @@ import DesignSystem
 
 class MyFeedView: UIView {
     
+    private var tempCount = 0
+    
     private var cancelBag = Set<AnyCancellable>()
 //    private var viewModel: BeneficiaryViewModel
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
+        $0.registerCell(NoDataCell.self)
         $0.registerCell(MyFeedCell.self)
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
@@ -52,13 +55,18 @@ class MyFeedView: UIView {
     
     private func layout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { _, _ in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/2),
-                                                  heightDimension: .absolute(moderateScale(number: 220)))
+
+            //TODO: - 수정 필요
+            let itemHeight: CGFloat = (self.tempCount == 0) ? 80 + 133 + 80 : 220
+            let itemWidth: CGFloat = (self.tempCount == 0) ? 1 : 1/2
+            
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
+                                                  heightDimension: .absolute(moderateScale(number: itemHeight)))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
         
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                   heightDimension: .absolute(moderateScale(number: 220)))
+                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             let section = NSCollectionLayoutSection(group: group)
@@ -73,12 +81,22 @@ class MyFeedView: UIView {
 extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return viewModel.getBeneficiaryCountryList().count + 1
-        return 10
+        if self.tempCount == 0 {
+            // MARK: - 빈 셀일때
+            return 1
+        } else {
+            return 10
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
-        
-        return cell
+        if self.tempCount == 0 {
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            cell.updateView(withType: .myFeed)
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
+            return cell
+        }
     }
 }

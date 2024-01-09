@@ -12,9 +12,11 @@ final class MoreCoordinator: MoreBaseCoordinator {
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-        let moreVC = MoreViewController()
-        moreVC.coordinator = self
-        rootViewController = UINavigationController(rootViewController: moreVC)
+//        let moreVC = MoreViewController()
+//        moreVC.coordinator = self
+        let profileMainVC = ProfileMainViewController()
+        profileMainVC.coordinator = self
+        rootViewController = UINavigationController(rootViewController: profileMainVC)
         return rootViewController
     }
     

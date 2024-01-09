@@ -31,7 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        }
         
         mainCoordinator = MainCoordinator()
-        window?.rootViewController = ProfileMainViewController()
+        window?.rootViewController = mainCoordinator?.start()
         window?.makeKeyAndVisible()
     }
 
