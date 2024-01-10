@@ -37,6 +37,12 @@ final class SettingView: UIView {
         self.init()
         self.settingType = settingType
         titleLabel.text = title
+        
+        if self.settingType == .arrow {
+            arrowTouchableImageView.isHidden = false
+        } else {
+            settingToggle.isHidden = false
+        }
     }
 
     init() {
