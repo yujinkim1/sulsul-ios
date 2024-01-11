@@ -24,6 +24,7 @@ public final class SearchViewController: BaseViewController {
     private lazy var searchTextField = UITextField().then {
         $0.placeholder = "검색어를 입력해주세요"
         $0.font = Font.bold(size: 32)
+        $0.delegate = self
     }
     
     private lazy var searchResetButton = UIButton().then {
@@ -118,6 +119,22 @@ public final class SearchViewController: BaseViewController {
             $0.trailing.equalTo(searchResetButton)
             $0.bottom.equalToSuperview()
         }
+    }
+}
+
+extension SearchViewController: UITextFieldDelegate {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let searchText = textField.text else { return true }
+        
+        let textIsNotEmpty = !(searchText.trimmingCharacters(in: .whitespaces).isEmpty)
+        let savedKeywordList = UserDefaultsUtil.shared.recentKeywordList() ?? []
+        
+        if textIsNotEmpty, savedKeywordList.count <= 5, !(savedKeywordList.contains(searchText)) {
+            let newKeywordList = (UserDefaultsUtil.shared.recentKeywordList() ?? []) + [searchText]
+            UserDefaultsUtil.shared.setRecentKeywordList(newKeywordList)
+        }
+        
+        return true
     }
 }
 
