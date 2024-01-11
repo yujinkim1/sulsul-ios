@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         mainCoordinator = MainCoordinator()
         // window?.rootViewController = mainCoordinator?.start()
-        window?.rootViewController = 
+        window?.rootViewController = SearchViewController()
         window?.makeKeyAndVisible()
     }
 
