@@ -17,8 +17,8 @@ public final class ProfileMainViewController: BaseViewController {
         $0.image = UIImage(named: "common_search")
         $0.tintColor = DesignSystemAsset.gray900.color
     })
-    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(named: "common_alarm")
+    private lazy var settingTouchableImageView = TouchableImageView(frame: .zero).then({
+        $0.image = UIImage(named: "common_setting")
         $0.tintColor = DesignSystemAsset.gray900.color
     })
     private lazy var containerView = UIView()
@@ -67,7 +67,7 @@ public final class ProfileMainViewController: BaseViewController {
         view.addSubviews([topHeaderView,
                           containerView])
         topHeaderView.addSubviews([searchTouchableIamgeView,
-                                   alarmTouchableImageView])
+                                   settingTouchableImageView])
         containerView.addSubviews([profileView,
                                    selectFeedView,
                                    likeFeedView])
@@ -90,10 +90,10 @@ public final class ProfileMainViewController: BaseViewController {
         }
         searchTouchableIamgeView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(alarmTouchableImageView.snp.leading).offset(moderateScale(number: -12))
+            $0.trailing.equalTo(settingTouchableImageView.snp.leading).offset(moderateScale(number: -12))
             $0.size.equalTo(moderateScale(number: 24))
         }
-        alarmTouchableImageView.snp.makeConstraints {
+        settingTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
             $0.size.equalTo(moderateScale(number: 24))
@@ -130,6 +130,10 @@ public final class ProfileMainViewController: BaseViewController {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+    
+    public override func setupIfNeeded() {
+        settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            
+        }
+    }
 }
-
-
