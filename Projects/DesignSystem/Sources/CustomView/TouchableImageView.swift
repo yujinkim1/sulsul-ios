@@ -29,7 +29,7 @@ public final class TouchableImageView: UIImageView {
         return touchArea.contains(point)
     }
     
-    func setOpaqueTapGestureRecognizer(setEffect: Bool? = true, onTapped: @escaping () -> Void) {
+    public func setOpaqueTapGestureRecognizer(setEffect: Bool? = true, onTapped: @escaping () -> Void) {
         let gesture = TapGestureRecognizer(target: self, action: #selector(blur(gesture:)))
         gesture.onTapped = onTapped
         if let setEffect = setEffect { isEffectSet = setEffect }

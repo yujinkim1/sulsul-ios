@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 import DesignSystem
+import MobileCoreServices
 
 public final class EditProfileViewController: DisappearKeyBoardBaseViewController {
     
@@ -80,6 +81,7 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
         
         addViews()
         makeConstraints()
+        setupIfNeeded()
     }
     
     public override func addViews() {
@@ -148,4 +150,17 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
             $0.height.equalTo(moderateScale(number: 50))
         }
     }
+    
+    public override func setupIfNeeded() {
+   
+    }
 }
+
+//
+//profileTouchableImageView.setOpaqueTapGestureRecognizer {
+//    self.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
+//                                  title: "dkdk",
+//                                  description: "dkdk",
+//                                  submitCompletion: nil,
+//                                  cancelCompletion: nil)
+//}

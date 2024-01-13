@@ -55,4 +55,15 @@ open class BaseViewController: UIViewController {
             toastView.removeFromSuperview()
         })
     }
+    
+    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, description: String?, submitCompletion: (() -> Void)?,
+                                       cancelCompletion: (() -> Void)?) {
+        let bottomSheetAlertView = BottomSheetAlertView(bottomSheetAlertType: bottomSheetAlertType)
+        bottomSheetAlertView.bind(title: title,
+                                  description: description,
+                                  submitCompletion: submitCompletion,
+                                  cancelCompletion: cancelCompletion)
+        view.addSubview(bottomSheetAlertView)
+        view.bringSubviewToFront(bottomSheetAlertView)
+    }
 }
