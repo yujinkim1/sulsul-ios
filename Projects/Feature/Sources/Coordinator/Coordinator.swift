@@ -44,12 +44,12 @@ enum AppFlow: Flow {
 
 enum TabBarFlow: Flow {
     case auth(AuthFlow)
-//    case common
+    case common(CommonScene)
     case home(HomeScene)
-    case benefit
-    case transfer
-    case transferHistory
-    case more(MoreFlow)
+    case benefit(BenefitScene)
+    case transfer(TransferScene)
+    case transferHistory(TransferHistoryScene)
+    case more(ProfileScene)
 }
 
 enum AuthFlow: Flow {
@@ -58,14 +58,17 @@ enum AuthFlow: Flow {
 //    case findEmail(FindEmailScene)
 //    case findPassword(FindPasswordScene)
     case profileInput(ProfileInputScene)
+//    case simplePasswordSetting
+//    case simplePasswordLogin
 }
 
-enum MoreFlow: Flow {
-    case profile(ProfileManagementScene)
+enum CommonScene {
+    case web
 }
 
 enum LoginScene {
     case main
+    case loginError
 }
 
 enum SignUpScene {
@@ -75,10 +78,11 @@ enum SignUpScene {
     case password
     case referralCode
     case complete
-    case bottomSheet
+    case signUpError
 }
 
 enum FindEmailScene {
+    case countryBottomSheet
     case sms
     case smsAuthorization
     case complete
@@ -88,7 +92,7 @@ enum FindPasswordScene {
     case intro
     case email
     case sms
-    case smsAuthorization
+    case authorization
     case newPassword
     case complete
 }
@@ -97,10 +101,46 @@ enum HomeScene {
     case main
 }
 
+enum BenefitScene {
+    case main
+}
+
+enum TransferScene {
+    case main
+    case searchBeneficiary
+    case beneficiaryInput
+    case beneficiaryDetailInput
+    case transferAmount
+    case transferCoupon
+    case transferConfirm
+    case changeAccount
+    case transferComplete
+    case bankBottomSheet
+    case purposeOfTransferBottomSheet
+    case fundsOfTransferBottomSheet
+    case jobInfoBottomSheet
+    case beneficiary
+    case beneficiaryDetail
+    case beneficiaryEdit
+}
+
+enum TransferHistoryScene {
+    case main
+    case transferFilterBottomSheet
+    case transferFilterDateBottomSheet
+    case detail
+    case transferMemoBottomSheet
+    case transferDetailBottomSheet
+}
+
 enum ProfileInputScene {
-//    case nickName
     case selectDrink
     case selectSnack
+}
+
+// MARK: - 마이페이지
+enum ProfileScene {
+    case main
 }
 
 enum ProfileManagementScene {

@@ -8,15 +8,12 @@
 import UIKit
 
 final class TransferCoordinator: TransferBaseCoordinator {
+    var currentFlowManager: CurrentFlowManager?
     var parentCoordinator: Coordinator?
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-//        let viewModel = TransferViewModel(usecase: AppContainer.shared.resolve(TransferUsecaseProtocol.self)!)
-        let transferVC = TransferViewController()
-        transferVC.coordinator = self
-        rootViewController = UINavigationController(rootViewController: transferVC)
-        return rootViewController
+        return UIViewController()
     }
     
     func moveTo(appFlow: Flow, userData: [String: Any]?) {

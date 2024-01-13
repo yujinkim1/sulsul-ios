@@ -8,15 +8,13 @@
 import UIKit
 
 final class TransferHistoryCoordinator: TransferHistoryBaseCoordinator {
+    var currentFlowManager: CurrentFlowManager?
+    
     var parentCoordinator: Coordinator?
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-//        let viewModel = TransferHistoryViewModel(usecase: AppContainer.shared.resolve(TransferHistoryUsecaseProtocol.self)!)
-        let transferHistoryVC = TransferHistoryViewController()
-        transferHistoryVC.coordinator = self
-        rootViewController = UINavigationController(rootViewController: transferHistoryVC)
-        return rootViewController
+        return UIViewController()
     }
     
     func moveTo(appFlow: Flow, userData: [String: Any]?) {

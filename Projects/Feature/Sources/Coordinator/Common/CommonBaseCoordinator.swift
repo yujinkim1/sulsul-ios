@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+public protocol CommonBaseCoordinator: Coordinator, CurrentCoordinated {}
+
+protocol CommonBaseCoordinated {
+    var coordinator: CommonBaseCoordinator? { get }
+}
