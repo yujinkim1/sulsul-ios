@@ -155,12 +155,3 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
    
     }
 }
-
-//
-//profileTouchableImageView.setOpaqueTapGestureRecognizer {
-//    self.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
-//                                  title: "dkdk",
-//                                  description: "dkdk",
-//                                  submitCompletion: nil,
-//                                  cancelCompletion: nil)
-//}
