@@ -69,15 +69,15 @@ final class SettingView: UIView {
         }
         titleLabel.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(moderateScale(number: 10))
-            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
+            $0.leading.equalToSuperview()
         }
         arrowTouchableImageView.snp.makeConstraints {
             $0.centerY.equalTo(titleLabel.snp.centerY)
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.trailing.equalToSuperview()
         }
         settingToggle.snp.makeConstraints {
             $0.centerY.equalTo(titleLabel.snp.centerY)
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.trailing.equalToSuperview()
         }
     }
 }

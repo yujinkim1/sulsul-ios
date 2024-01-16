@@ -1,26 +1,26 @@
-////
-////  likeFeedView.swift
-////  Feature
-////
-////  Created by 이범준 on 2024/01/08.
-////
+//
+//  MyFeedView.swift
+//  Feature
+//
+//  Created by 이범준 on 2024/01/08.
+//
 
 import UIKit
 import Combine
 import DesignSystem
 
-class LikeFeedView: UIView {
+class MyFeedView: UIView {
     
-    private var tempCount = 0
+    private var tempCount = 1
     
     private var cancelBag = Set<AnyCancellable>()
 //    private var viewModel: BeneficiaryViewModel
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
-        $0.registerCell(LikeFeedCell.self)
+        $0.registerCell(MyFeedCell.self)
         $0.showsVerticalScrollIndicator = false
-        $0.backgroundColor = .clear
+        $0.backgroundColor = .yellow
         $0.dataSource = self
     })
     
@@ -57,8 +57,8 @@ class LikeFeedView: UIView {
         return UICollectionViewCompositionalLayout { _, _ in
 
             //TODO: - 수정 필요
-            let itemHeight: CGFloat = (self.tempCount == 0) ? 80 + 133 + 80 : 220
-            let itemWidth: CGFloat = (self.tempCount == 0) ? 1 : 1/2
+            let itemHeight: CGFloat = (self.tempCount == 0) ? 80 + 133 + 80 : 531
+            let itemWidth: CGFloat = 1
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
@@ -78,7 +78,7 @@ class LikeFeedView: UIView {
     }
 }
 
-extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return viewModel.getBeneficiaryCountryList().count + 1
         if self.tempCount == 0 {
@@ -95,7 +95,7 @@ extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
             cell.updateView(withType: .logInMyFeed)
             return cell
         } else {
-            guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
+            guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
             return cell
         }
     }

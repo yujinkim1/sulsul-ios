@@ -54,7 +54,11 @@ public final class ProfileMainViewController: BaseViewController {
         $0.backgroundColor = .blue
     })
     
-    private lazy var likeFeedView = LikeFeedView()
+    private lazy var myFeedView = MyFeedView()
+    
+    private lazy var likeFeedView = LikeFeedView().then({
+        $0.isHidden = true
+    })
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +74,7 @@ public final class ProfileMainViewController: BaseViewController {
                                    settingTouchableImageView])
         containerView.addSubviews([profileView,
                                    selectFeedView,
+                                   myFeedView,
                                    likeFeedView])
         profileView.addSubviews([profileLabel,
                                  profileEditTouchableLabel,
@@ -125,6 +130,10 @@ public final class ProfileMainViewController: BaseViewController {
         likeFeedTouchableView.snp.makeConstraints {
             $0.height.equalToSuperview()
         }
+        myFeedView.snp.makeConstraints {
+            $0.top.equalTo(selectFeedView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
         likeFeedView.snp.makeConstraints {
             $0.top.equalTo(selectFeedView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
@@ -132,6 +141,16 @@ public final class ProfileMainViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
+        myFeedTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.likeFeedView.isHidden = true
+            self.myFeedView.isHidden = false
+        }
+        likeFeedTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.myFeedView.isHidden = true
+            self.likeFeedView.isHidden = false
+        }
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             
         }

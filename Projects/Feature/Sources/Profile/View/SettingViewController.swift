@@ -97,11 +97,11 @@ public final class SettingViewController: BaseViewController {
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
         settingStackView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 16))
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 378))
         }
         logoutTouchaleLabel.snp.makeConstraints {

@@ -1,24 +1,24 @@
-//
-//  MyFeedView.swift
-//  Feature
-//
-//  Created by 이범준 on 2024/01/08.
-//
+////
+////  likeFeedView.swift
+////  Feature
+////
+////  Created by 이범준 on 2024/01/08.
+////
 
 import UIKit
 import Combine
 import DesignSystem
 
-class MyFeedView: UIView {
+class LikeFeedView: UIView {
     
-    private var tempCount = 0
+    private var tempCount = 1
     
     private var cancelBag = Set<AnyCancellable>()
 //    private var viewModel: BeneficiaryViewModel
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
-        $0.registerCell(MyFeedCell.self)
+        $0.registerCell(LikeFeedCell.self)
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
         $0.dataSource = self
@@ -78,7 +78,7 @@ class MyFeedView: UIView {
     }
 }
 
-extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return viewModel.getBeneficiaryCountryList().count + 1
         if self.tempCount == 0 {
@@ -92,7 +92,7 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if self.tempCount == 0 {
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
-            cell.updateView(withType: .logInMyFeed)
+            cell.updateView(withType: .likeFeed)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
