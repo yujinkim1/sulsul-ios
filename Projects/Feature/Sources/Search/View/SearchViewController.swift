@@ -65,11 +65,9 @@ public final class SearchViewController: BaseViewController {
     
     public init() {
         super.init(nibName: nil, bundle: nil)
-        
-        UserDefaultsUtil.shared.setRecentKeywordList(["ㅣㅁㄴ어룀나어룀나ㅓ오림나ㅓ오리마너오리마너오리마너오림나ㅓ오리ㅏㅁ너외리ㅏㅁ너이롬나ㅓ오리ㅏㅁ너오리ㅏㅓㅁ노이러", "최근 검색어 긴거", "최근 검색어 내용 긴거", "짧은 검색어"])
-        recentKeywordCollectionView.reloadData()
-        
+
         bind()
+        setTabEvents()
     }
     
     required init?(coder: NSCoder) {
@@ -77,7 +75,7 @@ public final class SearchViewController: BaseViewController {
     }
     
     private func bind() {
-        self.setVisibilityKeywordLabel()
+        setVisibilityKeywordLabel()
         
         viewModel.reloadCollectionViewPublisher()
             .sink { [weak self] _ in
@@ -87,6 +85,14 @@ public final class SearchViewController: BaseViewController {
                 self.recentKeywordCollectionView.reloadData()
             }
             .store(in: &cancelBag)
+    }
+    
+    private func setTabEvents() {
+        recentKeywordResetButton.onTapped { [weak self] in
+            UserDefaultsUtil.shared.remove(key: .recentKeyword)
+            self?.recentKeywordCollectionView.reloadData()
+            self?.setVisibilityKeywordLabel()
+        }
     }
     
     private func setVisibilityKeywordLabel() {
@@ -186,6 +192,9 @@ extension SearchViewController: UITextFieldDelegate {
             let newKeywordList = (UserDefaultsUtil.shared.recentKeywordList() ?? []) + [searchText]
             UserDefaultsUtil.shared.setRecentKeywordList(newKeywordList)
         }
+        
+        recentKeywordCollectionView.reloadData()
+        setVisibilityKeywordLabel()
         
         return true
     }
