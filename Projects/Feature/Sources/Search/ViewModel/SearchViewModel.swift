@@ -36,4 +36,8 @@ final class SearchViewModel {
     func reloadCollectionViewPublisher() -> AnyPublisher<Void, Never> {
         return reloadCollectionViewSubject.eraseToAnyPublisher()
     }
+    
+    func keywordCount() -> Int {
+        return searchKeywords().count
+    }
 }

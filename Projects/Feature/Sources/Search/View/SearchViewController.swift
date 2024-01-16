@@ -76,6 +76,25 @@ public final class SearchViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func bind() {
+        self.setVisibilityKeywordLabel()
+        
+        viewModel.reloadCollectionViewPublisher()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                
+                self.setVisibilityKeywordLabel()
+                self.recentKeywordCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
+    }
+    
+    private func setVisibilityKeywordLabel() {
+        let isKeywordEmpty = viewModel.keywordCount() == 0
+        recentKeywordTitleLabel.isHidden = isKeywordEmpty
+        recentKeywordResetButton.isHidden = isKeywordEmpty
+    }
+    
     private func generateLayout() -> UICollectionViewCompositionalLayout {
         let layoutSize = NSCollectionLayoutSize(widthDimension: .estimated(50), heightDimension: .absolute(40))
 
