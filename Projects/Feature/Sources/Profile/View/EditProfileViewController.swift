@@ -66,6 +66,24 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
         $0.textColor = DesignSystemAsset.gray400.color
     })
     
+    private lazy var specializeGuideImageView = UIImageView().then({
+        $0.image = UIImage(named: "common_snackCheck")
+    })
+    
+    private lazy var specializeGuidLabel = UILabel().then({
+        $0.font = Font.regular(size: 14)
+        $0.text = "입력된 특수문자가 없어요."
+    })
+    
+    private lazy var countGuideImageView = UIImageView().then({
+        $0.image = UIImage(named: "common_snackCheck")
+    })
+    
+    private lazy var countGuideLabel = UILabel().then({
+        $0.font = Font.regular(size: 14)
+        $0.text = "적절한 글자수의 닉네임이에요."
+    })
+    
     private lazy var nextButton = UIButton().then {
         $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
         $0.titleLabel?.font = Font.bold(size: 16)
@@ -92,6 +110,10 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
                           induceUserNameLabel,
                           userNameTextField,
                           resetTouchableLabel,
+                          specializeGuideImageView,
+                          specializeGuidLabel,
+                          countGuideImageView,
+                          countGuideLabel,
                           nextButton])
         modifyProfileButton.addSubview(modifyProfileLabel)
         userNameTextField.addSubview(clearButton)
@@ -139,6 +161,24 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
         clearButton.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
+        }
+        specializeGuideImageView.snp.makeConstraints {
+            $0.top.equalTo(userNameTextField.snp.bottom).offset(moderateScale(number: 19))
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
+            $0.size.equalTo(moderateScale(number: 16))
+        }
+        specializeGuidLabel.snp.makeConstraints {
+            $0.centerY.equalTo(specializeGuideImageView.snp.centerY)
+            $0.leading.equalTo(specializeGuideImageView.snp.trailing).offset(moderateScale(number: 6))
+        }
+        countGuideImageView.snp.makeConstraints {
+            $0.top.equalTo(specializeGuidLabel.snp.bottom).offset(moderateScale(number: 10))
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
+            $0.size.equalTo(moderateScale(number: 16))
+        }
+        countGuideLabel.snp.makeConstraints {
+            $0.centerY.equalTo(countGuideImageView.snp.centerY)
+            $0.leading.equalTo(countGuideImageView.snp.trailing).offset(moderateScale(number: 6))
         }
         resetTouchableLabel.snp.makeConstraints {
             $0.bottom.equalTo(nextButton.snp.top).offset(-24)
