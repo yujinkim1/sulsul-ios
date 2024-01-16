@@ -6,9 +6,13 @@
 //
 
 import UIKit
+import Combine
 import DesignSystem
 
 public final class SearchViewController: BaseViewController {
+    private var cancelBag = Set<AnyCancellable>()
+    private lazy var viewModel = SearchViewModel()
+    
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
         $0.setTitle("검색", for: .normal)
@@ -49,13 +53,43 @@ public final class SearchViewController: BaseViewController {
         $0.addTarget(self, action: #selector(didTabRecentKeywordResetButton), for: .touchUpInside)
     }
     
-    private lazy var recentKeywordCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout()).then {
+    private lazy var recentKeywordCollectionView = UICollectionView(frame: .zero, collectionViewLayout: generateLayout()).then {
         $0.register(RecentKeywordCell.self, forCellWithReuseIdentifier: RecentKeywordCell.id)
         $0.showsVerticalScrollIndicator = false
         $0.showsHorizontalScrollIndicator = false
+        $0.isScrollEnabled = false
         $0.backgroundColor = .clear
         $0.delegate = self
         $0.dataSource = self
+    }
+    
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+        
+        UserDefaultsUtil.shared.setRecentKeywordList(["ㅣㅁㄴ어룀나어룀나ㅓ오림나ㅓ오리마너오리마너오리마너오림나ㅓ오리ㅏㅁ너외리ㅏㅁ너이롬나ㅓ오리ㅏㅁ너오리ㅏㅓㅁ노이러", "최근 검색어 긴거", "최근 검색어 내용 긴거", "짧은 검색어"])
+        recentKeywordCollectionView.reloadData()
+        
+        bind()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func generateLayout() -> UICollectionViewCompositionalLayout {
+        let layoutSize = NSCollectionLayoutSize(widthDimension: .estimated(50), heightDimension: .absolute(40))
+
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: layoutSize.heightDimension ),
+            subitems: [.init(layoutSize: layoutSize)]
+        )
+        
+        group.interItemSpacing = .fixed(moderateScale(number: 16))
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = moderateScale(number: 16)
+
+        return .init(section: section)
     }
     
     public override func addViews() {
@@ -140,18 +174,20 @@ extension SearchViewController: UITextFieldDelegate {
 
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return viewModel.searchKeywords().count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecentKeywordCell.id,
                                                             for: indexPath) as? RecentKeywordCell else { return UICollectionViewCell() }
         
+        cell.bind(viewModel.searchKeyword(indexPath.row))
+        
+        cell.deleteButton.onTapped {
+            self.viewModel.removeSelectedKeyword(indexPath)
+        }
+                
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 0, height: moderateScale(number: 40))
     }
 }
 

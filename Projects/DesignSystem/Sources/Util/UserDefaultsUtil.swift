@@ -7,12 +7,12 @@
 
 import Foundation
 
+public enum Key: String {
+    case recentKeyword
+}
+
 public struct UserDefaultsUtil {
     public static let shared = UserDefaultsUtil()
-    
-    enum Key: String {
-        case recentKeyword
-    }
     
     public func setRecentKeywordList(_ dataList: [String]) {
         set(dataList, key: .recentKeyword)
@@ -29,5 +29,9 @@ public struct UserDefaultsUtil {
     
     private func get(_ key: Key) -> Any? {
         return UserDefaults.standard.value(forKey: key.rawValue)
+    }
+    
+    public func remove(key: Key) {
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
 }
