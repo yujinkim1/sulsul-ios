@@ -11,7 +11,7 @@ import Service
 
 final class SelectSnackViewModel {
     private lazy var jsonDecoder = JSONDecoder()
-    private lazy var mapper = SnackModelMapper()
+    private lazy var mapper = PairingModelMapper()
     
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
@@ -138,12 +138,23 @@ extension SelectSnackViewModel {
                 switch result {
                 case .success(let responseData):
                     if let pairingsData = try? selfRef.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                        let mappedData = selfRef.mapper.snackModel(from: pairingsData.pairings ?? [])
+                        let mappedData = selfRef.mapper.pairingModel(from: pairingsData.pairings ?? [])
                         
-                        selfRef.initSectionModels = selfRef.makeSectionModelsWith(mappedData)
+                        let snackModels = mappedData.map { pairing -> SnackModel in
+                            return SnackModel(id: pairing.id ?? 0,
+                                              type: pairing.type ?? "",
+                                              subtype: pairing.subtype ?? "",
+                                              name: pairing.name ?? "",
+                                              image: pairing.image ?? "",
+                                              description: pairing.description ?? "",
+                                              isSelect: pairing.isSelect ?? false,
+                                              highlightedText: pairing.highlightedText ?? "")
+                        }
+                        
+                        selfRef.initSectionModels = selfRef.makeSectionModelsWith(snackModels)
                         selfRef.sectionModels = selfRef.initSectionModels
-                        selfRef.setCompletedSnackData.send(()) 
-                        selfRef.cellModels = mappedData
+                        selfRef.setCompletedSnackData.send(())
+                        selfRef.cellModels = snackModels
                     } else {
                         print("[/pairings] Fail Decode")
                     }

@@ -12,7 +12,7 @@ import Service
 final class SelectDrinkViewModel {
     
     private let jsonDecoder = JSONDecoder()
-    private let mapper = SnackModelMapper()
+    private let mapper = PairingModelMapper()
     private var cancelBag = Set<AnyCancellable>()
     private var dataSource = [SnackModel]()
     
@@ -29,7 +29,7 @@ final class SelectDrinkViewModel {
                 switch result {
                 case .success(let responseData):
                     if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                        let mappedData = self.mapper.snackModel(from: pairingsData.pairings ?? [])
+                        let mappedData = self.mapper.pairingModel(from: pairingsData.pairings ?? [])
                         self.dataSource = mappedData
                         self.setCompletedDrinkData.send(())
                     } else {
