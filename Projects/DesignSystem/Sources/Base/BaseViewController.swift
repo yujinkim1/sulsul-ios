@@ -13,6 +13,7 @@ open class BaseViewController: UIViewController {
         
         view.overrideUserInterfaceStyle = .dark
         view.backgroundColor = .white
+        navigationController?.navigationBar.isHidden = true
         
         addViews()
         makeConstraints()

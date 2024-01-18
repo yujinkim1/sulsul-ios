@@ -43,6 +43,16 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
             profileMainVC.coordinator = self
             currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
             currentNavigationViewController?.pushViewController(profileMainVC, animated: true)
+        case .profileSetting:
+            let profileSettingVC = ProfileSettingViewController()
+            profileSettingVC.coordinator = self
+            currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
+            currentNavigationViewController?.pushViewController(profileSettingVC, animated: true)
+        case .profileEdit:
+            let profileEditVC = ProfileEditViewController()
+            profileEditVC.coordinator = self
+            currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
+            currentNavigationViewController?.pushViewController(profileEditVC, animated: true)
         }
     }
 }

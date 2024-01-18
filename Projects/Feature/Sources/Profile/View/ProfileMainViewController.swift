@@ -152,7 +152,10 @@ public final class ProfileMainViewController: BaseViewController {
             self.likeFeedView.isHidden = false
         }
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
+        }
+        profileTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
         }
     }
 }

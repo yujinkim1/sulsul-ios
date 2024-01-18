@@ -10,16 +10,14 @@ import UIKit
 import DesignSystem
 import MobileCoreServices
 
-public final class EditProfileViewController: DisappearKeyBoardBaseViewController {
+public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
+    
+    var coordinator: MoreBaseCoordinator?
     
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
     
-    private lazy var topHeaderView = UIView()
-    
-    private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "left_arrow"), for: .normal)
-    }
+    private lazy var topHeaderView = BaseTopView()
     
     private lazy var titleLabel = UILabel().then({
         $0.text = "프로필 수정"
@@ -103,7 +101,7 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
     }
     
     public override func addViews() {
-        topHeaderView.addSubviews([backButton, titleLabel])
+        topHeaderView.addSubviews([titleLabel])
         view.addSubviews([topHeaderView,
                           profileTouchableImageView,
                           modifyProfileButton,
@@ -121,15 +119,9 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
     
     public override func makeConstraints() {
         topHeaderView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
+            $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(moderateScale(number: 59))
-        }
-        backButton.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.centerY.equalToSuperview()
-            $0.size.equalTo(moderateScale(number: 24))
         }
         titleLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -192,6 +184,8 @@ public final class EditProfileViewController: DisappearKeyBoardBaseViewControlle
     }
     
     public override func setupIfNeeded() {
-   
+        topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
     }
 }

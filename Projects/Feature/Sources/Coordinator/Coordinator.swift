@@ -121,6 +121,8 @@ enum ProfileInputScene {
 // MARK: - 마이페이지
 enum ProfileScene {
     case main
+    case profileSetting
+    case profileEdit
 }
 
 enum ProfileManagementScene {

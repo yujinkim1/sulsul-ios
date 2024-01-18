@@ -9,10 +9,10 @@ import UIKit
 import Then
 import DesignSystem
 
-public final class SettingViewController: BaseViewController {
+public final class ProfileSettingViewController: BaseViewController {
     var coordinator: MoreBaseCoordinator?
     
-    private lazy var topHeaderView = UIView()
+    private lazy var topHeaderView = BaseTopView()
     private lazy var scrollView = UIScrollView()
     private lazy var containerView = UIView()
     private lazy var titleLabel = UILabel().then({
@@ -111,6 +111,9 @@ public final class SettingViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
+        topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
                                           title: "회원탈퇴",
