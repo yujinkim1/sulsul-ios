@@ -7,14 +7,18 @@
 
 import UIKit
 
-final class MoreCoordinator: MoreBaseCoordinator {
+final class MoreCoordinator: NSObject, MoreBaseCoordinator {
     var currentFlowManager: CurrentFlowManager?
     
     var parentCoordinator: Coordinator?
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-        return UIViewController()
+        let moreVC = ProfileMainViewController()
+        moreVC.coordinator = self
+        rootViewController = UINavigationController(rootViewController: moreVC)
+        rootNavigationController?.delegate = self
+        return rootViewController
     }
     
     func moveTo(appFlow: Flow, userData: [String: Any]?) {
@@ -40,5 +44,15 @@ final class MoreCoordinator: MoreBaseCoordinator {
             currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
             currentNavigationViewController?.pushViewController(profileMainVC, animated: true)
         }
+    }
+}
+
+// MARK: - UINavigationControllerDelegate
+extension MoreCoordinator: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        guard viewController is HomeViewController else { return }
+        
+        let tabBarController = parentCoordinator?.rootViewController as? UITabBarController
+        tabBarController?.setTabBarHidden(false)
     }
 }

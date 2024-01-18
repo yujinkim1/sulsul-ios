@@ -108,22 +108,32 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     }
     
     private func startHomeFlow(_ flow: Flow, userData: [String: Any]?) {
+        currentFlowManager?.currentCoordinator = homeCoordinator
+        (rootViewController as? UITabBarController)?.selectedIndex = TabType.home.rawValue
         homeCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
     private func startBenefitFlow(_ flow: Flow, userData: [String: Any]?) {
+        currentFlowManager?.currentCoordinator = benefitCoordinator
+        (rootViewController as? UITabBarController)?.selectedIndex = TabType.benefit.rawValue
         benefitCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
     private func startTransferFlow(_ flow: Flow, userData: [String: Any]?) {
+        currentFlowManager?.currentCoordinator = transferCoordinator
+        (rootViewController as? UITabBarController)?.selectedIndex = TabType.transfer.rawValue
         transferCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
     private func startTransferHistoryFlow(_ flow: Flow, userData: [String: Any]?) {
+        currentFlowManager?.currentCoordinator = transferHistoryCoordinator
+        (rootViewController as? UITabBarController)?.selectedIndex = TabType.transferHistory.rawValue
         transferHistoryCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
     private func startMoreFlow(_ flow: Flow, userData: [String: Any]?) {
+        currentFlowManager?.currentCoordinator = moreCoordinator
+        (rootViewController as? UITabBarController)?.selectedIndex = TabType.more.rawValue
         moreCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
@@ -152,8 +162,12 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
             currentFlowManager?.currentCoordinator = homeCoordinator
         case .more:
             currentFlowManager?.currentCoordinator = moreCoordinator
-        case .benefit, .transfer, .transferHistory:
-            break
+        case .benefit:
+            currentFlowManager?.currentCoordinator = benefitCoordinator
+        case .transfer:
+            currentFlowManager?.currentCoordinator = transferCoordinator
+        case .transferHistory:
+            currentFlowManager?.currentCoordinator = transferHistoryCoordinator
         }
     }
     
@@ -164,22 +178,8 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
         }
         
         switch tabType {
-        case .home:
+        case .home, .benefit, .transfer, .transferHistory, .more:
             return true
-        case .benefit:
-//            tabBarController.setTabBarHidden(true)
-            startBenefitFlow(TabBarFlow.benefit(.main), userData: nil)
-            return false
-        case .transfer:
-//            tabBarController.setTabBarHidden(true)
-            startTransferFlow(TabBarFlow.transfer(.main), userData: nil)
-            return false
-        case .transferHistory:
-            startTransferHistoryFlow(TabBarFlow.transferHistory(.main), userData: nil)
-            return false
-        case .more:
-            startMoreFlow(TabBarFlow.more(.main), userData: nil)
-            return false
         }
     }
 }

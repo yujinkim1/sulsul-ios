@@ -7,14 +7,19 @@
 
 import UIKit
 
-final class BenefitCoordinator: BenefitBaseCoordinator {
+final class BenefitCoordinator: NSObject, BenefitBaseCoordinator {
     var currentFlowManager: CurrentFlowManager?
     
     var parentCoordinator: Coordinator?
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-        return UIViewController()
+
+        let benefitVC = BenefitViewController()
+        benefitVC.coordinator = self
+        rootViewController = UINavigationController(rootViewController: benefitVC)
+        rootNavigationController?.delegate = self
+        return rootViewController
     }
     
     func moveTo(appFlow: Flow, userData: [String: Any]?) {
@@ -25,7 +30,7 @@ final class BenefitCoordinator: BenefitBaseCoordinator {
         
         switch tabBarFlow {
         case .benefit(let benefitScene):
-            moveToBenefitScene(benefitScene, userData: nil)
+            moveToBenefitScene(benefitScene, userData: userData)
         default:
             parentCoordinator?.moveTo(appFlow: appFlow, userData: userData)
         }
@@ -34,9 +39,17 @@ final class BenefitCoordinator: BenefitBaseCoordinator {
     func moveToBenefitScene(_ scene: BenefitScene, userData: [String: Any]?) {
         switch scene {
         case .main:
-            let benefitVC = BenefitViewController()
-            benefitVC.coordinator = self
-            currentNavigationViewController?.pushViewController(benefitVC, animated: true)
+            rootNavigationController?.popToRootViewController(animated: true)
         }
+    }
+}
+
+// MARK: - UINavigationControllerDelegate
+extension BenefitCoordinator: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        guard viewController is BenefitViewController else { return }
+        
+        let tabBarController = parentCoordinator?.rootViewController as? UITabBarController
+        tabBarController?.setTabBarHidden(false)
     }
 }

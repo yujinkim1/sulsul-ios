@@ -107,30 +107,10 @@ enum BenefitScene {
 
 enum TransferScene {
     case main
-    case searchBeneficiary
-    case beneficiaryInput
-    case beneficiaryDetailInput
-    case transferAmount
-    case transferCoupon
-    case transferConfirm
-    case changeAccount
-    case transferComplete
-    case bankBottomSheet
-    case purposeOfTransferBottomSheet
-    case fundsOfTransferBottomSheet
-    case jobInfoBottomSheet
-    case beneficiary
-    case beneficiaryDetail
-    case beneficiaryEdit
 }
 
 enum TransferHistoryScene {
     case main
-    case transferFilterBottomSheet
-    case transferFilterDateBottomSheet
-    case detail
-    case transferMemoBottomSheet
-    case transferDetailBottomSheet
 }
 
 enum ProfileInputScene {
