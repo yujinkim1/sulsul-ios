@@ -94,7 +94,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     public override func viewDidLoad() {
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
-        
+        self.showCameraBottomSheet(selectCameraCompletion: nil,
+                                   selectAlbumCompletion: nil,
+                                   baseCompletion: nil)
         addViews()
         makeConstraints()
         setupIfNeeded()

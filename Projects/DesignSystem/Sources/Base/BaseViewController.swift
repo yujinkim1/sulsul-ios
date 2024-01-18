@@ -67,4 +67,13 @@ open class BaseViewController: UIViewController {
         view.addSubview(bottomSheetAlertView)
         view.bringSubviewToFront(bottomSheetAlertView)
     }
+    
+    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?, selectAlbumCompletion: (() -> Void)?, baseCompletion: (() -> Void)?) {
+        let cameraBottomSheet = CameraBottomSheet()
+        cameraBottomSheet.bind(selectCameraCompletion: selectCameraCompletion,
+                               selectAlbumCompletion: selectAlbumCompletion,
+                               selectBaseCompletion: baseCompletion)
+        view.addSubview(cameraBottomSheet)
+        view.bringSubviewToFront(cameraBottomSheet)
+    }
 }
