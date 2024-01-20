@@ -93,6 +93,9 @@ extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
         if self.tempCount == 0 {
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
             cell.updateView(withType: .likeFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("다음 클릭")
+            }
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }

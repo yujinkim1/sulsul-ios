@@ -34,8 +34,6 @@ public final class MainCoordinator: MainBaseCoordinator {
         guard let flow = appFlow.appFlow else { return }
         
         switch flow {
-        case .intro:
-            startIntroFlow(userData: userData)
         case .tabBar(let tabBarFlow):
             startTabBarFlow(tabBarFlow, userData: userData)
         }

@@ -8,9 +8,12 @@
 import UIKit
 import Then
 import DesignSystem
+import Combine
 
 public final class ProfileMainViewController: BaseViewController {
+    private var cancelBag = Set<AnyCancellable>()
     var coordinator: MoreBaseCoordinator?
+    private let viewModel = ProfileMainViewModel()
     
     private lazy var topHeaderView = UIView()
     private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
@@ -54,7 +57,7 @@ public final class ProfileMainViewController: BaseViewController {
         $0.backgroundColor = .blue
     })
     
-    private lazy var myFeedView = MyFeedView()
+    private lazy var myFeedView = MyFeedView(viewModel: viewModel)
     
     private lazy var likeFeedView = LikeFeedView().then({
         $0.isHidden = true
@@ -65,6 +68,11 @@ public final class ProfileMainViewController: BaseViewController {
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
+        bind()
+    }
+    
+    private func bind() {
+    
     }
     
     public override func addViews() {

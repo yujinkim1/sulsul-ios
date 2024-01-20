@@ -11,10 +11,8 @@ import DesignSystem
 
 class MyFeedView: UIView {
     
-    private var tempCount = 1
-    
     private var cancelBag = Set<AnyCancellable>()
-//    private var viewModel: BeneficiaryViewModel
+    private var viewModel: ProfileMainViewModel
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
@@ -24,8 +22,8 @@ class MyFeedView: UIView {
         $0.dataSource = self
     })
     
-    override init(frame: CGRect = .zero/*, viewModel: BeneficiaryViewModel*/) {
-//        self.viewModel = viewModel
+    init(frame: CGRect = .zero, viewModel: ProfileMainViewModel) {
+        self.viewModel = viewModel
         super.init(frame: frame)
         addViews()
         makeConstraints()
@@ -37,7 +35,12 @@ class MyFeedView: UIView {
     }
     
     func bind() {
-        
+        viewModel.myFeedsPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                self.collectionView.reloadData()
+            }
+            .store(in: &cancelBag)
     }
     
     func addViews() {
@@ -56,8 +59,7 @@ class MyFeedView: UIView {
     private func layout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { _, _ in
 
-            //TODO: - 수정 필요
-            let itemHeight: CGFloat = (self.tempCount == 0) ? 80 + 133 + 80 : 531
+            let itemHeight: CGFloat = self.viewModel.getMyFeedsValue().count == 0 ? 80 + 133 + 80 : 531
             let itemWidth: CGFloat = 1
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
@@ -81,21 +83,26 @@ class MyFeedView: UIView {
 extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return viewModel.getBeneficiaryCountryList().count + 1
-        if self.tempCount == 0 {
+        if viewModel.getMyFeedsValue().count == 0 {
             // MARK: - 빈 셀일때
             return 1
         } else {
-            return 10
+            return viewModel.getMyFeedsValue().count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if self.tempCount == 0 {
+        if viewModel.getMyFeedsValue().count == 0 {
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
             cell.updateView(withType: .logInMyFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("로그인하러가기")
+            }
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
+            let model = viewModel.getMyFeedsValue()[indexPath.row]
+            cell.bind(model)
             return cell
         }
     }

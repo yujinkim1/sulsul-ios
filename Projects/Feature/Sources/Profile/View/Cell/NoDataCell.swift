@@ -34,7 +34,7 @@ final class NoDataCell: UICollectionViewCell {
         $0.backgroundColor = DesignSystemAsset.main.color
         $0.layer.cornerRadius = moderateScale(number: 10)
     })
-    private lazy var nextLabel = UILabel().then({
+    lazy var nextLabel = TouchableLabel().then({
         $0.textColor = DesignSystemAsset.gray200.color
         $0.font = Font.bold(size: 16)
     })

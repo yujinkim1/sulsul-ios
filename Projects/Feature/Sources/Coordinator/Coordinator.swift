@@ -38,7 +38,6 @@ extension Flow {
 }
 
 enum AppFlow: Flow {
-    case intro
     case tabBar(TabBarFlow)
 }
 

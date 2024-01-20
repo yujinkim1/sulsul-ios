@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
+final class MyFeedCell: BaseCollectionViewCell<MyFeed> {
     
     static let reuseIdentifer = "MyFeedCell"
     
@@ -27,9 +27,22 @@ final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
         $0.layer.cornerRadius = moderateScale(number: 20)
     })
     
-    private lazy var feedCountView = UIView().then({
-        $0.backgroundColor = .yellow
+    private lazy var feedCountView = UIStackView().then({
+        $0.axis = .horizontal
+        $0.distribution = .fillProportionally
+        $0.spacing = moderateScale(number: 2)
+        $0.alignment = .center
+        $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 6)
+    })
+    
+    private lazy var feedCountImageView = UIImageView().then({
+        $0.image = UIImage(named: "album")
+    })
+    
+    private lazy var feedCountLabel = UILabel().then({
+        $0.textColor = DesignSystemAsset.gray900.color
+        $0.font = Font.regular(size: 12)
     })
     
     private lazy var feedTitleLabel = UILabel().then({
@@ -101,6 +114,8 @@ final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
                                    commentLabel,
                                    likeImageView,
                                    likeCountLabel])
+        feedCountView.addArrangedSubviews([feedCountImageView,
+                                           feedCountLabel])
     }
     
     private func makeConstraints() {
@@ -119,7 +134,12 @@ final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
         }
         feedCountView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 16))
-            $0.bottom.equalTo(feedTitleLabel.snp.top).offset(moderateScale(number: 4))
+            $0.bottom.equalTo(feedTitleLabel.snp.top).offset(moderateScale(number: -4))
+            $0.width.equalTo(moderateScale(number: 42))
+            $0.height.equalTo(moderateScale(number: 22))
+        }
+        feedCountImageView.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 16))
         }
         feedTitleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(moderateScale(number: 16))
@@ -158,8 +178,14 @@ final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
         }
     }
     
-    override func bind(_ model: TempMyFeedModel) {
+    override func bind(_ model: MyFeed) {
         super.bind(model)
-
+        dateLabel.text = model.createdAt
+        feedTitleLabel.text = model.title
+        feedDescriptionLabel.text = model.content
+        feedCountLabel.text = String(model.images.count)
+        viewCountLabel.text = String(model.viewCount)
+        commentLabel.text = String(model.commentsCount)
+        likeCountLabel.text = String(model.likesCount)
     }
 }
