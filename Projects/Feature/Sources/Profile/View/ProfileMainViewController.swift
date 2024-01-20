@@ -157,5 +157,8 @@ public final class ProfileMainViewController: BaseViewController {
         profileTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
         }
+        profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
+        }
     }
 }

@@ -10,7 +10,7 @@ import SnapKit
 import Then
 
 final class CameraBottomSheet: UIView {
-    private lazy var backgroundView = UIView(frame: UIScreen.main.bounds).then {
+    private lazy var backgroundView = TouchableView(frame: UIScreen.main.bounds).then {
         $0.backgroundColor = .black.withAlphaComponent(0.4)
     }
     
@@ -65,6 +65,9 @@ final class CameraBottomSheet: UIView {
     func bind(selectCameraCompletion: (() -> Void)?,
               selectAlbumCompletion: (() -> Void)?,
               selectBaseCompletion: (() -> Void)?) {
+        backgroundView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.removeFromSuperview()
+        }
         selectCameraView.setOpaqueTapGestureRecognizer { [weak self] in
             selectCameraCompletion
             self?.removeFromSuperview()
@@ -99,14 +102,17 @@ final class CameraBottomSheet: UIView {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         selectCameraView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(moderateScale(number: 12))
             $0.width.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 44))
         }
         selectAlbumView.snp.makeConstraints {
+            $0.top.equalTo(selectCameraView.snp.bottom)
             $0.width.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 44))
         }
         selectBaseView.snp.makeConstraints {
+            $0.top.equalTo(selectAlbumView.snp.bottom)
             $0.width.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 44))
         }

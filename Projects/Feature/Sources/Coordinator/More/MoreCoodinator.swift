@@ -60,7 +60,7 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
 // MARK: - UINavigationControllerDelegate
 extension MoreCoordinator: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        guard viewController is HomeViewController else { return }
+        guard viewController is ProfileMainViewController else { return }
         
         let tabBarController = parentCoordinator?.rootViewController as? UITabBarController
         tabBarController?.setTabBarHidden(false)

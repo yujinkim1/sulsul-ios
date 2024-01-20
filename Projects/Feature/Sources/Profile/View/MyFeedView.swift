@@ -20,7 +20,7 @@ class MyFeedView: UIView {
         $0.registerCell(NoDataCell.self)
         $0.registerCell(MyFeedCell.self)
         $0.showsVerticalScrollIndicator = false
-        $0.backgroundColor = .yellow
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.dataSource = self
     })
     

@@ -109,7 +109,8 @@ final class MyFeedCell: BaseCollectionViewCell<TempMyFeedModel> {
             $0.trailing.bottom.top.equalToSuperview()
         }
         dateLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview().offset(moderateScale(number: 16))
+            $0.leading.equalToSuperview()
         }
         feedImageView.snp.makeConstraints {
             $0.top.equalTo(dateLabel.snp.bottom).offset(moderateScale(number: 8))

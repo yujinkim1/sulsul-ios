@@ -105,7 +105,7 @@ public final class ProfileSettingViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 378))
         }
         logoutTouchaleLabel.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -38))
+            $0.top.equalTo(settingStackView.snp.bottom).offset(moderateScale(number: 67))
             $0.centerX.equalToSuperview()
         }
     }

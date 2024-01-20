@@ -34,7 +34,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.layer.cornerRadius = moderateScale(number: 16)
     })
     
-    private lazy var modifyProfileLabel = UILabel().then({
+    private lazy var modifyProfileLabel = TouchableLabel().then({
         $0.text = "사진 변경"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
@@ -92,11 +92,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     }
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
-        self.showCameraBottomSheet(selectCameraCompletion: nil,
-                                   selectAlbumCompletion: nil,
-                                   baseCompletion: nil)
         addViews()
         makeConstraints()
         setupIfNeeded()
@@ -180,7 +178,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         }
         nextButton.snp.makeConstraints {
             $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 50))
         }
     }
@@ -188,6 +186,11 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     public override func setupIfNeeded() {
         topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.navigationController?.popViewController(animated: true)
+        }
+        modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.showCameraBottomSheet(selectCameraCompletion: nil,
+                                       selectAlbumCompletion: nil,
+                                       baseCompletion: nil)
         }
     }
 }
