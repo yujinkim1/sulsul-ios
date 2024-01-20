@@ -8,7 +8,7 @@
 import DesignSystem
 import UIKit
 
-final class RankingDrinkCell: BaseCollectionViewCell<RankingDrink> {
+final class RankingDrinkCell: BaseCollectionViewCell<Ranking> {
     
     static let reuseIdentifier = "RankingDrinkCell"
     
@@ -29,14 +29,8 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingDrink> {
         $0.font = Font.bold(size: 20)
         $0.textColor = DesignSystemAsset.gray900.color
     }
-    
-    private lazy var variationImageView = UIImageView().then {
-        $0.image = UIImage()
-    }
 
-    private lazy var drinkImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "circle.fill")
-    }
+    private lazy var drinkImageView = UIImageView()
 
     private lazy var drinkNameLabel = UILabel().then {
         $0.setTextLineHeight(height: 32)
@@ -44,6 +38,10 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingDrink> {
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
+//    private lazy var variationImageView = UIImageView().then {
+//        $0.image = UIImage()
+//    }
+//    
 //    private lazy var variationStackView = UIStackView().then {
 //        $0.axis = .horizontal
 //        $0.spacing = 0
@@ -58,6 +56,7 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingDrink> {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         addViews()
         makeConstraints()
     }
@@ -69,12 +68,16 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingDrink> {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        
+        rankLabel.text = nil
+        drinkImageView.image = nil
+        drinkNameLabel.text = nil
     }
     
-    override func bind(_ model: RankingDrink) {
+    override func bind(_ model: Ranking) {
         super.bind(model)
-        drinkNameLabel.text = model.name
-        rankLabel.text = model.rank
+        
+        configure(model)
     }
 }
 
@@ -85,8 +88,8 @@ extension RankingDrinkCell {
         addSubview(containerView)
         containerView.addSubviews([
             rankLabel,
-            variationLabel,
-            variationImageView,
+//            variationLabel,
+//            variationImageView,
             drinkImageView,
             drinkNameLabel
         ])
@@ -97,17 +100,41 @@ extension RankingDrinkCell {
             $0.edges.equalToSuperview()
         }
         rankLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 10))
+            $0.leading.equalTo(containerView.snp.leading).offset(moderateScale(number: 10))
+            $0.centerY.equalToSuperview()
             $0.top.equalToSuperview().offset(moderateScale(number: 13))
         }
         drinkImageView.snp.makeConstraints {
             $0.leading.equalTo(rankLabel.snp.trailing).offset(moderateScale(number: 4))
-            $0.top.bottom.equalToSuperview().offset(8)
+            $0.centerY.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 70))
         }
         drinkNameLabel.snp.makeConstraints {
             $0.leading.equalTo(drinkImageView.snp.trailing).offset(moderateScale(number: 4))
+            $0.trailing.lessThanOrEqualToSuperview().offset(-moderateScale(number: 4))
             $0.top.bottom.equalToSuperview().offset(16)
+        }
+    }
+    
+    private func configure(_ model: Ranking) {
+        if let rank = model.rank {
+            rankLabel.text = String(rank)
+        } else {
+            print("Rank value is not available.")
+        }
+        
+        if let imageURLString = model.drink?.image,
+           let imageURL = URL(string: imageURLString) {
+            drinkImageView.loadImage(imageURL)
+        } else {
+            print("Image URL is not available.")
+            drinkImageView.image = UIImage(systemName: "circle.fill")
+        }
+        
+        if let drinkName = model.drink?.name {
+            drinkNameLabel.text = drinkName
+        } else {
+            print("Drink name is not available.")
         }
     }
 }
