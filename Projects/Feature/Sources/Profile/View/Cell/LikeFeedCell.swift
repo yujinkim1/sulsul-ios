@@ -8,18 +8,17 @@
 import UIKit
 import DesignSystem
 
-final class LikeFeedCell: BaseCollectionViewCell<TempLikeFeedModel> {
+final class LikeFeedCell: BaseCollectionViewCell<Feed> {
     
     static let reuseIdentifer = "LikeFeedCell"
     
     lazy var containerView = TouchableView().then({
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = DesignSystemAsset.white.color.cgColor
-        $0.backgroundColor = .clear
+        $0.backgroundColor = .black
         $0.layer.cornerRadius = 12
     })
     
     private lazy var feedImageView = UIImageView().then({
+        $0.layer.cornerRadius = 12
         $0.image = UIImage(systemName: "circle.fill")
     })
     
@@ -69,9 +68,26 @@ final class LikeFeedCell: BaseCollectionViewCell<TempLikeFeedModel> {
         }
     }
     
-    override func bind(_ model: TempLikeFeedModel) {
+    override func bind(_ model: Feed) {
         super.bind(model)
         feedTitleLabel.text = model.title
-        feedTimeLabel.text = model.time
+        feedTimeLabel.text = model.updatedAt
+        if let imageURL = URL(string: model.representImage) {
+            feedImageView.kf.setImage(with: imageURL)
+        }
     }
+    
+//    override func bind(_ model: Feed) {
+//        super.bind(model)
+//        dateLabel.text = model.createdAt
+//        feedTitleLabel.text = model.title
+//        feedDescriptionLabel.text = model.content
+//        feedCountLabel.text = String(model.images.count)
+//        viewCountLabel.text = String(model.viewCount)
+//        commentLabel.text = String(model.commentsCount)
+//        likeCountLabel.text = String(model.likesCount)
+//        if let imageURL = URL(string: model.representImage) {
+//            feedImageView.kf.setImage(with: imageURL)
+//        }
+//    }
 }

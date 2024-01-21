@@ -11,10 +11,8 @@ import DesignSystem
 
 class LikeFeedView: UIView {
     
-    private var tempCount = 1
-    
     private var cancelBag = Set<AnyCancellable>()
-//    private var viewModel: BeneficiaryViewModel
+    private var viewModel: ProfileMainViewModel
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
@@ -24,8 +22,8 @@ class LikeFeedView: UIView {
         $0.dataSource = self
     })
     
-    override init(frame: CGRect = .zero/*, viewModel: BeneficiaryViewModel*/) {
-//        self.viewModel = viewModel
+    init(frame: CGRect = .zero, viewModel: ProfileMainViewModel) {
+        self.viewModel = viewModel
         super.init(frame: frame)
         addViews()
         makeConstraints()
@@ -37,7 +35,12 @@ class LikeFeedView: UIView {
     }
     
     func bind() {
-        
+        viewModel.likeFeedsPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                self.collectionView.reloadData()
+            }
+            .store(in: &cancelBag)
     }
     
     func addViews() {
@@ -57,8 +60,8 @@ class LikeFeedView: UIView {
         return UICollectionViewCompositionalLayout { _, _ in
 
             //TODO: - 수정 필요
-            let itemHeight: CGFloat = (self.tempCount == 0) ? 80 + 133 + 80 : 220
-            let itemWidth: CGFloat = (self.tempCount == 0) ? 1 : 1/2
+            let itemHeight: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 80 + 133 + 80 : 220
+            let itemWidth: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 1 : 1/2
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
@@ -81,16 +84,15 @@ class LikeFeedView: UIView {
 extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return viewModel.getBeneficiaryCountryList().count + 1
-        if self.tempCount == 0 {
-            // MARK: - 빈 셀일때
+        if viewModel.getLikeFeedsValue().count == 0 {
             return 1
         } else {
-            return 10
+            return viewModel.getLikeFeedsValue().count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if self.tempCount == 0 {
+        if viewModel.getLikeFeedsValue().count == 0 {
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
             cell.updateView(withType: .likeFeed)
             cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
@@ -99,6 +101,8 @@ extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
+            let model = viewModel.getLikeFeedsValue()[indexPath.row]
+            cell.bind(model)
             return cell
         }
     }

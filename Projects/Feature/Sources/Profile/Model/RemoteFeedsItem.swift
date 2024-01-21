@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct RemoteFeedsByMeItem: Codable {
+struct RemoteFeedsItem: Codable {
     let nextCursorId: Int
     let size: Int
     let isLast: Bool
-    let content: [MyFeed]
+    let content: [Feed]
     
     private enum CodingKeys: String, CodingKey {
         case nextCursorId = "next_cursor_id"
@@ -21,7 +21,7 @@ struct RemoteFeedsByMeItem: Codable {
     }
 }
 
-struct MyFeed: Codable {
+struct Feed: Codable {
     let feedId: Int
     let writerInfo: WriterInfo
     let title: String

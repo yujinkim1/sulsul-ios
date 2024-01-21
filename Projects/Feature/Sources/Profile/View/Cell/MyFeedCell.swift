@@ -7,8 +7,9 @@
 
 import UIKit
 import DesignSystem
+import Kingfisher // MARK: - 이거 왜 서드파티에 추가 안되냐
 
-final class MyFeedCell: BaseCollectionViewCell<MyFeed> {
+final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     static let reuseIdentifer = "MyFeedCell"
     
@@ -22,7 +23,7 @@ final class MyFeedCell: BaseCollectionViewCell<MyFeed> {
         $0.textColor = DesignSystemAsset.white.color
     })
     
-    private lazy var feedImageView = UIView().then({
+    private lazy var feedImageView = UIImageView().then({
         $0.backgroundColor = .red
         $0.layer.cornerRadius = moderateScale(number: 20)
     })
@@ -178,7 +179,7 @@ final class MyFeedCell: BaseCollectionViewCell<MyFeed> {
         }
     }
     
-    override func bind(_ model: MyFeed) {
+    override func bind(_ model: Feed) {
         super.bind(model)
         dateLabel.text = model.createdAt
         feedTitleLabel.text = model.title
@@ -187,5 +188,8 @@ final class MyFeedCell: BaseCollectionViewCell<MyFeed> {
         viewCountLabel.text = String(model.viewCount)
         commentLabel.text = String(model.commentsCount)
         likeCountLabel.text = String(model.likesCount)
+        if let imageURL = URL(string: model.representImage) {
+            feedImageView.kf.setImage(with: imageURL)
+        }
     }
 }

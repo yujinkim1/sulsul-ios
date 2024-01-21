@@ -24,7 +24,8 @@ let dependencies = Dependencies(
         ],
         productTypes: [
             "Alamofire": .framework,
-            "Then": .framework
+            "Then": .framework,
+            "Kingfisher": .framework
         ]
     ),
     platforms: [.iOS]

@@ -59,7 +59,7 @@ public final class ProfileMainViewController: BaseViewController {
     
     private lazy var myFeedView = MyFeedView(viewModel: viewModel)
     
-    private lazy var likeFeedView = LikeFeedView().then({
+    private lazy var likeFeedView = LikeFeedView( viewModel: viewModel).then({
         $0.isHidden = true
     })
     

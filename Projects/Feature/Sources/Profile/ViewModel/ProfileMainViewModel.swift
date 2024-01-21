@@ -12,27 +12,28 @@ import Alamofire // TODO: - Alamofire는 Service에서만 사용되도록 로직
 
 struct ProfileMainViewModel {
     
+    private let accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIiLCJpYXQiOjE3MDU3NDk4MDEsImV4cCI6MTcwNjM1NDYwMSwiaWQiOjEsInNvY2lhbF90eXBlIjoiZ29vZ2xlIiwic3RhdHVzIjoiYWN0aXZlIn0.gucj-5g1CktXtAKqYp99K-_eI7sH_VmoyDTaVhKE6DU"
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
-    private var loginStatus: Bool = false
     
-    private var myFeeds = CurrentValueSubject<[MyFeed], Never>([])
+    private var myFeeds = CurrentValueSubject<[Feed], Never>([])
+    private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
+    
     init() {
         getFeedsByMe()
+        getFeedsLikeByMe()
     }
     
     // MARK: - 마이페이지: 내가 쓴 페이지 조회
     func getFeedsByMe() {
-        //MARK: - 테스트용 토큰
-        let accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIiLCJpYXQiOjE3MDU3NDk4MDEsImV4cCI6MTcwNjM1NDYwMSwiaWQiOjEsInNvY2lhbF90eXBlIjoiZ29vZ2xlIiwic3RhdHVzIjoiYWN0aXZlIn0.gucj-5g1CktXtAKqYp99K-_eI7sH_VmoyDTaVhKE6DU"
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken
+            "Authorization": "Bearer " + self.accessToken
         ]
         NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-me", header: headers) { result in
             switch result {
             case .success(let response):
-                if let myFeedsData = try? self.jsonDecoder.decode(RemoteFeedsByMeItem.self, from: response) {
+                if let myFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
                     myFeeds.send(myFeedsData.content)
                 } else {
                     print("디코딩 모델 에러")
@@ -43,12 +44,37 @@ struct ProfileMainViewModel {
         }
     }
     
-    func myFeedsPublisher() -> AnyPublisher<[MyFeed], Never> {
-        return myFeeds.eraseToAnyPublisher()
+    func getFeedsLikeByMe() {
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.accessToken
+        ]
+        
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/liked-by-me", header: headers) { result in
+            switch result {
+            case .success(let response):
+                if let likeFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
+                    likeFeeds.send(likeFeedsData.content)
+                } else {
+                    print("디코딩 모델 에러러어ㅓ")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
-    func getMyFeedsValue() -> [MyFeed] {
+    func myFeedsPublisher() -> AnyPublisher<[Feed], Never> {
+        return myFeeds.eraseToAnyPublisher()
+    }
+    func getMyFeedsValue() -> [Feed] {
         return myFeeds.value
+    }
+    func likeFeedsPublisher() -> AnyPublisher<[Feed], Never> {
+        return likeFeeds.eraseToAnyPublisher()
+    }
+    func getLikeFeedsValue() -> [Feed] {
+        return likeFeeds.value
     }
 }
 
