@@ -9,6 +9,7 @@ import Combine
 import UIKit
 import DesignSystem
 import MobileCoreServices
+import AVFoundation
 
 public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
     
@@ -189,9 +190,72 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             self?.navigationController?.popViewController(animated: true)
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.showCameraBottomSheet(selectCameraCompletion: nil,
+            self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
                                        selectAlbumCompletion: nil,
                                        baseCompletion: nil)
         }
     }
+    
+    private func openCamera() {
+        #if targetEnvironment(simulator)
+        fatalError()
+        #endif
+        // Privacy - Camera Usage Description
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] isAuthorized in
+            guard isAuthorized else {
+                self?.showAlertGoToSetting()
+                return
+            }
+            
+            DispatchQueue.main.async {
+                let pickerController = UIImagePickerController()
+                pickerController.sourceType = .camera
+                pickerController.allowsEditing = false
+                pickerController.mediaTypes = ["public.image"]
+                pickerController.delegate = self
+                self?.present(pickerController, animated: true)
+            }
+        }
+    }
+    
+    func showAlertGoToSetting() {
+        let alertController = UIAlertController(
+          title: "현재 카메라 사용에 대한 접근 권한이 없습니다.",
+          message: "설정 > {앱 이름}탭에서 접근을 활성화 할 수 있습니다.",
+          preferredStyle: .alert
+        )
+        let cancelAlert = UIAlertAction(
+          title: "취소",
+          style: .cancel
+        ) { _ in
+            alertController.dismiss(animated: true, completion: nil)
+          }
+        let goToSettingAlert = UIAlertAction(
+          title: "설정으로 이동하기",
+          style: .default) { _ in
+            guard
+              let settingURL = URL(string: UIApplication.openSettingsURLString),
+              UIApplication.shared.canOpenURL(settingURL)
+            else { return }
+            UIApplication.shared.open(settingURL, options: [:])
+          }
+        [cancelAlert, goToSettingAlert]
+          .forEach(alertController.addAction(_:))
+        DispatchQueue.main.async {
+          self.present(alertController, animated: true) // must be used from main thread only
+        }
+      }
+}
+extension ProfileEditViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    public func imagePickerController(
+    _ picker: UIImagePickerController,
+    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]
+  ) {
+    guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
+      picker.dismiss(animated: true)
+      return
+    }
+    self.profileTouchableImageView.image = image
+    picker.dismiss(animated: true, completion: nil)
+  }
 }
