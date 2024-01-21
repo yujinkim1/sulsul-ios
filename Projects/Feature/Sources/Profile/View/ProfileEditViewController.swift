@@ -13,6 +13,7 @@ import MobileCoreServices
 public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
     
     var coordinator: MoreBaseCoordinator?
+    private let viewModel = ProfileEditViewModel()
     
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
