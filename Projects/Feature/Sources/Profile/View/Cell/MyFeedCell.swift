@@ -28,11 +28,7 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         $0.layer.cornerRadius = moderateScale(number: 20)
     })
     
-    private lazy var feedCountView = UIStackView().then({
-        $0.axis = .horizontal
-        $0.distribution = .fillProportionally
-        $0.spacing = moderateScale(number: 2)
-        $0.alignment = .center
+    private lazy var feedCountView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 6)
     })
@@ -115,8 +111,8 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
                                    commentLabel,
                                    likeImageView,
                                    likeCountLabel])
-        feedCountView.addArrangedSubviews([feedCountImageView,
-                                           feedCountLabel])
+        feedCountView.addSubviews([feedCountImageView,
+                                   feedCountLabel])
     }
     
     private func makeConstraints() {
@@ -140,7 +136,13 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
             $0.height.equalTo(moderateScale(number: 22))
         }
         feedCountImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 8))
             $0.size.equalTo(moderateScale(number: 16))
+        }
+        feedCountLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(feedCountImageView.snp.trailing)
         }
         feedTitleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(moderateScale(number: 16))

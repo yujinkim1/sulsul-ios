@@ -13,6 +13,7 @@ class MyFeedView: UIView {
     
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
+    private let tabBarController: UITabBarController
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
@@ -22,9 +23,11 @@ class MyFeedView: UIView {
         $0.dataSource = self
     })
     
-    init(frame: CGRect = .zero, viewModel: ProfileMainViewModel) {
+    init(frame: CGRect = .zero, viewModel: ProfileMainViewModel, tabBarController: UITabBarController) {
         self.viewModel = viewModel
+        self.tabBarController = tabBarController
         super.init(frame: frame)
+        self.collectionView.delegate = self
         addViews()
         makeConstraints()
         bind()
@@ -107,3 +110,22 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
         }
     }
 }
+
+extension MyFeedView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.isTracking {
+            tabBarController.setTabBarHidden(true)
+        }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            tabBarController.setTabBarHidden(false)
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        tabBarController.setTabBarHidden(false)
+    }
+}
+

@@ -57,9 +57,9 @@ public final class ProfileMainViewController: BaseViewController {
         $0.backgroundColor = .blue
     })
     
-    private lazy var myFeedView = MyFeedView(viewModel: viewModel)
+    private lazy var myFeedView = MyFeedView(viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController())
     
-    private lazy var likeFeedView = LikeFeedView( viewModel: viewModel).then({
+    private lazy var likeFeedView = LikeFeedView( viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController()).then({
         $0.isHidden = true
     })
     
