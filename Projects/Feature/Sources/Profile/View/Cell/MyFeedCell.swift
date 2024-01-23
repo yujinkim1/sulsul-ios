@@ -142,7 +142,7 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         }
         feedCountLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(feedCountImageView.snp.trailing)
+            $0.leading.equalTo(feedCountImageView.snp.trailing).offset(moderateScale(number: 2))
         }
         feedTitleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(moderateScale(number: 16))

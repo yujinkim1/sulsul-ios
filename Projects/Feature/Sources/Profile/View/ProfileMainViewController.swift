@@ -42,7 +42,7 @@ public final class ProfileMainViewController: BaseViewController {
     })
     
     private lazy var profileTouchableImageView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(systemName: "circle.fill")
+        $0.image = UIImage(named: "profile_notUser")
     })
     
     private lazy var selectFeedView = UIStackView().then({
