@@ -50,6 +50,7 @@ public final class ProfileSettingViewController: BaseViewController {
                                                       title: "회원탈퇴")
     private lazy var logoutTouchaleLabel = TouchableLabel().then({
         $0.text = "로그아웃"
+        $0.textColor = DesignSystemAsset.red050.color
         $0.font = Font.bold(size: 16)
     })
     
@@ -115,11 +116,13 @@ public final class ProfileSettingViewController: BaseViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
-                                          title: "회원탈퇴",
-                                          description: "지금 탈퇴를 진행하면 7일동안 재가입이 불가능하며,\n기존에 작성했던 모든 피드와 취향 정보가 삭제돼요.",
-                                          submitCompletion: nil,
-                                          cancelCompletion: nil)
+            guard let self = self else { return }
+            self.tabBarController?.setTabBarHidden(true)
+            self.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
+                                           title: "회원탈퇴",
+                                           description: "지금 탈퇴를 진행하면 7일동안 재가입이 불가능하며,\n기존에 작성했던 모든 피드와 취향 정보가 삭제돼요.",
+                                           submitCompletion: nil,
+                                           cancelCompletion: {self.tabBarController?.setTabBarHidden(false)})
         }
         logoutTouchaleLabel.setOpaqueTapGestureRecognizer { [weak self] in
             self?.showAlertView(withType: .twoButton,

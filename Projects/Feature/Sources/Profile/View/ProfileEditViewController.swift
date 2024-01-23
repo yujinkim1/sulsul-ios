@@ -180,7 +180,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         }
         nextButton.snp.makeConstraints {
             $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(moderateScale(number: 50))
         }
     }

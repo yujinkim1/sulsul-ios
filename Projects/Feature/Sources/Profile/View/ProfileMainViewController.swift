@@ -9,6 +9,7 @@ import UIKit
 import Then
 import DesignSystem
 import Combine
+import Kingfisher
 
 public final class ProfileMainViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
@@ -72,7 +73,16 @@ public final class ProfileMainViewController: BaseViewController {
     }
     
     private func bind() {
-    
+        viewModel.userInfoPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                self?.profileLabel.text = result.nickname
+                if let imageURL = URL(string: result.image ?? "") {
+                    self?.profileTouchableImageView.kf.setImage(with: imageURL)
+                }
+            }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func addViews() {
