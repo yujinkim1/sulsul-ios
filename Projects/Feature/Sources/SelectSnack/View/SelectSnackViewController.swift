@@ -118,6 +118,7 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
 

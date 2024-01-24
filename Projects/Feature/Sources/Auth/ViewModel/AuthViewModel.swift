@@ -12,10 +12,12 @@ import GoogleSignIn
 import KakaoSDKAuth
 import KakaoSDKUser
 import Service
+import Combine
 
 final class AuthViewModel: NSObject {
     
     private lazy var jsonDecoder = JSONDecoder()
+    private lazy var loginSuccess = PassthroughSubject<Bool, Never>()
     
     override public init() {
         super.init()
@@ -31,6 +33,10 @@ final class AuthViewModel: NSObject {
 
     public func continueWithGoogle(id: String, item: String) {
         signin(type: .google, id: id, item: item)
+    }
+    
+    func loginSuccessPublisher() -> AnyPublisher<Bool, Never> {
+        return loginSuccess.eraseToAnyPublisher()
     }
 }
 
@@ -116,6 +122,9 @@ extension AuthViewModel {
                                 let expiresIn = data.expiresIn
                                 
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                                self.loginSuccess.send(true)
+                            } else {
+                                print("디코딩 모델 에러")
                             }
                         case .failure(let error):
                             print(error)
@@ -125,7 +134,12 @@ extension AuthViewModel {
             }
         }
         UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-            guard error != nil else { return }
+            print(">>>>>>>")
+            print(oauthToken)
+            print(">>>>>>>")
+            print(error)
+            
+            guard error == nil else { return }
             
             if let accessToken = oauthToken?.accessToken {
                 let url = SignInType.kakao.endpoint()
@@ -137,8 +151,10 @@ extension AuthViewModel {
                             let accessToken = data.accessToken
                             let tokenType = data.tokenType
                             let expiresIn = data.expiresIn
-                            
+                            self.loginSuccess.send(true)
                             KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                        } else {
+                            print("디코딩 모델 에러")
                         }
                     case .failure(let error):
                         print(error)

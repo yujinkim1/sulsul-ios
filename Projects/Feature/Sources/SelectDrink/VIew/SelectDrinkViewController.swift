@@ -68,6 +68,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }()
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()

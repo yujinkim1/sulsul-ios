@@ -8,9 +8,12 @@
 import DesignSystem
 import GoogleSignIn
 import UIKit
+import Combine
 
 public final class AuthViewController: BaseViewController {
     var viewModel: AuthViewModel?
+    var coordinator: AuthBaseCoordinator?
+    private var cancelBag = Set<AnyCancellable>()
 
     private lazy var topView = UIView().then {
         $0.frame = .zero
@@ -77,6 +80,7 @@ public final class AuthViewController: BaseViewController {
     }
 
     override public func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         
@@ -85,6 +89,17 @@ public final class AuthViewController: BaseViewController {
         addViews()
         makeConstraints()
         setupIfNeeded()
+        bind()
+    }
+    
+    private func bind() {
+        guard let viewModel = viewModel else { return }
+        viewModel.loginSuccessPublisher()
+            .sink { [weak self] state in
+                if state {
+                    self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
+                }
+            }.store(in: &cancelBag)
     }
 
     override public func addViews() {
@@ -172,7 +187,7 @@ public final class AuthViewController: BaseViewController {
 
 extension AuthViewController {
     @objc private func backButtonDidTap() {
-        #warning("이전 화면으로 이동하는 것을 구현해야 해요.")
+        self.navigationController?.popViewController(animated: true)
     }
     @objc private func termsButtonDidTap() {
         #warning("서비스 약관, 개인정보 처리방침 뷰어로 이동해야 해요.")

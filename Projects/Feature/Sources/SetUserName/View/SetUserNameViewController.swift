@@ -11,6 +11,7 @@ import DesignSystem
 
 public final class SetUserNameViewController: BaseViewController {
     
+    var coordinator: AuthBaseCoordinator?
     private var viewModel: SelectUserNameViewModel?
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
@@ -94,6 +95,7 @@ public final class SetUserNameViewController: BaseViewController {
     }
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         

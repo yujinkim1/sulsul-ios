@@ -20,23 +20,23 @@ final class SelectUserNameViewModel: NSObject {
     var userName: String = ""
     
     public func requestRandomNickname() {
-        let accessToken = KeychainStore.shared.read(label: "accessToken")
-        var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken!
-        ]
-        
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/nickname", header: headers) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let responseData):
-                if let userName = self.parseRandomNickname(from: responseData) {
-                    self.userNameSubject.send(userName)
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
+//        let accessToken = KeychainStore.shared.read(label: "accessToken")
+//        var headers: HTTPHeaders = [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer " + accessToken!
+//        ]
+//        
+//        NetworkWrapper.shared.getBasicTask(stringURL: "/users/nickname", header: headers) { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case .success(let responseData):
+//                if let userName = self.parseRandomNickname(from: responseData) {
+//                    self.userNameSubject.send(userName)
+//                }
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
     
     private func parseRandomNickname(from data: Data) -> String? {
