@@ -35,6 +35,27 @@ public struct NetworkWrapper {
         }
     }
     
+    public func deleteBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
+        var defaultHeader = configureHeader()
+        header?.forEach { defaultHeader[$0.name] = $0.value }
+        
+        AF.request("\(apiDomain)\(stringURL)", method: .delete, encoding: JSONEncoding.default, headers: defaultHeader).validate(statusCode: 200..<300).responseJSON { response in
+            switch response.result {
+            case .success:
+                if let responseData = response.data {
+                    completion(.success(responseData))
+                } else {
+//                    completion(.failure(HTTPError.networkFailureError))
+                }
+            case .failure(let error):
+                if let responseData = response.data, let json = try? jsonDecoder.decode(NetworkError.self, from: responseData) {
+                    completion(.failure(NetworkError(statusCode: response.response?.statusCode, error: json.message, message: json.message)))
+                } else {
+                    completion(.failure(NetworkError(statusCode: response.response?.statusCode, message: error.localizedDescription)))
+                }
+            }
+        }
+    }
     
     public func postBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
         var defaultHeader = configureHeader()

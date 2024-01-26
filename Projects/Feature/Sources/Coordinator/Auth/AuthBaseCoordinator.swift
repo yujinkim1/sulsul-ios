@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AuthBaseCoordinator: Coordinator, CurrentCoordinated {
+public protocol AuthBaseCoordinator: Coordinator, CurrentCoordinated {
     
 }
 

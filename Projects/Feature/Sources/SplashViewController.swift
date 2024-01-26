@@ -31,12 +31,9 @@ public final class SplashViewController: BaseViewController {
     }
     public override func setupIfNeeded() {
         testTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
-            print("클릭")
-            if self?.coordinator == nil {
-                print("비어있음")
-            }
-            print(self?.coordinator)
-            self?.coordinator?.moveTo(appFlow: AppFlow.intro, userData: nil)
+//            self?.coordinator?.moveTo(appFlow: AppFlow.intro, userData: nil)
+            
+            self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.home(.main)), userData: nil)
         }
     }
 }

@@ -14,8 +14,8 @@ public final class MainCoordinator: MainBaseCoordinator {
     public var rootViewController: UIViewController = UIViewController()
     
     public init() {
+        
     }
-    
     public func start() -> UIViewController {
         tabBarCoordinator.parentCoordinator = self
         mainTabBar = tabBarCoordinator.start() as? UITabBarController
@@ -34,8 +34,6 @@ public final class MainCoordinator: MainBaseCoordinator {
         guard let flow = appFlow.appFlow else { return }
         
         switch flow {
-        case .intro:
-            startIntroFlow(userData: userData)
         case .tabBar(let tabBarFlow):
             startTabBarFlow(tabBarFlow, userData: userData)
         }
@@ -49,7 +47,12 @@ public final class MainCoordinator: MainBaseCoordinator {
     
     private func startTabBarFlow(_ tabBarFlow: TabBarFlow, userData: [String: Any]?) {
         guard let mainTabBar = self.mainTabBar else { return }
-        rootNavigationController?.pushViewController(mainTabBar, animated: false)
+        
+        if rootNavigationController?.viewControllers.first is UITabBarController == false {
+            rootNavigationController?.viewControllers.removeAll()
+            rootNavigationController?.pushViewController(mainTabBar, animated: false)
+        }
+        
         tabBarCoordinator.moveTo(appFlow: tabBarFlow, userData: userData)
     }
 }

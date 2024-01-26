@@ -13,6 +13,7 @@ open class BaseViewController: UIViewController {
         
         view.overrideUserInterfaceStyle = .dark
         view.backgroundColor = .white
+        navigationController?.navigationBar.isHidden = true
         
         addViews()
         makeConstraints()
@@ -54,5 +55,25 @@ open class BaseViewController: UIViewController {
         }, completion: { [weak self] _ in
             toastView.removeFromSuperview()
         })
+    }
+    
+    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, description: String?, submitCompletion: (() -> Void)?,
+                                       cancelCompletion: (() -> Void)?) {
+        let bottomSheetAlertView = BottomSheetAlertView(bottomSheetAlertType: bottomSheetAlertType)
+        bottomSheetAlertView.bind(title: title,
+                                  description: description,
+                                  submitCompletion: submitCompletion,
+                                  cancelCompletion: cancelCompletion)
+        view.addSubview(bottomSheetAlertView)
+        view.bringSubviewToFront(bottomSheetAlertView)
+    }
+    
+    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?, selectAlbumCompletion: (() -> Void)?, baseCompletion: (() -> Void)?) {
+        let cameraBottomSheet = CameraBottomSheet()
+        cameraBottomSheet.bind(selectCameraCompletion: selectCameraCompletion,
+                               selectAlbumCompletion: selectAlbumCompletion,
+                               selectBaseCompletion: baseCompletion)
+        view.addSubview(cameraBottomSheet)
+        view.bringSubviewToFront(cameraBottomSheet)
     }
 }

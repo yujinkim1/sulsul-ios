@@ -21,7 +21,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     var currentFlowManager: CurrentFlowManager?
     var rootViewController: UIViewController = UITabBarController()
     
-//    var commonCoordinator: CommonBaseCoordinator = CommonCoordinator()
+    var commonCoordinator: CommonBaseCoordinator = CommonCoordinator()
     var authCoordinator: AuthBaseCoordinator = AuthCoordinator()
     var homeCoordinator: HomeBaseCoordinator = HomeCoordinator()
     var benefitCoordinator: BenefitBaseCoordinator = BenefitCoordinator()
@@ -32,8 +32,8 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     func start() -> UIViewController {
         let homeVC = homeCoordinator.start()
         homeCoordinator.parentCoordinator = self
-        
         homeVC.tabBarItem = UITabBarItem(title: "홈", image: UIImage(named: "tabBar_home"), selectedImage: UIImage(named: "tabBar_selectHome"))
+        
         let benefitVC = benefitCoordinator.start()
         benefitCoordinator.parentCoordinator = self
         benefitVC.tabBarItem = UITabBarItem(title: "랭킹", image: UIImage(named: "tabBar_ranking"), selectedImage: UIImage(named: "tabBar_selectRanking"))
@@ -68,12 +68,17 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         
         authCoordinator.parentCoordinator = self
         authCoordinator.currentFlowManager = currentFlowManager
-//        
-//        commonCoordinator.parentCoordinator = self
-//        commonCoordinator.currentFlowManager = currentFlowManager
-//        
-//        moreCoordinator.parentCoordinator = self
-//        moreCoordinator.currentFlowManager = currentFlowManager
+        
+        benefitCoordinator.currentFlowManager = currentFlowManager
+        
+        transferCoordinator.currentFlowManager = currentFlowManager
+        
+        transferHistoryCoordinator.currentFlowManager = currentFlowManager
+
+        commonCoordinator.parentCoordinator = self
+        commonCoordinator.currentFlowManager = currentFlowManager
+
+        moreCoordinator.currentFlowManager = currentFlowManager
         
         return rootViewController
     }
@@ -95,12 +100,10 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
             startTransferHistoryFlow(tabBarFlow, userData: userData)
         case .more:
             startMoreFlow(tabBarFlow, userData: userData)
-//        case .auth:
-//            startAuthFlow(tabBarFlow, userData: userData)
-//        case .common:
-//            startCommonFlow(tabBarFlow, userData: userData)
-        case .auth(_):
+        case .auth:
             startAuthFlow(tabBarFlow, userData: userData)
+        case .common:
+            startCommonFlow(tabBarFlow, userData: userData)
         }
     }
     
@@ -137,10 +140,10 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     private func startAuthFlow(_ flow: Flow, userData: [String: Any]?) {
         authCoordinator.moveTo(appFlow: flow, userData: userData)
     }
-//    
-//    private func startCommonFlow(_ flow: Flow, userData: [String: Any]?) {
-//        commonCoordinator.moveTo(appFlow: flow, userData: userData)
-//    }
+    
+    private func startCommonFlow(_ flow: Flow, userData: [String: Any]?) {
+        commonCoordinator.moveTo(appFlow: flow, userData: userData)
+    }
 }
 
 // MARK: - UITabBarControllerDelegate
@@ -157,14 +160,26 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
         switch tabType {
         case .home:
             currentFlowManager?.currentCoordinator = homeCoordinator
+        case .more:
+            currentFlowManager?.currentCoordinator = moreCoordinator
         case .benefit:
             currentFlowManager?.currentCoordinator = benefitCoordinator
         case .transfer:
             currentFlowManager?.currentCoordinator = transferCoordinator
         case .transferHistory:
             currentFlowManager?.currentCoordinator = transferHistoryCoordinator
-        case .more:
-            currentFlowManager?.currentCoordinator = moreCoordinator
+        }
+    }
+    
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        guard let selectedIndex = tabBarController.viewControllers?.firstIndex(of: viewController),
+              let tabType = TabType(rawValue: selectedIndex) else {
+            return false
+        }
+        
+        switch tabType {
+        case .home, .benefit, .transfer, .transferHistory, .more:
+            return true
         }
     }
 }

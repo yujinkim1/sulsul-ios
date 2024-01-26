@@ -10,21 +10,11 @@ import SnapKit
 import Then
 
 public final class BaseTopView: UIView {
-    lazy var backTouchableView = TouchableView()
+    public lazy var backTouchableView = TouchableView()
     
     private lazy var backImageView = UIImageView().then {
-        $0.image = UIImage(named: "BackButton")
+        $0.image = UIImage(named: "common_leftArrow")
         $0.contentMode = .scaleAspectFit
-    }
-    
-    lazy var closeTouchableView = TouchableView().then {
-        $0.isHidden = true
-    }
-    
-    private lazy var closeImageView = UIImageView().then {
-        $0.image = UIImage(named: "CloseButton")
-        $0.contentMode = .scaleAspectFit
-        
     }
     
     override init(frame: CGRect) {
@@ -39,30 +29,16 @@ public final class BaseTopView: UIView {
     }
     
     private func attribute() {
-        let buttonMargin: CGFloat = 5
-        
-        addSubviews([backTouchableView, closeTouchableView])
+        addSubviews([backTouchableView])
         backTouchableView.addSubview(backImageView)
-        closeTouchableView.addSubview(closeImageView)
         
         backTouchableView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(moderateScale(number: 20 - buttonMargin))
-            $0.top.equalToSuperview().inset(moderateScale(number: 16 - buttonMargin))
-            $0.size.equalTo(moderateScale(number: buttonMargin + 24 + buttonMargin))
-        }
-        
-        backImageView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.centerY.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 24))
         }
         
-        closeTouchableView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(moderateScale(number: 20 - buttonMargin))
-            $0.top.equalToSuperview().inset(moderateScale(number: 16 - buttonMargin))
-            $0.size.equalTo(moderateScale(number: buttonMargin + 24 + buttonMargin))
-        }
-        
-        closeImageView.snp.makeConstraints {
+        backImageView.snp.makeConstraints {
             $0.center.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 24))
         }

@@ -19,11 +19,13 @@ let dependencies = Dependencies(
             .snapKit,
             .then,
             .swinject,
+            .kingfisher,
             .kakaoSDK
         ],
         productTypes: [
             "Alamofire": .framework,
-            "Then": .framework
+            "Then": .framework,
+            "Kingfisher": .framework
         ]
     ),
     platforms: [.iOS]
@@ -40,4 +42,6 @@ public extension Package {
                                            requirement: .upToNextMajor(from: "2.8.3"))
     static let kakaoSDK: Package = .remote(url: "https://github.com/kakao/kakao-ios-sdk",
                                            requirement: .upToNextMajor(from: "2.0.0"))
+    static let kingfisher: Package = .remote(url: "https://github.com/onevcat/Kingfisher.git",
+                                             requirement: .upToNextMajor(from: "7.0.0"))
 }
