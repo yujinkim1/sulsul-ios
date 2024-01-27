@@ -8,20 +8,20 @@
 import Foundation
 
 struct Ranking: Codable {
-    let rank: Int?
-    let drink: Drink?
-    let description: String?
+    let startDate: String?
+    let endDate: String?
+    let ranking: [RankingItem]?
     
     enum CodingKeys: String, CodingKey {
-        case rank = "rank"
-        case drink = "alcohol"
-        case description = "description"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case ranking
     }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.rank = try container.decodeIfPresent(Int.self, forKey: .rank)
-        self.drink = try container.decodeIfPresent(Drink.self, forKey: .drink)
-        self.description = try container.decodeIfPresent(String.self, forKey: .description)
+        self.startDate = try container.decodeIfPresent(String.self, forKey: .startDate)
+        self.endDate = try container.decodeIfPresent(String.self, forKey: .endDate)
+        self.ranking = try container.decodeIfPresent([RankingItem].self, forKey: .ranking)
     }
 }
