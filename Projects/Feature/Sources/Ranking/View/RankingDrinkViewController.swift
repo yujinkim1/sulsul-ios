@@ -20,10 +20,12 @@ final class RankingDrinkViewController: BaseViewController {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(120))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(86))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 8
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
         
         return section
     }
@@ -64,7 +66,7 @@ final class RankingDrinkViewController: BaseViewController {
 extension RankingDrinkViewController {
     private func bind() {
         viewModel?
-            .$rankingDrink
+            .rankingDrinkPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.rankingDrinkCollectionView.reloadData()
@@ -80,7 +82,7 @@ extension RankingDrinkViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return viewModel?.dataSourceCount() ?? 0
+        return viewModel?.drinkDatasourceCount() ?? 0
     }
     
     func collectionView(
@@ -91,7 +93,8 @@ extension RankingDrinkViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        if let model = viewModel?.rankingDrink.first?.ranking?[indexPath.item] {
+        if let model = viewModel?.drinkDatasource.first?.ranking?[indexPath.item] {
+            print(model)
             cell.bind(model)
         }
         

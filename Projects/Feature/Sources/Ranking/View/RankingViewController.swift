@@ -114,7 +114,7 @@ public final class RankingViewController: BaseViewController {
 extension RankingViewController {
     private func bind() {
         viewModel?
-            .$rankingDrink
+            .rankingBasePublisher
             .sink { [weak self] data in
                 guard let self = self,
                       let startDate = data.first?.startDate,
@@ -179,7 +179,9 @@ extension RankingViewController: UICollectionViewDelegate {
         
         let direction: UIPageViewController.NavigationDirection = indexPath.item > 0 ? .forward : .reverse
         
-        pageViewController.setViewControllers([selectedViewController], direction: direction, animated: true)
+        pageViewController.setViewControllers([selectedViewController], direction: direction, animated: true) { [weak self] _ in
+            self?.updateTabIndex()
+        }
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -190,7 +192,7 @@ extension RankingViewController: UICollectionViewDelegate {
         
         if selectedItem >= 0 && selectedItem < 2 {
             let indexPath = IndexPath(item: selectedItem, section: 0)
-            collectionView(pageTabBarView, didSelectItemAt: indexPath)
+            pageTabBarView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
         }
     }
 }
@@ -264,7 +266,12 @@ extension RankingViewController: UIPageViewControllerDelegate {
         transitionCompleted completed: Bool
     ) {
         guard completed else { return }
-        updateTabIndex()
+        guard let currentViewController = pageViewController.viewControllers?.first,
+              let currentIndex = viewControllers.firstIndex(of: currentViewController) else { return }
+        
+        let indexPath = IndexPath(item: currentIndex, section: 0)
+        pageTabBarView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+        collectionView(pageTabBarView, didSelectItemAt: indexPath)
     }
     
     private func updateTabIndex() {
