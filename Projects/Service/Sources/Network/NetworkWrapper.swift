@@ -80,6 +80,31 @@ public struct NetworkWrapper {
         }
     }
     
+    public func putBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
+        var defaultHeader = configureHeader()
+        header?.forEach { defaultHeader[$0.name] = $0.value }
+        
+        AF.request("\(apiDomain)\(stringURL)", method: .put, parameters: parameters, encoding: JSONEncoding.default, headers: defaultHeader).validate(statusCode: 200..<300).responseJSON { response in
+            switch response.result {
+            case .success:
+                if let responseData = response.data {
+                    print(responseData)
+                    completion(.success(responseData))
+                } else if response.data == nil {
+                    completion(.success(Data()))
+                } else {
+//                    completion(.failure(HTTPError.networkFailureError))
+                }
+            case .failure(let error):
+                if let responseData = response.data, let json = try? jsonDecoder.decode(NetworkError.self, from: responseData) {
+                    completion(.failure(NetworkError(statusCode: error.responseCode, error: json.message, message: json.message)))
+                } else {
+                    completion(.failure(NetworkError(statusCode: error.responseCode, message: error.localizedDescription)))
+                }
+            }
+        }
+    }
+    
     func putAuthMultiPartTask(images: [String: Data],
                               stringURL: String,
                               param: Parameters? = nil,

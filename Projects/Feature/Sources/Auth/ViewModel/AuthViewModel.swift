@@ -95,9 +95,7 @@ extension AuthViewModel {
                     let accessToken = data.accessToken
                     let tokenType = data.tokenType
                     let expiresIn = data.expiresIn
-                    
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                    print("구글 로그인 성공")
                 }
             case .failure(let error):
                 print(error)
@@ -134,11 +132,6 @@ extension AuthViewModel {
             }
         }
         UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-            print(">>>>>>>")
-            print(oauthToken)
-            print(">>>>>>>")
-            print(error)
-            
             guard error == nil else { return }
             
             if let accessToken = oauthToken?.accessToken {
@@ -151,8 +144,8 @@ extension AuthViewModel {
                             let accessToken = data.accessToken
                             let tokenType = data.tokenType
                             let expiresIn = data.expiresIn
-                            self.loginSuccess.send(true)
                             KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                            self.loginSuccess.send(true)
                         } else {
                             print("디코딩 모델 에러")
                         }

@@ -24,7 +24,6 @@ public final class SplashViewController: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             if KeychainStore.shared.read(label: "accessToken") != nil {
                 print("로그인되어 있음")

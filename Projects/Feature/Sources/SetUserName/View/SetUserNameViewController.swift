@@ -215,6 +215,11 @@ extension SetUserNameViewController {
                 self?.randomNickname = userName
             }
             .store(in: &cancelBag)
+        
+//        viewModel?.setUserNamePublisher()
+//            .sink { [weak self] _ in
+//                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectDrink)), userData: nil)
+//            }.store(in: &cancelBag)
     }
     
     private func updateValidationLabelStackView(text: String?) {
@@ -311,7 +316,8 @@ extension SetUserNameViewController {
     }
     
     @objc private func nextButtonDidTap() {
-        #warning("다음 화면으로 이동하는 것을 구현해야 해요.")
+        // TODO: - 추후 userId 수정
+        viewModel?.sendSetUserName(userId: 1, userNickName: userNameTextField.text ?? "")
     }
     
     @objc private func keyboardWillShow(notification: NSNotification) {
