@@ -118,6 +118,10 @@ extension AuthViewModel {
                                 let accessToken = data.accessToken
                                 let tokenType = data.tokenType
                                 let expiresIn = data.expiresIn
+                                let id = data.userID
+                                
+                                print(">>>>>>>")
+                                print(id)
                                 
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.loginSuccess.send(true)
@@ -144,6 +148,9 @@ extension AuthViewModel {
                             let accessToken = data.accessToken
                             let tokenType = data.tokenType
                             let expiresIn = data.expiresIn
+                            let id = data.userID
+                            
+                            // TODO: - 아이디 들어오는거 확인 여기부터 작업 시작
                             KeychainStore.shared.create(item: accessToken, label: "accessToken")
                             self.loginSuccess.send(true)
                         } else {
