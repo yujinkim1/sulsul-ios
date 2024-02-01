@@ -164,7 +164,7 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DrinkCell.reuseIdentifer, for: indexPath) as? DrinkCell else { return UICollectionViewCell() }
         
         let model = viewModel.getDataSource(indexPath.row)
-        cell.model = model
+        cell.bind(model)
         cell.setSelectColor(model.isSelect)
         
         return cell

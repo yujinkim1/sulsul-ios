@@ -35,7 +35,7 @@ struct ProfileEditViewModel {
                 if let nickname = try? self.jsonDecoder.decode(UserName.self, from: response) {
                     randomNickname.send(nickname.value)
                 } else {
-                    print("디코딩 모델 에러")
+                    print("디코딩 모델 에러4")
                 }
             case .failure(let error):
                 print(error)

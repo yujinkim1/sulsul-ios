@@ -95,6 +95,7 @@ public final class AuthViewController: BaseViewController {
     private func bind() {
         guard let viewModel = viewModel else { return }
         
+        // TODO: - 이미 사용자 입력을 마친 사용자라면 해당 플로우 건너뛰고 바로 홈으로 이동하도록 수정해야됨
         viewModel.loginSuccessPublisher()
             .sink { [weak self] state in
                 if state {

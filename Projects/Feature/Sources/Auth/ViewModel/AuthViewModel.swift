@@ -103,7 +103,7 @@ extension AuthViewModel {
                     let expiresIn = data.expiresIn
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
                 } else {
-                    print("디코딩 모델 에러")
+                    print("디코딩 모델 에러1")
                 }
             case .failure(let error):
                 if let networkError = error as? NetworkError {
@@ -130,10 +130,11 @@ extension AuthViewModel {
                                 let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
+                                UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.loginSuccess.send(true)
                             } else {
-                                print("디코딩 모델 에러")
+                                print("디코딩 모델 에러2")
                             }
                         case .failure(let error):
                             print(error)
@@ -161,7 +162,7 @@ extension AuthViewModel {
                             KeychainStore.shared.create(item: accessToken, label: "accessToken")
                             self.loginSuccess.send(true)
                         } else {
-                            print("디코딩 모델 에러")
+                            print("디코딩 모델 에러3")
                         }
                     case .failure(let error):
                         print(error)

@@ -57,7 +57,8 @@ final class AuthCoordinator: AuthBaseCoordinator {
 
 extension AuthCoordinator {
     private func moveToNickNameScene(_ userData: [String: Any]?) {
-        let setUserNameVC = SetUserNameViewController()
+        let viewModel = SelectUserNameViewModel()
+        let setUserNameVC = SetUserNameViewController(viewModel: viewModel)
         setUserNameVC.coordinator = self
         currentNavigationViewController?.pushViewController(setUserNameVC, animated: false)
     }

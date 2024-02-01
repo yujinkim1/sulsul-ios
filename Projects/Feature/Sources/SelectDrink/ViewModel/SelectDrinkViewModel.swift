@@ -33,7 +33,7 @@ final class SelectDrinkViewModel {
                         self.dataSource = mappedData
                         self.setCompletedDrinkData.send(())
                     } else {
-                        print("디코딩 모델 에러")
+                        print("디코딩 모델 에러8")
                     }
                 case .failure(let error):
                     print(error)
