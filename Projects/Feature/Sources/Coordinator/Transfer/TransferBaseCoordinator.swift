@@ -7,8 +7,9 @@
 
 import Foundation
 
-public protocol TransferBaseCoordinator: Coordinator {}
+public protocol TransferBaseCoordinator: Coordinator, CurrentCoordinated {}
 
 protocol TransferBaseCoordinated {
     var coordinator: TransferBaseCoordinator? { get }
 }
+

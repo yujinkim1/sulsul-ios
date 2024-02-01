@@ -25,13 +25,13 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private lazy var containerView = UIView()
     
     private lazy var numberLabel = UILabel().then({
         $0.text = "Q1."
         $0.font = Font.regular(size: 18)
-        $0.textColor = DesignSystemAsset.gray100.color
+        $0.textColor = DesignSystemAsset.gray900.color
     })
     private lazy var titleLabel = UILabel().then({
         $0.text = "주로 마시는 술"
@@ -144,6 +144,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     public override func setupIfNeeded() {
+        topView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
         }

@@ -33,14 +33,6 @@ final class AuthCoordinator: AuthBaseCoordinator {
     
     private func startAuthFlow(_ flow: AuthFlow, userData: [String: Any]?) {
         switch flow {
-//        case .login(let loginScene):
-//            startLoginFlow(loginScene, userData: userData)
-//        case .signUp(let signUpScene):
-//            startSignUpFlow(signUpScene, userData: userData)
-//        case .findEmail(let findEmailScene):
-//            startFindEmailFlow(findEmailScene, userData: userData)
-//        case .findPassword(let findPasswordScene):
-//            startFindPasswordFlow(findPasswordScene, userData: userData)
         case .profileInput(let profileInputScene):
             startProfileInputFlow(profileInputScene, userData: userData)
         }

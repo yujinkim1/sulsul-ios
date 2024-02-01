@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol BenefitBaseCoordinator: Coordinator {}
+public protocol BenefitBaseCoordinator: Coordinator, CurrentCoordinated {}
 
 protocol BenefitBaseCoordinated {
     var coordinator: BenefitBaseCoordinator? { get }
