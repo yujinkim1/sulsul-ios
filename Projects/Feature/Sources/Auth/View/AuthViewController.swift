@@ -94,11 +94,24 @@ public final class AuthViewController: BaseViewController {
     
     private func bind() {
         guard let viewModel = viewModel else { return }
+        
         viewModel.loginSuccessPublisher()
             .sink { [weak self] state in
                 if state {
                     self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
                 }
+            }.store(in: &cancelBag)
+        
+        viewModel.getErrorSubject()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+//                self?.showAlertView(withType: .oneButton,
+//                                    title: error,
+//                                    description: error,
+//                                    submitCompletion: nil,
+//                                    cancelCompletion: nil)
+                print(error)
             }.store(in: &cancelBag)
     }
 

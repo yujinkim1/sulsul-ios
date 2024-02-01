@@ -23,9 +23,6 @@ struct ProfileMainViewModel {
     private var userInfo = PassthroughSubject<UserInfoModel, Never>()
     
     init() {
-        // 이거 여기서 하지말고 viewDidload로 바꾸자
-        getFeedsByMe()
-        getFeedsLikeByMe()
     }
     
     func getUserInfo() {

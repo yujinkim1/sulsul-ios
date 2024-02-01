@@ -7,6 +7,7 @@
 
 import UIKit
 import DesignSystem
+import Service
 
 final class HomeViewController: BaseViewController {
     var coordinator: HomeBaseCoordinator?
@@ -19,6 +20,12 @@ final class HomeViewController: BaseViewController {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1.0)
+        
+        if (KeychainStore.shared.read(label: "accessToken") != nil) {
+            loginButton.isHidden = true
+        } else {
+            loginButton.isHidden = false
+        }
     }
     
     override func addViews() {
