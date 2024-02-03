@@ -121,6 +121,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+    
     private func bind() {
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.drinkCollectionView.reloadData()
@@ -142,6 +143,11 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                 }
             }
             .store(in: &cancelBag)
+        
+        viewModel.completeDrinkPreferencePublisher()
+            .sink { [weak self] in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+            }.store(in: &cancelBag)
     }
     
     public override func setupIfNeeded() {
@@ -149,7 +155,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+            self?.viewModel.sendSetUserDrinkPreference()
         }
     }
 }
