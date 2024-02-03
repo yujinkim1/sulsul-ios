@@ -8,20 +8,72 @@
 import Combine
 import Foundation
 import Service
+import Alamofire
 
 final class SelectSnackViewModel {
     private lazy var jsonDecoder = JSONDecoder()
     private lazy var mapper = SnackModelMapper()
+    private var cancelBag = Set<AnyCancellable>()
     
+    private let userId = UserDefaultsUtil.shared.getInstallationId()
+    private let accessToken = KeychainStore.shared.read(label: "accessToken")
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
     private lazy var searchResultCountData = PassthroughSubject<Int, Never>()
+    private var setUserSnackPreference = PassthroughSubject<Void, Never>()
+    private var completeSnackPreference = PassthroughSubject<Void, Never>()
     private lazy var initSectionModels = [SnackSectionModel]()
     private lazy var sectionModels = [SnackSectionModel]()
     private lazy var cellModels = [SnackModel]()
     
     init() {
+        bind()
+    }
+    
+    private func bind() {
         requestSnackList()
+        
+        setUserSnackPreference
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let selectedIds = cellModels.filter { $0.isSelect }.map { $0.id }
+                print("선택된 것 : \(selectedIds)")
+                let params: [String: Any] = ["alcohols": [],
+                                             "foods": selectedIds]
+                var headers: HTTPHeaders = [
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + accessToken!
+                ]
+                
+                NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
+                    switch result {
+                    case .success(let response):
+//                        if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: resopnse) {
+//                            print(">>>>>>")
+//                            print(userData)
+//                        } else {
+//                            print("디코딩 안되는데?")
+//                        }
+//                        self?.completeSnackPreference.send(())
+                        if let responseDataString = String(data: response, encoding: .utf8) {
+                            print("Response Data as String:")
+                            print(responseDataString)
+                        } else {
+                            print("Failed to convert response data to string.")
+                        }
+
+                        if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                            print("Decoded UserModel:")
+                            print(userData)
+                        } else {
+                            print("Decoding failed.")
+                        }
+                        self?.completeSnackPreference.send(())
+                    case.failure(let error):
+                        print(error)
+                    }
+                }
+            }.store(in: &cancelBag)
     }
     
     private func makeSectionModelsWith(_ snackModels: [SnackModel]) -> [SnackSectionModel] {
@@ -126,6 +178,14 @@ final class SelectSnackViewModel {
     
     func searchResultCountDataPublisher() -> AnyPublisher<Int, Never> {
         return searchResultCountData.eraseToAnyPublisher()
+    }
+    
+    func sendSetUserSnackPreference() {
+        setUserSnackPreference.send(())
+    }
+    
+    func completeSnackPreferencePublisher() -> AnyPublisher<Void, Never> {
+        return completeSnackPreference.eraseToAnyPublisher()
     }
 }
 

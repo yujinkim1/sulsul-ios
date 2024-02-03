@@ -83,12 +83,13 @@ extension AddSnackViewModel {
     
     private func requestGETNameOf(_ id: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(id)") { [weak self] result in
-            guard let selfRef = self else { return }
+            guard let self = self else { return }
             
             switch result {
             case .success(let responseData):
-                if let userData = try? selfRef.jsonDecoder.decode(UserModel.self, from: responseData) {
-                    self?.userNickName.send(userData.nickname)
+                if let userData = try? self.jsonDecoder.decode(UserModel.self, from: responseData) {
+                    guard let nickname = userData.nickname else { return }
+                    self.userNickName.send(nickname)
                 } else {
                     print("[/users/id] Fail Decode")
                 }

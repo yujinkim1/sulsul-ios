@@ -124,6 +124,7 @@ public final class SelectSnackViewController: BaseViewController {
 
         addViews()
         makeConstraints()
+        bind()
     }
     
     public override func addViews() {
@@ -213,6 +214,13 @@ public final class SelectSnackViewController: BaseViewController {
         }
     }
     
+    private func bind() {
+        viewModel.completeSnackPreferencePublisher()
+            .sink { [weak self] in
+                print("성공해서 메인화면으로 이동해야됨")
+            }.store(in: &cancelBag)
+    }
+    
     @objc private func didTabAddSnackButton() {
         
     }
@@ -226,7 +234,7 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     @objc private func didTabNextButton() {
-        
+        self.viewModel.sendSetUserSnackPreference()
     }
 }
 
