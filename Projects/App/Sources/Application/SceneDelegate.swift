@@ -66,3 +66,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            let viewController = SignInViewController()SettingViewController
 //            window?.rootViewController = viewController
 //        }
+        mainCoordinator = MainCoordinator()
+        window?.rootViewController = mainCoordinator?.start()
+        window?.makeKeyAndVisible()
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
+            if AuthApi.isKakaoTalkLoginUrl(url) {
+                _ = AuthController.handleOpenUrl(url: url)
+            }
+        }
+    }
+
+    func sceneDidDisconnect(_ scene: UIScene) {}
+
+    func sceneDidBecomeActive(_ scene: UIScene) {}
+
+    func sceneWillResignActive(_ scene: UIScene) {}
+
+    func sceneWillEnterForeground(_ scene: UIScene) {}
+
+    func sceneDidEnterBackground(_ scene: UIScene) {}
+}
