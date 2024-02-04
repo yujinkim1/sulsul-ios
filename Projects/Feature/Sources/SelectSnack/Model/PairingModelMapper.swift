@@ -8,9 +8,9 @@
 import Foundation
 
 struct PairingModelMapper {
-    func pairingModel(from pairingModels: [Pairing]) -> [Pairing] {
-        return pairingModels.map { pairingModel -> Pairing in
-            return Pairing(id: pairingModel.id ?? 0,
+    func pairingModel(from pairingModels: [Pairing]) -> [SnackModel] {
+        return pairingModels.map { pairingModel -> SnackModel in
+            return SnackModel(id: pairingModel.id ?? 0,
                               type: pairingModel.type ?? "",
                               subtype: pairingModel.subtype ?? "",
                               name: pairingModel.name ?? "",
