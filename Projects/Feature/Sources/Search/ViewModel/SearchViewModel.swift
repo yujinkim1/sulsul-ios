@@ -71,11 +71,11 @@ extension SearchViewModel {
                 
                 switch result {
                 case .success(let responseData):
-                    if let pairingsData = try? selfRef.jsonDecoder.decode(PairingModel.self, from: responseData) {
-                        let mappedData = selfRef.mapper.pairingModel(from: pairingsData.pairings ?? [])
+                    if let pairingsData = try? selfRef.jsonDecoder.decode(PairingModel.self, from: responseData),
+                       let parings = pairingsData.pairings {
                         
-                        selfRef.drinkList = mappedData.filter{ $0.type == "술" }
-                        selfRef.snackList = mappedData.filter{ $0.type == "안주" }
+                        selfRef.drinkList = parings.filter{ $0.type == "술" }
+                        selfRef.snackList = parings.filter{ $0.type == "안주" }
                     } else {
                         print("[/pairings] Fail Decode")
                     }
