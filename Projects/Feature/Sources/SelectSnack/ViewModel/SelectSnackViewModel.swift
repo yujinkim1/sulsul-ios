@@ -17,6 +17,7 @@ final class SelectSnackViewModel {
     
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
+    private var userInfo: UserModel?
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
     private lazy var searchResultCountData = PassthroughSubject<Int, Never>()
@@ -33,12 +34,14 @@ final class SelectSnackViewModel {
     private func bind() {
         requestSnackList()
         
+        getUserInfo()
+        
         setUserSnackPreference
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 let selectedIds = cellModels.filter { $0.isSelect }.map { $0.id }
-                print("선택된 것 : \(selectedIds)")
-                let params: [String: Any] = ["alcohols": [],
+                
+                let params: [String: Any] = ["alcohols": userInfo?.preference?.alcohols,
                                              "foods": selectedIds]
                 var headers: HTTPHeaders = [
                     "Content-Type": "application/json",
@@ -48,32 +51,31 @@ final class SelectSnackViewModel {
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
                     case .success(let response):
-//                        if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: resopnse) {
-//                            print(">>>>>>")
-//                            print(userData)
-//                        } else {
-//                            print("디코딩 안되는데?")
-//                        }
-//                        self?.completeSnackPreference.send(())
-                        if let responseDataString = String(data: response, encoding: .utf8) {
-                            print("Response Data as String:")
-                            print(responseDataString)
-                        } else {
-                            print("Failed to convert response data to string.")
-                        }
-
                         if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
-                            print("Decoded UserModel:")
-                            print(userData)
+                            self?.completeSnackPreference.send(())
                         } else {
                             print("Decoding failed.")
                         }
-                        self?.completeSnackPreference.send(())
                     case.failure(let error):
                         print(error)
                     }
                 }
             }.store(in: &cancelBag)
+    }
+    
+    private func getUserInfo() {
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+            switch result {
+            case .success(let response):
+                if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                    self?.userInfo = userData
+                } else {
+                    print("디코딩 모델 에러 9")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
     private func makeSectionModelsWith(_ snackModels: [SnackModel]) -> [SnackSectionModel] {

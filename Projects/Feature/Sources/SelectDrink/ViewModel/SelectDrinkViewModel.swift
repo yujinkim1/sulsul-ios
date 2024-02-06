@@ -14,6 +14,7 @@ final class SelectDrinkViewModel {
     
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
+    private var userInfo: UserModel?
     
     private let jsonDecoder = JSONDecoder()
     private let mapper = SnackModelMapper()
@@ -31,6 +32,8 @@ final class SelectDrinkViewModel {
     }
     
     func bind() {
+        getUserInfo()
+        
         sendPairingsValue()
         
         setUserDrinkPreference
@@ -38,7 +41,7 @@ final class SelectDrinkViewModel {
                 guard let self = self else { return }
                 let selectedIds = dataSource.filter { $0.isSelect }.map { $0.id }
                 let params: [String: Any] = ["alcohols": selectedIds,
-                                             "foods": []]
+                                             "foods": userInfo?.preference?.foods]
                 var headers: HTTPHeaders = [
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + accessToken!
@@ -46,8 +49,12 @@ final class SelectDrinkViewModel {
                 
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
-                    case .success(let resopnse):
-                        self?.completeDrinkPreference.send(())
+                    case .success(let response):
+                        if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                            self?.completeDrinkPreference.send(())
+                        } else {
+                            print("Decoding failed.")
+                        }
                     case.failure(let error):
                         print(error)
                     }
@@ -74,6 +81,20 @@ final class SelectDrinkViewModel {
         }
     }
     
+    private func getUserInfo() {
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+            switch result {
+            case .success(let response):
+                if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                    self?.userInfo = userData
+                } else {
+                    print("디코딩 모델 에러 9")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     // 술 취향 설정
     func sendSetUserDrinkPreference() {
         setUserDrinkPreference.send(())
