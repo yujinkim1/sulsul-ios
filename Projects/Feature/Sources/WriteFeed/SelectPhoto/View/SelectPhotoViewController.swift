@@ -36,13 +36,17 @@ public class SelectPhotoViewController: BaseViewController {
     }
     
     private lazy var flowLayout = UICollectionViewFlowLayout().then {
-        $0.minimumLineSpacing = moderateScale(number: 6)
-        $0.minimumInteritemSpacing = moderateScale(number: 5.67)
+        $0.minimumLineSpacing = 5.67
+        $0.minimumInteritemSpacing = 5.67
     }
     
     private lazy var imageCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout).then {
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .white
+        $0.delegate = self
+        $0.dataSource = self
+        $0.register(WriteFeedPhotoCell.self, forCellWithReuseIdentifier: WriteFeedPhotoCell.id)
+        $0.backgroundColor = DesignSystemAsset.black.color
     }
     
     public override func viewDidLoad() {
@@ -95,5 +99,24 @@ public class SelectPhotoViewController: BaseViewController {
             $0.bottom.leading.trailing.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 74))
         }
+    }
+}
+
+extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WriteFeedPhotoCell.id,
+                                                            for: indexPath) as? WriteFeedPhotoCell else { return UICollectionViewCell() }
+        
+        return cell
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let spacing = 17.01
+        let itemSize = (UIScreen.main.bounds.width - 17.01) / 4
+        return CGSize(width: itemSize, height: itemSize)
     }
 }
