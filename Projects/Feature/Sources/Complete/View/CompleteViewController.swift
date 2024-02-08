@@ -110,6 +110,6 @@ extension CompleteViewController {
     }
     @objc private func mainButtonDidTap() {
         #warning("메인 화면으로 이동하는 것을 구현해야 해요.")
-        self.coordinator?.moveTo(appFlow: TabBarFlow.transfer(.main), userData: nil)
+        self.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
     }
 }
