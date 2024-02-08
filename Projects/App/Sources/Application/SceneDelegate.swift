@@ -56,13 +56,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
 }
-
-
-//        // 키체인 테스트
-//        if KeychainStore.shared.read(label: "accessToken") != nil {
-//            let viewController = SetUserNameViewController()
-//            window?.rootViewController = viewController
-//        } else {
-//            let viewController = SignInViewController()SettingViewController
-//            window?.rootViewController = viewController
-//        }

@@ -27,7 +27,7 @@ final class HomeViewController: BaseViewController {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
             switch result {
             case .success(let response):
-                if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     print(userData)
                 } else {
                     print("디코딩 모델 에러 9")

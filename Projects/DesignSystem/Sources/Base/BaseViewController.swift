@@ -12,7 +12,7 @@ open class BaseViewController: UIViewController {
         super.viewDidLoad()
         
         view.overrideUserInterfaceStyle = .dark
-        view.backgroundColor = .white
+        view.backgroundColor = DesignSystemAsset.black.color
         navigationController?.navigationBar.isHidden = true
         
         addViews()

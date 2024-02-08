@@ -15,6 +15,7 @@ struct ProfileMainViewModel {
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
+    private let userMapper = UserMapper()
     
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
@@ -33,8 +34,9 @@ struct ProfileMainViewModel {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)", header: headers) { result in
             switch result {
             case .success(let response):
-                if let userData = try? self.jsonDecoder.decode(UserInfoModel.self, from: response) {
-                    userInfo.send(userData)
+                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                    let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
+                    userInfo.send(mappedUserInfo)
                 } else {
                     print("디코딩 모델 에러5")
                 }
@@ -43,6 +45,7 @@ struct ProfileMainViewModel {
             }
         }
     }
+
     // MARK: - 마이페이지: 내가 쓴 페이지 조회
     func getFeedsByMe() {
         guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }

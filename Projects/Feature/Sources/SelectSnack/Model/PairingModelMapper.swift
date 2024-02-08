@@ -7,7 +7,20 @@
 
 import Foundation
 
-struct SnackModelMapper {
+struct PairingModelMapper {
+    func pairingModel(from pairingModels: [Pairing]) -> [Pairing] {
+        return pairingModels.map { pairingModel -> Pairing in
+            return Pairing(id: pairingModel.id ?? 0,
+                              type: pairingModel.type ?? "",
+                              subtype: pairingModel.subtype ?? "",
+                              name: pairingModel.name ?? "",
+                              image: pairingModel.image ?? "",
+                              description: pairingModel.description ?? "",
+                              isSelect: pairingModel.isSelect ?? false,
+                              highlightedText: pairingModel.highlightedText ?? "")
+        }
+    }
+    
     func snackModel(from pairingModels: [Pairing]) -> [SnackModel] {
         return pairingModels.map { pairingModel -> SnackModel in
             return SnackModel(id: pairingModel.id ?? 0,
@@ -20,4 +33,5 @@ struct SnackModelMapper {
                               highlightedText: pairingModel.highlightedText ?? "")
         }
     }
+    
 }

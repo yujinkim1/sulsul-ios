@@ -11,7 +11,7 @@ import Service
 
 final class AddSnackViewModel {
     private lazy var jsonDecoder = JSONDecoder()
-    
+    private let userMapper = UserMapper()
     // MARK: Output
     private lazy var goNextPage = PassthroughSubject<Void, Never>()
     private lazy var updateSelectedSnackSort = PassthroughSubject<String, Never>()
@@ -87,7 +87,7 @@ extension AddSnackViewModel {
             
             switch result {
             case .success(let responseData):
-                if let userData = try? self.jsonDecoder.decode(UserModel.self, from: responseData) {
+                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: responseData) {
                     guard let nickname = userData.nickname else { return }
                     self.userNickName.send(nickname)
                 } else {

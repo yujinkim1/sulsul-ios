@@ -14,10 +14,11 @@ final class SelectDrinkViewModel {
     
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
-    private var userInfo: UserModel?
+    private var userInfo: UserInfoModel?
     
     private let jsonDecoder = JSONDecoder()
-    private let mapper = SnackModelMapper()
+    private let mapper = PairingModelMapper()
+    private let userMapper = UserMapper()
     private var cancelBag = Set<AnyCancellable>()
     private var dataSource = [SnackModel]()
     
@@ -41,7 +42,7 @@ final class SelectDrinkViewModel {
                 guard let self = self else { return }
                 let selectedIds = dataSource.filter { $0.isSelect }.map { $0.id }
                 let params: [String: Any] = ["alcohols": selectedIds,
-                                             "foods": userInfo?.preference?.foods]
+                                             "foods": userInfo?.preference.foods]
                 var headers: HTTPHeaders = [
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + accessToken!
@@ -50,7 +51,7 @@ final class SelectDrinkViewModel {
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
                     case .success(let response):
-                        if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
+                        if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                             self?.completeDrinkPreference.send(())
                         } else {
                             print("Decoding failed.")
@@ -85,8 +86,9 @@ final class SelectDrinkViewModel {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
             switch result {
             case .success(let response):
-                if let userData = try? self?.jsonDecoder.decode(UserModel.self, from: response) {
-                    self?.userInfo = userData
+                if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                    let mappedUserInfo = self?.userMapper.userInfoModel(from: userData)
+                    self?.userInfo = mappedUserInfo
                 } else {
                     print("디코딩 모델 에러 9")
                 }
