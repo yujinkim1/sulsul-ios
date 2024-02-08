@@ -11,9 +11,16 @@ import DesignSystem
 
 class MyFeedView: UIView {
     
+    enum MyFeedState {
+        case loginFeedExist
+        case loginFeedNotExist
+        case notLogin
+    }
+    
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
     private let tabBarController: UITabBarController
+    private var myFeedState: MyFeedState?
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
@@ -37,7 +44,7 @@ class MyFeedView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind() {
+    private func bind() {
         viewModel.myFeedsPublisher()
             .receive(on: DispatchQueue.main)
             .sink { _ in
@@ -46,11 +53,11 @@ class MyFeedView: UIView {
             .store(in: &cancelBag)
     }
     
-    func addViews() {
+    private func addViews() {
         addSubviews([collectionView])
     }
     
-    func makeConstraints() {
+    private func makeConstraints() {
         collectionView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 18))
             $0.leading.equalToSuperview().offset(moderateScale(number: 20))
@@ -59,11 +66,26 @@ class MyFeedView: UIView {
         }
     }
     
+    private func updateState(_ myFeedState: MyFeedState) {
+        self.myFeedState = myFeedState
+    }
+    
     private func layout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout { _, _ in
-
-            let itemHeight: CGFloat = self.viewModel.getMyFeedsValue().count == 0 ? 80 + 133 + 80 : 531
+        return UICollectionViewCompositionalLayout { [weak self] _, _ in
+            guard let self = self else { return nil }
+            
             let itemWidth: CGFloat = 1
+            let itemHeight: CGFloat
+            switch myFeedState {
+            case .loginFeedExist:
+                itemHeight = 611
+            case .loginFeedNotExist:
+                itemHeight = 213
+            case .notLogin:
+                itemHeight = 213
+            case nil:
+                itemHeight = 0
+            }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))

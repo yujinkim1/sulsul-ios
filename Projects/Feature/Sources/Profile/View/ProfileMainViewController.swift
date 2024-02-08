@@ -91,9 +91,16 @@ public final class ProfileMainViewController: BaseViewController {
         viewModel.userInfoPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-                self?.profileLabel.text = result.nickname
-                if let imageURL = URL(string: result.image ?? "") {
-                    self?.profileTouchableImageView.kf.setImage(with: imageURL)
+                guard let self = self else { return }
+                if result.id == 0 { // 비로그인 상태
+                    self.profileLabel.text = "로그인 해주세요!"
+                    self.profileEditTouchableLabel.isHidden = true
+                } else { // 로그인 상태
+                    self.profileLabel.text = result.nickname
+                    self.profileEditTouchableLabel.isHidden = false
+                    if let imageURL = URL(string: result.image ?? "") {
+                        self.profileTouchableImageView.kf.setImage(with: imageURL)
+                    }
                 }
             }.store(in: &cancelBag)
         

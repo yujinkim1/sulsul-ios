@@ -71,14 +71,14 @@ public final class ProfileSettingViewController: BaseViewController {
                                    settingStackView,
                                    logoutTouchaleLabel])
         settingStackView.addArrangedSubviews([managementTitleLabel,
-                                             drinkSettingView,
-                                             snackSettingView,
-                                             appSettingTitleLabel,
-                                             alarmSettingView,
-                                             feedBackSettingView,
-                                             termsSettingView,
-                                             personalSettingView,
-                                             signOutSettingView])
+                                              drinkSettingView,
+                                              snackSettingView,
+                                              appSettingTitleLabel,
+                                              alarmSettingView,
+                                              feedBackSettingView,
+                                              termsSettingView,
+                                              personalSettingView,
+                                              signOutSettingView])
     }
     
     public override func makeConstraints() {
@@ -120,17 +120,18 @@ public final class ProfileSettingViewController: BaseViewController {
             guard let self = self else { return }
             self.tabBarController?.setTabBarHidden(true)
             self.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
-                                           title: "회원탈퇴",
-                                           description: "지금 탈퇴를 진행하면 7일동안 재가입이 불가능하며,\n기존에 작성했던 모든 피드와 취향 정보가 삭제돼요.",
-                                           submitCompletion: nil,
-                                           cancelCompletion: {self.tabBarController?.setTabBarHidden(false)})
+                                          title: "회원탈퇴",
+                                          description: "지금 탈퇴를 진행하면 7일동안 재가입이 불가능하며,\n기존에 작성했던 모든 피드와 취향 정보가 삭제돼요.",
+                                          submitCompletion: nil,
+                                          cancelCompletion: {self.tabBarController?.setTabBarHidden(false)})
         }
         logoutTouchaleLabel.setOpaqueTapGestureRecognizer { [weak self] in
             self?.showAlertView(withType: .twoButton,
                                 title: "로그아웃 하시겠어요?",
                                 description: nil,
-                                submitCompletion: { KeychainStore.shared.delete(label: "accessToken")
-//                UserDefaultsUtil.remove(<#T##self: UserDefaultsUtil##UserDefaultsUtil#>)
+                                submitCompletion: {
+                KeychainStore.shared.delete(label: "accessToken")
+                UserDefaultsUtil.shared.remove(.userId)
             },
                                 cancelCompletion: nil)
         }

@@ -7,10 +7,6 @@
 
 import Foundation
 
-public enum Key: String {
-    case recentKeyword
-}
-
 public struct UserDefaultsUtil {
     public static let shared = UserDefaultsUtil()
     
@@ -39,7 +35,7 @@ public struct UserDefaultsUtil {
         return defaults.value(forKey: UserDefaultKey.userId.rawValue) as? Int ?? 0
     }
     
-    public func remove(key: Key) {
-        UserDefaults.standard.removeObject(forKey: key.rawValue)
+    public func remove(_ key: UserDefaultKey) {
+        defaults.removeObject(forKey: key.rawValue)
     }
 }

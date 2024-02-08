@@ -47,7 +47,7 @@ final class SearchViewModel {
         var updatedKeywords = searchKeywords()
         updatedKeywords.remove(at: indexPath.row)
         
-        UserDefaultsUtil.shared.remove(key: .recentKeyword)
+        UserDefaultsUtil.shared.remove(.recentKeyword)
         UserDefaultsUtil.shared.setRecentKeywordList(updatedKeywords)
         
         reloadCollectionViewSubject.send(())

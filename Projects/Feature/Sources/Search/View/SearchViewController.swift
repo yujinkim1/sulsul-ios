@@ -90,7 +90,7 @@ public final class SearchViewController: BaseViewController {
     
     private func setTabEvents() {
         recentKeywordResetButton.onTapped { [weak self] in
-            UserDefaultsUtil.shared.remove(key: .recentKeyword)
+            UserDefaultsUtil.shared.remove(.recentKeyword)
             self?.recentKeywordCollectionView.reloadData()
             self?.setVisibilityKeywordLabel()
         }

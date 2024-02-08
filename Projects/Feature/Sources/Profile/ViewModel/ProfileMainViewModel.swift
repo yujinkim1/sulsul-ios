@@ -19,7 +19,12 @@ struct ProfileMainViewModel {
     
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
-    private var userInfo = PassthroughSubject<UserInfoModel, Never>()
+    private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
+                                                                           uid: "",
+                                                                           nickname: "",
+                                                                           image: "",
+                                                                           preference: .init(alcohols: [0], foods: [0]),
+                                                                           status: ""))
     
     init() {
     }

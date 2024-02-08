@@ -22,12 +22,12 @@ final class HomeViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // MARK: - 테스트용 추후 삭제 필요
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
             switch result {
             case .success(let response):
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                    print(">>>>>>>")
                     print(userData)
                 } else {
                     print("디코딩 모델 에러 9")
