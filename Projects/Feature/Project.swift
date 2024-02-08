@@ -9,6 +9,14 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.framework(name: Module.feature.name,
-                                dependencies: [Module.service.project] + [Module.designSystem.project],
+                                packages: [.remote(url: "https://github.com/google/GoogleSignIn-iOS",
+                                                   requirement: .upToNextMajor(from: "7.0.0"))
+                                ],
+                                dependencies: [Module.service.project,
+                                               Module.designSystem.project,
+                                               .package(product: "GoogleSignIn"),
+                                               .package(product: "CocoaLumberjack"),
+                                               .package(product: "CocoaLumberjackSwift")],
                                 sources: .default,
+                                scripts: [.SwiftLintShell],
                                 resources: .default)

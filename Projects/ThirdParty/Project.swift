@@ -12,4 +12,6 @@ let project = Project.framework(name: Module.thirdParty.name,
                                 dependencies: [.swinject,
                                                .alamofire,
                                                .snapKit,
-                                               .then])
+                                               .then,
+                                               .kingfisher,
+                                               .kakaoSDK])

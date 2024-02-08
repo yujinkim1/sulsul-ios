@@ -1,0 +1,10 @@
+app_identifier("Alamofire") # The bundle identifier of your app
+apple_id("dlqkawns@naver.com") # Your Apple Developer Portal username
+
+itc_team_id("125492983") # App Store Connect Team ID
+team_id("277QUM3J2F") # Developer Portal Team ID
+itc_team_id("125492983") # App Store Connect Team ID
+team_id("277QUM3J2F") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
