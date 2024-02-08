@@ -50,12 +50,12 @@ public final class ProfileMainViewController: BaseViewController {
         $0.distribution = .fillEqually
     })
     
-    private lazy var myFeedTouchableView = TouchableView().then({
-        $0.backgroundColor = .red
+    private lazy var myFeedTouchableView = UnderlineTouchableView("나의 피드").then({
+        $0.updateView(true)
     })
     
-    private lazy var likeFeedTouchableView = TouchableView().then({
-        $0.backgroundColor = .blue
+    private lazy var likeFeedTouchableView = UnderlineTouchableView("좋아요 표시한 피드").then({
+        $0.updateView(false)
     })
     
     private lazy var myFeedView = MyFeedView(viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController())
@@ -172,11 +172,15 @@ public final class ProfileMainViewController: BaseViewController {
     public override func setupIfNeeded() {
         myFeedTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
+            myFeedTouchableView.updateView(true)
+            likeFeedTouchableView.updateView(false)
             self.likeFeedView.isHidden = true
             self.myFeedView.isHidden = false
         }
         likeFeedTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
+            myFeedTouchableView.updateView(false)
+            likeFeedTouchableView.updateView(true)
             self.myFeedView.isHidden = true
             self.likeFeedView.isHidden = false
         }
