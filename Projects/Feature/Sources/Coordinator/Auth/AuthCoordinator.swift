@@ -51,8 +51,8 @@ final class AuthCoordinator: AuthBaseCoordinator {
             moveToSelectDrinkScene(userData)
         case .selectSnack:
             moveToSelectSnackScene(userData)
-//        case .selectComplete:
-//            moveToSelectCompleteScene(userData)
+        case .selectComplete:
+            moveToSelectCompleteScene(userData)
         }
     }
 }
@@ -77,7 +77,8 @@ extension AuthCoordinator {
         currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
     }
     private func moveToSelectCompleteScene(_ userData: [String: Any]?) {
-//        let selectCompleteVC = CompleteViewController()
-//        select
+        let selectCompleteVC = CompleteViewController()
+        selectCompleteVC.coordinator = self
+        currentNavigationViewController?.pushViewController(selectCompleteVC, animated: true)
     }
 }

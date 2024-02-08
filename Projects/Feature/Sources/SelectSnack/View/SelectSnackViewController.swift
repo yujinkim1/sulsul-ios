@@ -218,6 +218,7 @@ public final class SelectSnackViewController: BaseViewController {
         viewModel.completeSnackPreferencePublisher()
             .sink { [weak self] in
                 print("성공해서 메인화면으로 이동해야됨")
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: nil)
             }.store(in: &cancelBag)
     }
     

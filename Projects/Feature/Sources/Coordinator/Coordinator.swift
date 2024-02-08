@@ -111,6 +111,7 @@ enum ProfileInputScene {
     case setUserName
     case selectDrink
     case selectSnack
+    case selectComplete
 }
 
 // MARK: - 마이페이지

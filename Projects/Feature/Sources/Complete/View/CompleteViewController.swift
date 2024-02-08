@@ -9,6 +9,7 @@ import DesignSystem
 import UIKit
 
 public final class CompleteViewController: BaseViewController {
+    var coordinator: AuthBaseCoordinator?
     var username = "보라색하이볼"
     
     private lazy var topView = UIView().then {
@@ -105,8 +106,10 @@ public final class CompleteViewController: BaseViewController {
 extension CompleteViewController {
     @objc private func backButtonDidTap() {
         #warning("함께 먹는 안주 화면으로 이동하는 것을 구현해야 해요.")
+        self.dismiss(animated: true)
     }
     @objc private func mainButtonDidTap() {
         #warning("메인 화면으로 이동하는 것을 구현해야 해요.")
+        self.coordinator?.moveTo(appFlow: TabBarFlow.transfer(.main), userData: nil)
     }
 }
