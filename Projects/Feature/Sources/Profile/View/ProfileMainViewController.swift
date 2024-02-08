@@ -95,6 +95,8 @@ public final class ProfileMainViewController: BaseViewController {
                 if result.id == 0 { // 비로그인 상태
                     self.profileLabel.text = "로그인 해주세요!"
                     self.profileEditTouchableLabel.isHidden = true
+                    self.myFeedView.updateState(.notLogin)
+//                    self.likeFeedView.updateState(.notLogin)
                 } else { // 로그인 상태
                     self.profileLabel.text = result.nickname
                     self.profileEditTouchableLabel.isHidden = false

@@ -66,7 +66,7 @@ class MyFeedView: UIView {
         }
     }
     
-    private func updateState(_ myFeedState: MyFeedState) {
+    func updateState(_ myFeedState: MyFeedState) {
         self.myFeedState = myFeedState
     }
     
