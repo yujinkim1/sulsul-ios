@@ -36,6 +36,8 @@ struct ProfileMainViewModel {
             case .success(let response):
                 if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
+                    print("여기>>>>")
+                    print(mappedUserInfo)
                     userInfo.send(mappedUserInfo)
                 } else {
                     print("디코딩 모델 에러5")

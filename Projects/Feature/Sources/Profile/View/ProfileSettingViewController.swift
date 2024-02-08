@@ -129,7 +129,9 @@ public final class ProfileSettingViewController: BaseViewController {
             self?.showAlertView(withType: .twoButton,
                                 title: "로그아웃 하시겠어요?",
                                 description: nil,
-                                submitCompletion: { KeychainStore.shared.delete(label: "accessToken") },
+                                submitCompletion: { KeychainStore.shared.delete(label: "accessToken")
+//                UserDefaultsUtil.remove(<#T##self: UserDefaultsUtil##UserDefaultsUtil#>)
+            },
                                 cancelCompletion: nil)
         }
     }

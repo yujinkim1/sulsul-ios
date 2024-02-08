@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import DesignSystem
+import Service
 
 public final class SearchViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
