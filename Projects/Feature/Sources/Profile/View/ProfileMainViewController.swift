@@ -29,8 +29,12 @@ public final class ProfileMainViewController: BaseViewController {
     
     private lazy var profileView = UIView()
     
+    private lazy var profileLabelStackView = UIStackView().then({
+        $0.axis = .vertical
+        $0.spacing = moderateScale(number: 8)
+    })
+    
     private lazy var profileLabel = UILabel().then({
-        $0.text = "testestese"
         $0.font = Font.bold(size: 32)
         $0.textColor = DesignSystemAsset.gray900.color
     })
@@ -105,9 +109,10 @@ public final class ProfileMainViewController: BaseViewController {
                                    selectFeedView,
                                    myFeedView,
                                    likeFeedView])
-        profileView.addSubviews([profileLabel,
-                                 profileEditTouchableLabel,
+        profileView.addSubviews([profileLabelStackView,
                                  profileTouchableImageView])
+        profileLabelStackView.addArrangedSubviews([profileLabel,
+                                                   profileEditTouchableLabel])
         selectFeedView.addArrangedSubviews([myFeedTouchableView,
                                             likeFeedTouchableView])
     }
@@ -137,11 +142,9 @@ public final class ProfileMainViewController: BaseViewController {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 72))
         }
-        profileLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
-        }
-        profileEditTouchableLabel.snp.makeConstraints {
-            $0.bottom.leading.equalToSuperview()
+        profileLabelStackView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview()
         }
         profileTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
