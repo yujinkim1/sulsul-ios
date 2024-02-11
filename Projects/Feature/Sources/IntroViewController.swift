@@ -17,7 +17,10 @@ final class IntroViewController: BaseViewController, MainBaseCoordinated {
         super.viewDidLoad()
         addViews()
         makeConstraints()
-        setupIfNeeded()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.coordinator?.moveTo(appFlow: AppFlow.tabBar(.auth(.profileInput(.selectDrink))), userData: nil)
+        }
     }
     
     private lazy var startButton = TouchableView().then {
@@ -33,12 +36,6 @@ final class IntroViewController: BaseViewController, MainBaseCoordinated {
         startButton.snp.makeConstraints {
             $0.center.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 100))
-        }
-    }
-    
-    override func setupIfNeeded() {
-        startButton.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.auth(.profileInput(.selectDrink))), userData: nil)
         }
     }
 }

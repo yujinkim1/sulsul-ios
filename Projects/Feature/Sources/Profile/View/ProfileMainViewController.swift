@@ -14,7 +14,7 @@ import Kingfisher
 public final class ProfileMainViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
     var coordinator: MoreBaseCoordinator?
-    private let viewModel = ProfileMainViewModel()
+    private let viewModel: ProfileMainViewModel
     
     private lazy var topHeaderView = UIView()
     private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
@@ -64,12 +64,23 @@ public final class ProfileMainViewController: BaseViewController {
         $0.isHidden = true
     })
     
+    init(viewModel: ProfileMainViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
         bind()
+        viewModel.getFeedsByMe()
+        viewModel.getFeedsLikeByMe()
     }
     
     private func bind() {

@@ -16,6 +16,7 @@ struct ProfileEditViewModel {
     private let accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIiLCJpYXQiOjE3MDU3NDk4MDEsImV4cCI6MTcwNjM1NDYwMSwiaWQiOjEsInNvY2lhbF90eXBlIjoiZ29vZ2xlIiwic3RhdHVzIjoiYWN0aXZlIn0.gucj-5g1CktXtAKqYp99K-_eI7sH_VmoyDTaVhKE6DU"
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
+    private let userMapper = UserMapper()
     
     private let randomNickname = PassthroughSubject<String, Never>()
     
@@ -35,22 +36,23 @@ struct ProfileEditViewModel {
                 if let nickname = try? self.jsonDecoder.decode(UserName.self, from: response) {
                     randomNickname.send(nickname.value)
                 } else {
-                    print("디코딩 모델 에러")
+                    print("디코딩 모델 에러4")
                 }
             case .failure(let error):
                 print(error)
             }
         }
     }
-    
     // MARK: - ID로 유저 정보를 조회
     func getUserInfo(userId: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { result in
             switch result {
             case .success(let response):
                 if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
-                    print(">>>>>>>>")
-                    print(userInfo)
+                    let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
+                    print("여기 이제 값 가져와서 모델에 넣어놓자")
+                } else {
+                    print("디코딩 에러")
                 }
             case .failure(let error):
                 print(error)

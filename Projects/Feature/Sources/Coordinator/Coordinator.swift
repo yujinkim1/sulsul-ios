@@ -52,13 +52,8 @@ enum TabBarFlow: Flow {
 }
 
 enum AuthFlow: Flow {
-//    case login(LoginScene)
-//    case signUp(SignUpScene)
-//    case findEmail(FindEmailScene)
-//    case findPassword(FindPasswordScene)
+    case login
     case profileInput(ProfileInputScene)
-//    case simplePasswordSetting
-//    case simplePasswordLogin
 }
 
 enum CommonScene {
@@ -113,8 +108,10 @@ enum TransferHistoryScene {
 }
 
 enum ProfileInputScene {
+    case setUserName
     case selectDrink
     case selectSnack
+    case selectComplete
 }
 
 // MARK: - 마이페이지
