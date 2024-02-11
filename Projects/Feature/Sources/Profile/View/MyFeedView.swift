@@ -47,7 +47,12 @@ class MyFeedView: UIView {
     private func bind() {
         viewModel.myFeedsPublisher()
             .receive(on: DispatchQueue.main)
-            .sink { _ in
+            .sink { response in
+                if response.count == 0 {
+                    self.myFeedState = .loginFeedNotExist
+                } else {
+                    self.myFeedState = .loginFeedExist
+                }
                 self.collectionView.reloadData()
             }
             .store(in: &cancelBag)
@@ -107,27 +112,66 @@ class MyFeedView: UIView {
 
 extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return viewModel.getBeneficiaryCountryList().count + 1
-        if viewModel.getMyFeedsValue().count == 0 {
-            // MARK: - 빈 셀일때
-            return 1
-        } else {
+
+//        if viewModel.getMyFeedsValue().count == 0 {
+//            // MARK: - 빈 셀일때
+//            return 1
+//        } else {
+//            return viewModel.getMyFeedsValue().count
+//        }
+        
+        switch myFeedState {
+        case .loginFeedExist:
             return viewModel.getMyFeedsValue().count
+        case .loginFeedNotExist:
+            return 1
+        case .notLogin:
+            return 1
+        case .none:
+            return 0
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if viewModel.getMyFeedsValue().count == 0 {
-            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
-            cell.updateView(withType: .logInMyFeed)
-            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
-                print("로그인하러가기")
-            }
-            return cell
-        } else {
+//        if viewModel.getMyFeedsValue().count == 0 {
+//            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+//            cell.updateView(withType: .logInMyFeed)
+//            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+//                print("로그인하러가기")
+//            }
+//            return cell
+//        } else {
+//            guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
+//            let model = viewModel.getMyFeedsValue()[indexPath.row]
+//            cell.bind(model)
+//            return cell
+//        }
+        switch myFeedState {
+        case .loginFeedExist:
             guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
             let model = viewModel.getMyFeedsValue()[indexPath.row]
             cell.bind(model)
+            
+            return cell
+        case .loginFeedNotExist:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            cell.updateView(withType: .logInMyFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("피드가 없음")
+            }
+            
+            return cell
+        case .notLogin:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            cell.updateView(withType: .logOutMyFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("로그인하러 가기")
+            }
+            
+            return cell
+        case .none:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            
             return cell
         }
     }

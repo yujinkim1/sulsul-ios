@@ -16,6 +16,7 @@ struct ProfileMainViewModel {
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private let userMapper = UserMapper()
+    private let tempMapper = PairingModelMapper()
     
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
@@ -64,7 +65,10 @@ struct ProfileMainViewModel {
             switch result {
             case .success(let response):
                 if let myFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
-                    myFeeds.send(myFeedsData.content)
+                    let mappedData = tempMapper.feedModel(from: myFeedsData.content ?? [])
+                    myFeeds.send(mappedData)
+                    print(">>>>>>")
+                    print(myFeedsData)
                 } else {
                     print("디코딩 모델 에러6")
                 }
@@ -85,7 +89,8 @@ struct ProfileMainViewModel {
             switch result {
             case .success(let response):
                 if let likeFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
-                    likeFeeds.send(likeFeedsData.content)
+                    let mappedData = tempMapper.feedModel(from: likeFeedsData.content ?? [])
+                    likeFeeds.send(mappedData)
                 } else {
                     print("디코딩 모델 에러7")
                 }
