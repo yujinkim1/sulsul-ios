@@ -116,6 +116,14 @@ public final class ProfileSettingViewController: BaseViewController {
         topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
+        drinkSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+        }
+        snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+        }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.tabBarController?.setTabBarHidden(true)

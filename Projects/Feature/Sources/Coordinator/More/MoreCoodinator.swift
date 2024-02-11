@@ -50,6 +50,16 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
             profileEditVC.coordinator = self
             currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
             currentNavigationViewController?.pushViewController(profileEditVC, animated: true)
+        case .selectDrink:
+            let viewModel = SelectDrinkViewModel()
+            let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+            selectDrinkVC.coordinator = self
+            currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
+        case .selectSnack:
+            let viewModel = SelectSnackViewModel()
+            let selectDrinkVC = SelectSnackViewController(viewModel: viewModel)
+            selectDrinkVC.coordinator = self
+            currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
         }
     }
 }

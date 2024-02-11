@@ -119,6 +119,8 @@ enum ProfileScene {
     case main
     case profileSetting
     case profileEdit
+    case selectDrink
+    case selectSnack
 }
 
 enum ProfileManagementScene {
