@@ -57,6 +57,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     }
     
     private lazy var clearButton = UIButton().then {
+        $0.addTarget(self, action: #selector(clearButtonDidTap), for: .touchUpInside)
         $0.setImage(UIImage(named: "filled_clear"), for: .normal)
     }
 
@@ -84,13 +85,12 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.text = "적절한 글자수의 닉네임이에요."
     })
     
-    private lazy var nextButton = UIButton().then {
-        $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
-        $0.titleLabel?.font = Font.bold(size: 16)
-        $0.layer.cornerRadius = CGFloat(12)
-        $0.setTitle("완료", for: .normal)
-        $0.setTitleColor(DesignSystemAsset.gray200.color, for: .normal)
-        $0.isEnabled = true
+    public lazy var nextButton = IndicatorTouchableView().then {
+        $0.text = "다음"
+        $0.textColor = DesignSystemAsset.gray200.color
+        $0.backgroundColor = DesignSystemAsset.main.color
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.clipsToBounds = true
     }
     
     public override func viewDidLoad() {
@@ -100,6 +100,19 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         addViews()
         makeConstraints()
         setupIfNeeded()
+        bind()
+    }
+    
+    private func bind() {
+        viewModel.randomNicknamePublisher()
+            .sink { [weak self] response in
+                self?.userNameTextField.text = response
+            }.store(in: &cancelBag)
+        
+        viewModel.setUserNamePublisher()
+            .sink { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }.store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -194,6 +207,19 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                                        selectAlbumCompletion: nil,
                                        baseCompletion: nil)
         }
+        resetTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.getRandomNickname()
+        }
+        nextButton.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            // TODO: - validation 검증로직 추가 통과 안되면 nextButton 비활성화
+            self.viewModel.setNickname(userNameTextField.text!)
+        }
+    }
+    
+    @objc private func clearButtonDidTap() {
+        userNameTextField.text = ""
     }
     
     private func openCamera() {
