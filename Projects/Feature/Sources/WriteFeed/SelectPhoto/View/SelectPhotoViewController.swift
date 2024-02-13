@@ -6,10 +6,17 @@
 //
 
 import UIKit
+import Photos
 import Combine
 import DesignSystem
 
 public class SelectPhotoViewController: BaseViewController {
+    
+    private let viewModel = SelectPhotoViewModel()
+    
+    private let cellSize = (UIScreen.main.bounds.width - 17.01) / 4
+    
+    private var cancelBag = Set<AnyCancellable>()
     
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow")?.withTintColor(DesignSystemAsset.gray900.color), for: .normal)
@@ -47,6 +54,22 @@ public class SelectPhotoViewController: BaseViewController {
         $0.dataSource = self
         $0.register(WriteFeedPhotoCell.self, forCellWithReuseIdentifier: WriteFeedPhotoCell.id)
         $0.backgroundColor = DesignSystemAsset.black.color
+    }
+    
+    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nil, bundle: nil)
+        
+        viewModel
+            .shouldUpateData()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.imageCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     public override func viewDidLoad() {
@@ -104,19 +127,19 @@ public class SelectPhotoViewController: BaseViewController {
 
 extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel.galleryImages().count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WriteFeedPhotoCell.id,
                                                             for: indexPath) as? WriteFeedPhotoCell else { return UICollectionViewCell() }
         
+        cell.bind(viewModel.galleryImages()[indexPath.item])
+        
         return cell
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let spacing = 17.01
-        let itemSize = (UIScreen.main.bounds.width - 17.01) / 4
-        return CGSize(width: itemSize, height: itemSize)
+        return CGSize(width: cellSize, height: cellSize)
     }
 }

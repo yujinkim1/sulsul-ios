@@ -8,11 +8,11 @@
 import UIKit
 import DesignSystem
 
-final class WriteFeedPhotoCell: BaseCollectionViewCell<String> {
-    static let id = "WriteFeedPhotoCell"
+final class WriteFeedPhotoCell: BaseCollectionViewCell<UIImage> {
     
     private lazy var photoImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
     }
     
     private lazy var selectedNumberLabel = UILabel().then {
@@ -31,10 +31,8 @@ final class WriteFeedPhotoCell: BaseCollectionViewCell<String> {
         layout()
     }
     
-    override func bind(_ model: String) {
-        if let url = URL(string: model) {
-            photoImageView.loadImage(url)
-        }
+    override func bind(_ model: UIImage) {
+        photoImageView.image = model
     }
     
     private func layout() {
