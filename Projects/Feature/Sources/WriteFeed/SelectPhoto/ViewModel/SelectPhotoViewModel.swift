@@ -72,4 +72,8 @@ final class SelectPhotoViewModel {
     func lastSelectedImage() -> UIImage {
         return images[lastSelectedIndex]
     }
+    
+    func selectedCount() -> Int {
+        return selectionIndex.count
+    }
 }

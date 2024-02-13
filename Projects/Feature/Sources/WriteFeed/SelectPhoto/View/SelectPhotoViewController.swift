@@ -38,6 +38,16 @@ public class SelectPhotoViewController: BaseViewController {
         $0.backgroundColor = .white
     }
     
+    private lazy var selectedCountLabel = UILabel().then {
+        $0.layer.cornerRadius = moderateScale(number: 8)
+        $0.font = Font.regular(size: 12)
+        $0.textColor = DesignSystemAsset.gray900.color
+        $0.textAlignment = .center
+        $0.backgroundColor = DesignSystemAsset.gray200.color
+        $0.clipsToBounds = true
+        $0.text = "0/5"
+    }
+    
     private lazy var bottomShadowView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.black.color
     }
@@ -90,7 +100,8 @@ public class SelectPhotoViewController: BaseViewController {
             nextButton,
             selectedImageView,
             imageCollectionView,
-            bottomShadowView
+            bottomShadowView,
+            selectedCountLabel
         ])
     }
     
@@ -126,6 +137,13 @@ public class SelectPhotoViewController: BaseViewController {
             $0.bottom.leading.trailing.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 74))
         }
+        
+        selectedCountLabel.snp.makeConstraints {
+            $0.bottom.equalTo(selectedImageView).offset(moderateScale(number: -16))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.width.equalTo(moderateScale(number: 34))
+            $0.height.equalTo(moderateScale(number: 22))
+        }
     }
 }
 
@@ -158,6 +176,8 @@ extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewD
                 
                 // MARK: 커다란 이미지 표시
                 selfRef.selectedImageView.image = selfRef.viewModel.lastSelectedImage()
+                
+                selfRef.selectedCountLabel.text = "\(selfRef.viewModel.selectedCount())/5"
             }
         }
         
