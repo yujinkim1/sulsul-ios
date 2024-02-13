@@ -60,7 +60,11 @@ public class SelectPhotoViewController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         viewModel
-            .shouldUpateData()
+            .fetchImages
+            .send(())
+        
+        viewModel
+            .updateData
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.imageCollectionView.reloadData()
@@ -134,16 +138,27 @@ extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewD
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WriteFeedPhotoCell.id,
                                                             for: indexPath) as? WriteFeedPhotoCell else { return UICollectionViewCell() }
         
+        // MARK: 이미지 표시
         let image = viewModel.galleryImages()[indexPath.item]
-        
         cell.bind(image)
         
+        // MARK: 선택 상태 표시
+        let selection = viewModel.selectStatus(indexPath)
+        cell.updateUIBySelection(selection.0, count: selection.1)
+                
         cell.photoImageView.onTapped { [weak self] in
-            self?.selectedImageView.image = image
-        }
-        
-        if indexPath.item == 0 {
-            selectedImageView.image = image
+            guard let selfRef = self else { return }
+            
+            if selfRef.viewModel.canSelectImage(indexPath) {
+                selfRef.viewModel.toggleSelection(indexPath)
+                
+                // MARK: 선택 상태 표시
+                let selection = selfRef.viewModel.selectStatus(indexPath)
+                cell.updateUIBySelection(selection.0, count: selection.1)
+                
+                // MARK: 커다란 이미지 표시
+                selfRef.selectedImageView.image = selfRef.viewModel.lastSelectedImage()
+            }
         }
         
         return cell

@@ -17,7 +17,7 @@ public class PhotoAuthUtil {
     private var photoWidth = (UIScreen.main.bounds.width - 17.01) / 4
     private lazy var photoSize = CGSize(width: photoWidth, height: photoWidth)
     
-    private var allImagesLoaded = CurrentValueSubject<Void, Never>(())
+    private var allImagesLoaded = CurrentValueSubject<[UIImage], Never>([])
     
     private init() {
         requestGalleryAuth { [weak self] in
@@ -42,7 +42,7 @@ public class PhotoAuthUtil {
                 selfRef.allPhotoImage.append(image)
                 
                 if selfRef.allPhotoImage.count == selfRef.photoLoadResult?.count {
-                    selfRef.allImagesLoaded.send(())
+                    selfRef.allImagesLoaded.send(selfRef.allPhotoImage)
                 }
             }
         }
@@ -61,8 +61,8 @@ public class PhotoAuthUtil {
         }
     }
     
-    public func shouldUpateData() -> AnyPublisher<Void, Never> {
-        return allImagesLoaded.eraseToAnyPublisher()
+    public func shouldUpateData(_: Void) -> AnyPublisher<[UIImage], Never> {
+        return allImagesLoaded.dropFirst().eraseToAnyPublisher()
     }
     
     public func galleryImages() -> [UIImage] {

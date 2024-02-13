@@ -21,6 +21,9 @@ final class WriteFeedPhotoCell: BaseCollectionViewCell<UIImage> {
         $0.layer.cornerRadius = moderateScale(number: 8)
         $0.backgroundColor = DesignSystemAsset.black.color.withAlphaComponent(0.3)
         $0.clipsToBounds = true
+        $0.textColor = .white
+        $0.textAlignment = .center
+        $0.font = Font.regular(size: 10)
     }
     
     override init(frame: CGRect) {
@@ -33,6 +36,25 @@ final class WriteFeedPhotoCell: BaseCollectionViewCell<UIImage> {
     
     override func bind(_ model: UIImage) {
         photoImageView.image = model
+    }
+    
+    override func layoutIfNeeded() {
+        updateUIBySelection(false, count: nil)
+    }
+    
+    func updateUIBySelection(_ isSelect: Bool, count: String?) {
+        if isSelect, let count = count {
+            photoImageView.layer.borderColor = DesignSystemAsset.main.color.cgColor
+            photoImageView.layer.borderWidth = moderateScale(number: 1.5)
+            selectedNumberLabel.text = count
+            selectedNumberLabel.layer.borderWidth = 0
+            selectedNumberLabel.backgroundColor = DesignSystemAsset.main.color
+        } else {
+            photoImageView.layer.borderWidth = 0
+            selectedNumberLabel.text = ""
+            selectedNumberLabel.layer.borderWidth = moderateScale(number: 1.5)
+            selectedNumberLabel.backgroundColor = DesignSystemAsset.black.color.withAlphaComponent(0.3)
+        }
     }
     
     private func layout() {
