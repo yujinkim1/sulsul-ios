@@ -10,7 +10,7 @@ import DesignSystem
 
 final class WriteFeedPhotoCell: BaseCollectionViewCell<UIImage> {
     
-    private lazy var photoImageView = UIImageView().then {
+    lazy var photoImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.clipsToBounds = true
     }

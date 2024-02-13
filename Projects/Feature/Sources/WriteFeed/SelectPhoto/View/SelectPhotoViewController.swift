@@ -134,7 +134,17 @@ extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewD
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WriteFeedPhotoCell.id,
                                                             for: indexPath) as? WriteFeedPhotoCell else { return UICollectionViewCell() }
         
-        cell.bind(viewModel.galleryImages()[indexPath.item])
+        let image = viewModel.galleryImages()[indexPath.item]
+        
+        cell.bind(image)
+        
+        cell.photoImageView.onTapped { [weak self] in
+            self?.selectedImageView.image = image
+        }
+        
+        if indexPath.item == 0 {
+            selectedImageView.image = image
+        }
         
         return cell
     }
