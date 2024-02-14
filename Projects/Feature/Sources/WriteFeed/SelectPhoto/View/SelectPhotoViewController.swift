@@ -164,6 +164,8 @@ extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewD
         let image = viewModel.galleryImages()[indexPath.item]
         cell.bind(image)
         
+        selectedImageView.image = viewModel.lastSelectedImage()
+        
         // MARK: 선택 상태 표시
         let selection = viewModel.selectStatus(indexPath)
         cell.updateUIBySelection(selection.0, count: selection.1)
@@ -180,7 +182,6 @@ extension SelectPhotoViewController: UICollectionViewDelegate, UICollectionViewD
                 
                 // MARK: 커다란 이미지 표시
                 selfRef.selectedImageView.image = selfRef.viewModel.lastSelectedImage()
-                
                 selfRef.selectedCountLabel.text = "\(selfRef.viewModel.selectedCount())/5"
             }
         }
