@@ -10,7 +10,8 @@ import Photos
 import Combine
 import DesignSystem
 
-public class SelectPhotoViewController: BaseViewController {
+public class SelectPhotoViewController: BaseViewController, CommonBaseCoordinated {
+    var coordinator: CommonBaseCoordinator?
     
     private let viewModel = SelectPhotoViewModel()
     
@@ -67,6 +68,8 @@ public class SelectPhotoViewController: BaseViewController {
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nil, bundle: nil)
         
+        hidesBottomBarWhenPushed = true
+        
         viewModel
             .fetchImages
             .send(())
@@ -95,6 +98,10 @@ public class SelectPhotoViewController: BaseViewController {
         
         addViews()
         makeConstraints()
+        
+        backButton.onTapped { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
     }
     
     public override func addViews() {

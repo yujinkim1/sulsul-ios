@@ -52,7 +52,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(frame: scene.coordinateSpace.bounds)
         window?.windowScene = scene
-        window?.rootViewController = SelectPhotoViewController()
+        window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
 }

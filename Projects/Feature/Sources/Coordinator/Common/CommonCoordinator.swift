@@ -34,7 +34,16 @@ final class CommonCoordinator: CommonBaseCoordinator {
         switch scene {
         case .web:
             moveToTermsWebScene(userData)
+        case .selectPhoto:
+            moveToSelectPhoto()
         }
+    }
+    
+    private func moveToSelectPhoto() {
+        let vc = SelectPhotoViewController()
+        vc.coordinator = self
+        
+        currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToTermsWebScene(_ userData: [String: Any]?) {
