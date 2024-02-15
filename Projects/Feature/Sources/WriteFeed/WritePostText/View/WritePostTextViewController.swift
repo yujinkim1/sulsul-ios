@@ -8,10 +8,20 @@
 import UIKit
 import DesignSystem
 
-final class WritePostTextViewController: BaseViewController, CommonBaseCoordinated {
+final class WritePostTextViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var coordinator: CommonBaseCoordinator?
     
     override func viewDidLoad() {
-        view.backgroundColor = .yellow
+        super.viewDidLoad()
+        
+        setHeaderText("썸네일&제목입력", actionText: "다음")
+    }
+    
+    override func addViews() {
+        super.addViews()
+    }
+    
+    override func makeConstraints() {
+        super.makeConstraints()
     }
 }

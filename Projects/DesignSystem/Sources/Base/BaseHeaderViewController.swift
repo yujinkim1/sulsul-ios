@@ -8,18 +8,18 @@
 import UIKit
 
 open class BaseHeaderViewController: BaseViewController {
-    lazy var headerView = UIView()
+    open lazy var headerView = UIView()
     
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow")?.withTintColor(DesignSystemAsset.gray900.color), for: .normal)
     }
     
-    lazy var titleLabel = UILabel().then {
+    open lazy var titleLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
     }
     
-    lazy var actionButton = UILabel().then {
+    open lazy var actionButton = UILabel().then {
         $0.textColor = DesignSystemAsset.main.color
         $0.font = Font.semiBold(size: 14)
     }
@@ -29,6 +29,15 @@ open class BaseHeaderViewController: BaseViewController {
         
         addViews()
         makeConstraints()
+        
+        backButton.onTapped { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    open func setHeaderText(_ titleText: String, actionText: String) {
+        titleLabel.text = titleText
+        actionButton.text = actionText
     }
     
     open override func addViews() {
