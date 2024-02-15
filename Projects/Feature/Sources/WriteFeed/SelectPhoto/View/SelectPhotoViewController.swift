@@ -108,7 +108,7 @@ public class SelectPhotoViewController: BaseViewController, CommonBaseCoordinate
             if selfRef.viewModel.selectedCount() > 0 {
                 let selectedImages = selfRef.viewModel.selectedImage()
                 selfRef.coordinator?.moveTo(appFlow: TabBarFlow.common(.writePostText),
-                                            userData: ["imgaes": selectedImages])
+                                            userData: ["images": selectedImages])
             }
         }
         
