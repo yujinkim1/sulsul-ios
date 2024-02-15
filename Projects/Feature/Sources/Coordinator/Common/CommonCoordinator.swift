@@ -36,7 +36,18 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToTermsWebScene(userData)
         case .selectPhoto:
             moveToSelectPhoto()
+        case .writePostText:
+            moveToWritePostText(userData)
         }
+    }
+    
+    private func moveToWritePostText(_ userData: [String: Any]?) {
+        guard let images = userData?["images"] else { return }
+        
+        let vc = WritePostTextViewController()
+        vc.coordinator = self
+        
+        currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToSelectPhoto() {

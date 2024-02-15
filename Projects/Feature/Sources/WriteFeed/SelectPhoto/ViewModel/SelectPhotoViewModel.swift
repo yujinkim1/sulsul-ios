@@ -76,4 +76,14 @@ final class SelectPhotoViewModel {
     func selectedCount() -> Int {
         return selectionIndex.count
     }
+    
+    func selectedImage() -> [UIImage] {
+        var selectedImages: [UIImage] = []
+        
+        selectionIndex.forEach { selectedIndex in
+            selectedImages.append(images[selectedIndex])
+        }
+        
+        return selectedImages
+    }
 }

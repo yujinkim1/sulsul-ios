@@ -98,6 +98,19 @@ public class SelectPhotoViewController: BaseViewController, CommonBaseCoordinate
         
         addViews()
         makeConstraints()
+        setTabEvents()
+    }
+    
+    private func setTabEvents() {
+        nextButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
+            if selfRef.viewModel.selectedCount() > 0 {
+                let selectedImages = selfRef.viewModel.selectedImage()
+                selfRef.coordinator?.moveTo(appFlow: TabBarFlow.common(.writePostText),
+                                            userData: ["imgaes": selectedImages])
+            }
+        }
         
         backButton.onTapped { [weak self] in
             self?.navigationController?.popViewController(animated: true)
