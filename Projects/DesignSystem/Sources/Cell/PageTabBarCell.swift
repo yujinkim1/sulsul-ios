@@ -1,0 +1,78 @@
+//
+//  PageTabBarCell.swift
+//  DesignSystem
+//
+//  Created by Yujin Kim on 2024-01-12.
+//
+
+import UIKit
+
+/// 페이지를 전환하는 역할을 해주는 컴포넌트
+open class PageTabBarCell: UICollectionViewCell {
+    public static let reuseIdentifier = "PageTabBarCell"
+    
+    // MARK: - Custom Property
+    private let selectedColor = DesignSystemAsset.main.color
+    private let unselectedColor = DesignSystemAsset.gray300.color
+    private let selectedFontSize = Font.bold(size: 18)
+    private let unselectedFontSize = Font.medium(size: 18)
+    
+    private lazy var indicatorView = UIView()
+    private lazy var titleLabel = UILabel().then {
+        $0.frame = .zero
+        $0.setTextLineHeight(height: 28)
+    }
+    
+    open var title: String? {
+        get {
+            return titleLabel.text
+        }
+        set {
+            titleLabel.text = newValue
+        }
+    }
+    
+    override open var isSelected: Bool {
+        didSet {
+            titleLabel.font = isSelected ? selectedFontSize : unselectedFontSize
+            titleLabel.textColor = isSelected ? selectedColor : unselectedColor
+            
+            indicatorView.backgroundColor = isSelected ? selectedColor : unselectedColor
+        }
+    }
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addViews()
+        makeConstraints()
+    }
+    
+    @available(*, unavailable)
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override open func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.titleLabel.text = nil
+    }
+    
+    // MARK: - Custom Method
+    
+    private func addViews() {
+        self.contentView.addSubviews([titleLabel, indicatorView])
+    }
+    
+    private func makeConstraints() {
+        titleLabel.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+        }
+        
+        indicatorView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 2))
+        }
+    }
+}
