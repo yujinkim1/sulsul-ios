@@ -5,9 +5,9 @@
 //  Created by Yujin Kim on 2024-01-05.
 //
 
-import DesignSystem
 import Combine
 import UIKit
+import DesignSystem
 
 public final class RankingViewController: BaseViewController {
     var coordinator: RankingBaseCoordinator?
@@ -15,6 +15,13 @@ public final class RankingViewController: BaseViewController {
     
     private var viewControllers: [UIViewController] = []
     private var cancelBag = Set<AnyCancellable>()
+    
+    private lazy var rankingDrinkViewController = RankingDrinkViewController()
+    private lazy var rankingCombinationViewController = RankingCombinationViewController()
+    private lazy var pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal).then {
+        $0.dataSource = self
+        $0.delegate = self
+    }
     
     private lazy var titleLabel = UILabel().then {
         $0.text = "이번주 랭킹"
@@ -43,21 +50,8 @@ public final class RankingViewController: BaseViewController {
         $0.showsHorizontalScrollIndicator = false
         $0.delegate = self
         $0.dataSource = self
-        $0.register(RankingPageTabBarCell.self, forCellWithReuseIdentifier: RankingPageTabBarCell.reuseIdentifier)
+        $0.register(PageTabBarCell.self, forCellWithReuseIdentifier: PageTabBarCell.reuseIdentifier)
     }
-    
-    private lazy var indicatorView = UIView().then {
-        $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 1)
-    }
-    
-    private lazy var pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal).then {
-        $0.dataSource = self
-        $0.delegate = self
-    }
-    
-    private lazy var rankingDrinkViewController = RankingDrinkViewController()
-    
-    private lazy var rankingCombinationViewController = RankingCombinationViewController()
     
     public override func viewDidLoad() {
         view.backgroundColor = DesignSystemAsset.black.color
@@ -73,7 +67,7 @@ public final class RankingViewController: BaseViewController {
     
     public override func addViews() {
         pageTabBarContainerView.addSubview(pageTabBarView)
-        view.addSubviews([titleLabel, weekendLabel, pageTabBarContainerView, indicatorView, pageViewController.view])
+        view.addSubviews([titleLabel, weekendLabel, pageTabBarContainerView, pageViewController.view])
         addChild(pageViewController)
     }
     
@@ -95,15 +89,9 @@ public final class RankingViewController: BaseViewController {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.top.bottom.equalToSuperview()
         }
-        indicatorView.snp.makeConstraints {
-            $0.height.equalTo(2)
-            $0.width.equalTo(pageTabBarView.snp.width).dividedBy(2)
-            $0.top.equalTo(pageTabBarContainerView.snp.bottom)
-            $0.leading.equalTo(pageTabBarView)
-        }
         pageViewController.view.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 16))
+            $0.top.equalTo(pageTabBarView.snp.bottom).offset(moderateScale(number: 16))
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
@@ -128,7 +116,6 @@ extension RankingViewController {
         viewControllers = [rankingDrinkViewController, rankingCombinationViewController]
         
         pageViewController.didMove(toParent: self)
-        
         pageViewController.setViewControllers([viewControllers.first!], direction: .forward, animated: false)
     }
 }
@@ -141,16 +128,17 @@ extension RankingViewController: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RankingPageTabBarCell.reuseIdentifier, for: indexPath) as? RankingPageTabBarCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PageTabBarCell.reuseIdentifier, for: indexPath) as? PageTabBarCell else {
             return UICollectionViewCell()
         }
         
         if indexPath.item == 0 {
-            cell.configure(text: "술")
-            
+            // cell.configure(text: "술")
+            cell.title = "술"
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
         } else if indexPath.item == 1 {
-            cell.configure(text: "술+안주")
+            // cell.configure(text: "술+안주")
+            cell.title = "술+안주"
         }
         
         return cell
@@ -163,17 +151,6 @@ extension RankingViewController: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let itemWidth = collectionView.bounds.width / CGFloat(2)
         let position = CGFloat(indexPath.item) * itemWidth
-        
-        UIView.animate(withDuration: 0.3) {
-            self.indicatorView.snp.remakeConstraints {
-                $0.height.equalTo(2)
-                $0.width.equalTo(self.pageTabBarView.snp.width).dividedBy(2)
-                $0.top.equalTo(self.pageTabBarContainerView.snp.bottom)
-                $0.leading.equalTo(self.pageTabBarView).offset(position)
-            }
-            
-            self.view.layoutIfNeeded()
-        }
         
         let selectedViewController = viewControllers[indexPath.item]
         

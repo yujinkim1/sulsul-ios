@@ -89,9 +89,7 @@ extension RankingCombinationViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RankingCombinationCell.reuseIdentifier, for: indexPath) as? RankingCombinationCell else {
-            return UICollectionViewCell()
-        }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RankingCombinationCell.reuseIdentifier, for: indexPath) as? RankingCombinationCell else { return UICollectionViewCell() }
         
         if let model = viewModel?.combinationDatasource.first?.ranking?[indexPath.item] {
             print(model)
@@ -105,5 +103,5 @@ extension RankingCombinationViewController: UICollectionViewDataSource {
 // MARK: - 콜렉션 뷰 델리게이트
 
 extension RankingCombinationViewController: UICollectionViewDelegate {
-    // 필요한 경우 사용할 예정
+    // 필요한 경우 사용
 }

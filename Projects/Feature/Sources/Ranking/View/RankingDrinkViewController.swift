@@ -5,18 +5,18 @@
 //  Created by Yujin Kim on 2024-01-05.
 //
 
-import DesignSystem
 import Combine
 import UIKit
+import DesignSystem
 
 /// 술 순위를 보여주는 뷰 컨트롤러
 final class RankingDrinkViewController: BaseViewController {
     var viewModel: RankingViewModel?
+    var detailViewController: DetailDrinkViewController?
     
     private var cancelBag = Set<AnyCancellable>()
     
     private lazy var layout = UICollectionViewCompositionalLayout { (section, environment) -> NSCollectionLayoutSection? in
-        // 한 flow당 하나의 아이템
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
@@ -105,5 +105,16 @@ extension RankingDrinkViewController: UICollectionViewDataSource {
 // MARK: - 콜렉션 뷰 델리게이트
 
 extension RankingDrinkViewController: UICollectionViewDelegate {
-    // 필요한 경우 사용할 예정
+    /// !! - DetailDrinkViewController 디자인 테스트
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        let rootViewController = RankingViewController()
+        let viewController = DetailDrinkViewController()
+        
+        let navigationController = UINavigationController(rootViewController: rootViewController)
+        navigationController.pushViewController(viewController, animated: true)
+        // present(viewController, animated: true, completion: nil)
+    }
 }
