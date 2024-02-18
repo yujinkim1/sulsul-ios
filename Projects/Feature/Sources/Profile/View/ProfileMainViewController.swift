@@ -92,9 +92,7 @@ public final class ProfileMainViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
-                print(">>>>>>>>")
-                print(result)
-                if result.id == 0 { // 비로그인 상태
+                if result.id == 0 {
                     self.profileLabel.text = "로그인 해주세요!"
                     self.profileEditTouchableLabel.isHidden = true
                     self.myFeedView.updateState(.notLogin)
@@ -201,7 +199,8 @@ public final class ProfileMainViewController: BaseViewController {
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
         }
         profileTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
         }
         profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }

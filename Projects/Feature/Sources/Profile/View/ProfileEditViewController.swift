@@ -116,6 +116,11 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             .sink { [weak self] response in
                 guard let self = self else { return }
                 self.userNameTextField.text = response
+                specializeGuideImageView.image = UIImage(named: "checkmark")
+                specializeGuidLabel.textColor = UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
+                countGuideImageView.image = UIImage(named: "checkmark")
+                countGuideLabel.textColor = UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
+                
                 self.nextButton.textColor = DesignSystemAsset.gray200.color
                 self.nextButton.backgroundColor = DesignSystemAsset.main.color
                 self.nextButton.isUserInteractionEnabled = true
