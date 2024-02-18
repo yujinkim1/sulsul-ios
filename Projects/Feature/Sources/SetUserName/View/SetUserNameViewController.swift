@@ -325,7 +325,6 @@ extension SetUserNameViewController {
     }
     
     @objc private func nextButtonDidTap() {
-        // TODO: - 추후 userId 수정
         viewModel.sendSetUserName(userId: UserDefaultsUtil.shared.getInstallationId(), userNickName: userNameTextField.text ?? "")
     }
     

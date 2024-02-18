@@ -204,7 +204,14 @@ public final class ProfileMainViewController: BaseViewController {
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
         }
         profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: nil)
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
         }
+    }
+}
+
+extension ProfileMainViewController: SetCompleteDelegate {
+    func setComplete() {
+        viewModel.getUserInfo()
     }
 }
