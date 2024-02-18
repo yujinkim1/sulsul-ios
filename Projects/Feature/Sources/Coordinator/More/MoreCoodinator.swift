@@ -46,10 +46,8 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
             currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
             currentNavigationViewController?.pushViewController(profileSettingVC, animated: true)
         case .profileEdit:
-            guard let delegate = userData?["delegate"] as? SetCompleteDelegate else { return }
             let profileEditVC = ProfileEditViewController()
             profileEditVC.coordinator = self
-            profileEditVC.delegate = delegate
             currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
             currentNavigationViewController?.pushViewController(profileEditVC, animated: true)
         case .selectDrink:

@@ -79,6 +79,7 @@ public final class ProfileMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
@@ -207,10 +208,8 @@ public final class ProfileMainViewController: BaseViewController {
             self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
         }
     }
-}
-
-extension ProfileMainViewController: SetCompleteDelegate {
-    func setComplete() {
+    
+    @objc func profileIsChanged() {
         viewModel.getUserInfo()
     }
 }
