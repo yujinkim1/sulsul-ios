@@ -42,9 +42,10 @@ final class CommonCoordinator: CommonBaseCoordinator {
     }
     
     private func moveToWritePostText(_ userData: [String: Any]?) {
-        guard let images = userData?["images"] else { return }
+        guard let images = userData?["images"] as? [UIImage] else { return }
         
-        let vc = WritePostTextViewController()
+        let vc = WriteTitleViewController()
+        vc.setSelectedImages(images)
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)
