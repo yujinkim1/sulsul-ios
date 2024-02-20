@@ -38,7 +38,16 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToSelectPhoto()
         case .writePostText:
             moveToWritePostText(userData)
+        case.writeContent:
+            moveToWriteContent(userData)
         }
+    }
+    
+    private func moveToWriteContent(_ userData: [String: Any]?) {
+        guard let images = userData?["images"] as? [UIImage] else { return }
+
+        let vc = WriteContentViewController()
+        vc.coordinator = self
     }
     
     private func moveToWritePostText(_ userData: [String: Any]?) {

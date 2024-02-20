@@ -1,5 +1,5 @@
 //
-//  WritePostTextViewController.swift
+//  WriteTitleViewController.swift
 //  Feature
 //
 //  Created by 김유진 on 2/15/24.
@@ -11,6 +11,8 @@ import DesignSystem
 final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var coordinator: CommonBaseCoordinator?
     
+    private lazy var textViewTwoLineHeight: Int? = nil
+    
     private lazy var thumnailImageView = UIImageView().then {
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.contentMode = .scaleAspectFill
@@ -18,10 +20,18 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         $0.clipsToBounds = true
     }
     
+    private lazy var titlePlaceholderLabel = UILabel().then {
+        $0.text = "여기에 제목을 입력해주세요."
+        $0.textColor = DesignSystemAsset.gray900.color
+        $0.font = Font.bold(size: 24)
+    }
+    
     private lazy var titleTextView = UITextView().then {
         $0.font = Font.bold(size: 24)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.backgroundColor = .clear
+        $0.delegate = self
+        $0.textContainer.maximumNumberOfLines = 2
     }
     
     private lazy var imageScrollView = UIScrollView()
@@ -89,6 +99,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             thumnailImageView,
             imageScrollView,
             reSelectPhotoLabel,
+            titlePlaceholderLabel,
             titleTextView
         ])
         
@@ -104,9 +115,16 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             $0.size.equalTo(moderateScale(number: 353))
         }
         
+        titlePlaceholderLabel.snp.makeConstraints {
+            $0.trailing.equalTo(thumnailImageView).inset(moderateScale(number: 16))
+            $0.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
+            $0.leading.equalTo(thumnailImageView).inset(moderateScale(number: 22))
+            $0.height.equalTo(moderateScale(number: 36))
+        }
+        
         titleTextView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
-            $0.height.equalTo(moderateScale(number: 72))
+            $0.height.equalTo(moderateScale(number: 36))
         }
         
         imageScrollView.snp.makeConstraints {
@@ -123,5 +141,24 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         imageStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+}
+
+extension WriteTitleViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
+        let numberOfChars = newText.count
+        return numberOfChars <= 30
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        let numberOfLine = Int(textView.contentSize.height / textView.font!.lineHeight)
+        
+        titleTextView.snp.remakeConstraints {
+            $0.leading.trailing.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
+            $0.height.equalTo(moderateScale(number: numberOfLine == 2 ? 72 : 36))
+        }
+        
+        titlePlaceholderLabel.isHidden = !textView.text.isEmpty
     }
 }
