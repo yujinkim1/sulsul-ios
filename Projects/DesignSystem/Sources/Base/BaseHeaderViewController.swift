@@ -35,9 +35,13 @@ open class BaseHeaderViewController: BaseViewController {
         }
     }
     
-    open func setHeaderText(_ titleText: String, actionText: String) {
+    open func setHeaderText(_ titleText: String, actionText: String, actionColor: UIColor? = nil) {
         titleLabel.text = titleText
         actionButton.text = actionText
+        
+        if let actionColor = actionColor {
+            actionButton.textColor = actionColor
+        }
     }
     
     open override func addViews() {

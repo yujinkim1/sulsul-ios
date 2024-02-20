@@ -14,6 +14,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
     private lazy var images: [UIImage] = []
     private lazy var heightByLine: [Int: CGFloat] = [1: 36, 2: 72, 3: 108]
     private lazy var textViewTwoLineHeight: Int? = nil
+    private lazy var thumnailIndex = 0
     
     private lazy var thumnailImageView = UIImageView().then {
         $0.layer.cornerRadius = moderateScale(number: 12)
@@ -66,7 +67,11 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             guard let selfRef = self else { return }
             
             if !(selfRef.titleTextView.text.replacingOccurrences(of: " ", with: "").isEmpty) {
-                selfRef.coordinator?.moveTo(appFlow: AppFlow.tabBar(.common(.writeContent)), userData: ["images": selfRef.images])
+                var thumnailFirstSort = selfRef.images
+                let thumnail = thumnailFirstSort.remove(at: selfRef.thumnailIndex)
+                thumnailFirstSort.insert(thumnail, at: 0)
+                
+                selfRef.coordinator?.moveTo(appFlow: AppFlow.tabBar(.common(.writeContent)), userData: ["images": thumnailFirstSort])
             }
         }
     }
@@ -89,6 +94,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             }
             
             imageView.onTapped { [weak self] in
+                self?.thumnailIndex = index
                 self?.thumnailImageView.image = image
                 self?.updateThumnailImage(index)
             }
