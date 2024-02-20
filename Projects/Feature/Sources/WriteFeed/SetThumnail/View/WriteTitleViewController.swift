@@ -11,6 +11,8 @@ import DesignSystem
 final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var coordinator: CommonBaseCoordinator?
     
+    private lazy var images: [UIImage] = []
+    private lazy var heightByLine: [Int: CGFloat] = [1: 36, 2: 72, 3: 108]
     private lazy var textViewTwoLineHeight: Int? = nil
     
     private lazy var thumnailImageView = UIImageView().then {
@@ -31,10 +33,12 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         $0.textColor = DesignSystemAsset.gray900.color
         $0.backgroundColor = .clear
         $0.delegate = self
-        $0.textContainer.maximumNumberOfLines = 2
+        $0.textContainer.maximumNumberOfLines = 3
     }
     
-    private lazy var imageScrollView = UIScrollView()
+    private lazy var imageScrollView = UIScrollView().then {
+        $0.showsHorizontalScrollIndicator = false
+    }
     
     private lazy var imageStackView = UIStackView().then {
         $0.distribution = .equalSpacing
@@ -57,9 +61,19 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         reSelectPhotoLabel.onTapped { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
+        
+        actionButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
+            if !(selfRef.titleTextView.text.replacingOccurrences(of: " ", with: "").isEmpty) {
+                selfRef.coordinator?.moveTo(appFlow: AppFlow.tabBar(.common(.writeContent)), userData: ["images": selfRef.images])
+            }
+        }
     }
     
     func setSelectedImages(_ images: [UIImage]) {
+        self.images = images
+        
         images.enumerated().forEach { index, image in
             let imageView = SelectableImageView(image: image)
             
@@ -153,10 +167,11 @@ extension WriteTitleViewController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         let numberOfLine = Int(textView.contentSize.height / textView.font!.lineHeight)
+        guard let height = heightByLine[numberOfLine] else { return }
         
         titleTextView.snp.remakeConstraints {
             $0.leading.trailing.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
-            $0.height.equalTo(moderateScale(number: numberOfLine == 2 ? 72 : 36))
+            $0.height.equalTo(moderateScale(number: height))
         }
         
         titlePlaceholderLabel.isHidden = !textView.text.isEmpty
