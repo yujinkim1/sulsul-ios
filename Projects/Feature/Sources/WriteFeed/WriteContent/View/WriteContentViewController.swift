@@ -96,7 +96,14 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         tagAddButton.onTapped {
         }
         
-        imageAddButton.onTapped {
+        imageAddButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
+            if selfRef.images.count == 5 {
+                selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요")
+            } else {
+                // TODO: 갤러리 오픈
+            }
         }
     }
     
