@@ -44,6 +44,10 @@ open class BaseHeaderViewController: BaseViewController {
         }
     }
     
+    open func changeActionColor(_ color: UIColor) {
+        actionButton.textColor = color
+    }
+    
     open override func addViews() {
         super.addViews()
         

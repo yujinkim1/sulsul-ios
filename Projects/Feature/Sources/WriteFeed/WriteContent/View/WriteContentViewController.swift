@@ -249,6 +249,13 @@ extension WriteContentViewController: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        placeholderLabel.isHidden = !textView.text.isEmpty
+        let isTextEmpty = textView.text.isEmpty
+        placeholderLabel.isHidden = !isTextEmpty
+        
+        if isTextEmpty {
+            changeActionColor(DesignSystemAsset.gray300.color)
+        } else {
+            changeActionColor(DesignSystemAsset.main.color)
+        }
     }
 }
