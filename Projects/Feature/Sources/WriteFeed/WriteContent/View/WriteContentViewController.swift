@@ -70,10 +70,34 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         $0.layer.cornerRadius = moderateScale(number: 16)
     }
     
+    private lazy var iconContainerView = UIView()
+    private lazy var iconLineView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray200.color
+    }
+    
+    private lazy var imageAddButton = UIView()
+    private lazy var imageAddImageView = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addImage")
+    }
+    
+    private lazy var tagAddButton = UIView()
+    private lazy var tagAddImageView = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addTag")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setHeaderText("내용입력", actionText: "게시", actionColor: DesignSystemAsset.gray300.color)
+        setTabEvents()
+    }
+    
+    private func setTabEvents() {
+        tagAddButton.onTapped {
+        }
+        
+        imageAddButton.onTapped {
+        }
     }
     
     func setSelectedImages(_ images: [UIImage]) {
@@ -109,13 +133,23 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
             recognizedImageView,
             lineView,
             contentStackView,
-            placeholderLabel
+            placeholderLabel,
+            iconContainerView
         ])
         
         contentStackView.addArrangedSubviews([
             contentTextView,
             tagContainerView
         ])
+        
+        iconContainerView.addSubviews([
+            iconLineView,
+            imageAddButton,
+            tagAddButton
+        ])
+        
+        imageAddButton.addSubview(imageAddImageView)
+        tagAddButton.addSubview(tagAddImageView)
         
         imageScrollView.addSubview(imageStackView)
     }
@@ -163,6 +197,39 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         
         placeholderLabel.snp.makeConstraints {
             $0.top.leading.equalTo(contentTextView).offset(moderateScale(number: 7))
+        }
+        
+        iconContainerView.snp.makeConstraints {
+            $0.width.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(moderateScale(number: 34))
+            $0.height.equalTo(moderateScale(number: 48))
+        }
+
+        iconLineView.snp.makeConstraints {
+            $0.top.width.centerX.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 2))
+        }
+        
+        imageAddButton.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(moderateScale(number: 12))
+            $0.size.equalTo(moderateScale(number: 40))
+            $0.centerY.equalToSuperview()
+        }
+        
+        tagAddButton.snp.makeConstraints {
+            $0.leading.equalTo(imageAddButton.snp.trailing)
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(moderateScale(number: 40))
+        }
+        
+        imageAddImageView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.size.equalTo(moderateScale(number: 24))
+        }
+        
+        tagAddImageView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.size.equalTo(moderateScale(number: 24))
         }
     }
 }
