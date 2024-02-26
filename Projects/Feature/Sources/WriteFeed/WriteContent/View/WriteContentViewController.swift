@@ -105,6 +105,12 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
                 // TODO: 갤러리 오픈
             }
         }
+        
+        actionButton.onTapped { [weak self] in
+            let vc = ScoreBottomSheetViewController(snack: "삼겹살", drink: "처음처럼")
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: false)
+        }
     }
     
     func setSelectedImages(_ images: [UIImage]) {
@@ -253,8 +259,10 @@ extension WriteContentViewController: UITextViewDelegate {
         placeholderLabel.isHidden = !isTextEmpty
         
         if isTextEmpty {
+            actionButton.isUserInteractionEnabled = false
             changeActionColor(DesignSystemAsset.gray300.color)
         } else {
+            actionButton.isUserInteractionEnabled = true
             changeActionColor(DesignSystemAsset.main.color)
         }
     }
