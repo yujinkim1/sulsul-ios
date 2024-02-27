@@ -8,6 +8,8 @@
 import UIKit
 
 open class BaseViewController: UIViewController {
+    open lazy var keyboardHeight: CGFloat = 0
+
     open override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -18,11 +20,31 @@ open class BaseViewController: UIViewController {
         addViews()
         makeConstraints()
         setupIfNeeded()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillChange),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillChange),
+                                               name: UIResponder.keyboardDidHideNotification,
+                                               object: nil)
+        
     }
     
     deinit {
         LogDebug("🌈 deinit ---> \(self)")
         deinitialize()
+    }
+    
+    @objc func keyboardWillChange(_ notification: Notification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            
+            self.keyboardHeight = keyboardHeight
+        }
     }
     
     open func addViews() {}
@@ -48,8 +70,13 @@ open class BaseViewController: UIViewController {
     open func showToastMessageView(toastType: ToastType, title: String) {
         let toastView = ToastMessageView()
         toastView.bind(toastType: toastType, title: title)
+        
         view.addSubview(toastView)
         view.bringSubviewToFront(toastView)
+        toastView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: 15))
+        }
         UIView.animate(withDuration: 1, delay: 0.5, options: .curveEaseOut, animations: { [weak self] in
             toastView.alpha = 0.0
         }, completion: { [weak self] _ in
