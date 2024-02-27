@@ -122,12 +122,70 @@ final class ScoreBottomSheetViewController: BaseViewController {
         view.backgroundColor = .clear
         
         setupGestureRecognizer()
+        setTabEvents()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         showBottomSheet()
+    }
+    
+    private func setTabEvents() {
+        clapImageView1.onTapped { [weak self] in
+            self?.scoreLabel.text = "1점"
+            self?.scoreLabel.textColor = DesignSystemAsset.main.color
+            self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView2.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView3.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView4.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView5.image = UIImage(named: "writeFeed_clap")
+            self?.completeButton.setClickable(true)
+        }
+        
+        clapImageView2.onTapped { [weak self] in
+            self?.scoreLabel.text = "2점"
+            self?.scoreLabel.textColor = DesignSystemAsset.main.color
+            self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView2.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView3.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView4.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView5.image = UIImage(named: "writeFeed_clap")
+            self?.completeButton.setClickable(true)    
+        }
+        
+        clapImageView3.onTapped { [weak self] in
+            self?.scoreLabel.text = "3점"
+            self?.scoreLabel.textColor = DesignSystemAsset.main.color
+            self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView2.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView3.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView4.image = UIImage(named: "writeFeed_clap")
+            self?.clapImageView5.image = UIImage(named: "writeFeed_clap")
+            self?.completeButton.setClickable(true)
+        }
+        
+        clapImageView4.onTapped { [weak self] in
+            self?.scoreLabel.text = "4점"
+            self?.scoreLabel.textColor = DesignSystemAsset.main.color
+            self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView2.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView3.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView4.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView5.image = UIImage(named: "writeFeed_clap")
+            self?.completeButton.setClickable(true)
+        }
+        
+        clapImageView5.onTapped { [weak self] in
+            self?.scoreLabel.text = "5점"
+            self?.scoreLabel.textColor = DesignSystemAsset.main.color
+            self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView2.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView3.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView4.image = UIImage(named: "writeFeed_clapFilled")
+            self?.clapImageView5.image = UIImage(named: "writeFeed_clapFilled")
+            self?.completeButton.setClickable(true)
+        }
     }
     
     override func addViews() {

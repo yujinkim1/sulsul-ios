@@ -36,7 +36,7 @@ public class DefaultButton: UIView {
         super.init(coder: coder)
     }
     
-    func setClickable(_ canClick: Bool) {
+    public func setClickable(_ canClick: Bool) {
         if canClick {
             isUserInteractionEnabled = false
             backgroundColor = DesignSystemAsset.main.color
