@@ -87,6 +87,8 @@ final class ScoreBottomSheetViewController: BaseViewController {
     private lazy var clapImageView4 = UIImageView(image: UIImage(named: "writeFeed_clap"))
     private lazy var clapImageView5 = UIImageView(image: UIImage(named: "writeFeed_clap"))
     
+    private lazy var completeButton = DefaultButton(title: "작성 완료")
+    
     init(snack: String, drink: String) {
         super.init(nibName: nil, bundle: nil)
 
@@ -135,7 +137,8 @@ final class ScoreBottomSheetViewController: BaseViewController {
         bottomSheetView.addSubviews([
             bottomSheetTitleLabel,
             snackDrinkStackView,
-            scoreStackView
+            scoreStackView,
+            completeButton
         ])
         
         snackDrinkStackView.addArrangedSubviews([
@@ -167,8 +170,8 @@ final class ScoreBottomSheetViewController: BaseViewController {
         let topConstant = view.safeAreaInsets.bottom + view.safeAreaLayoutGuide.layoutFrame.height
         bottomSheetViewTopConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstant)
         NSLayoutConstraint.activate([
-            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: moderateScale(number: 18)),
-            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: moderateScale(number: -18)),
+            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: moderateScale(number: 10)),
+            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: moderateScale(number: -10)),
             bottomSheetView.heightAnchor.constraint(equalToConstant: bottomHeight),
             bottomSheetViewTopConstraint
         ])
@@ -180,7 +183,7 @@ final class ScoreBottomSheetViewController: BaseViewController {
         
         snackDrinkStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(bottomSheetTitleLabel.snp.bottom).offset(moderateScale(number: 16))
+            $0.top.equalTo(bottomSheetTitleLabel.snp.bottom).offset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 32))
         }
         
@@ -193,6 +196,13 @@ final class ScoreBottomSheetViewController: BaseViewController {
             imageView.snp.makeConstraints {
                 $0.size.equalTo(moderateScale(number: 24))
             }
+        }
+        
+        completeButton.snp.makeConstraints {
+            $0.top.equalTo(scoreStackView.snp.bottom).offset(moderateScale(number: 13))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 22))
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 52))
         }
     }
 }
