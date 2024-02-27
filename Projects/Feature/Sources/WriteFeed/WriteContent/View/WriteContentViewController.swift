@@ -251,6 +251,11 @@ extension WriteContentViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
         let numberOfChars = newText.count
+        
+        if !(numberOfChars <= 500) {
+            showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.")
+        }
+        
         return numberOfChars <= 500
     }
     
