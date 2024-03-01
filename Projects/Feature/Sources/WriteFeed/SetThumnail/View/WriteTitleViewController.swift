@@ -72,6 +72,9 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
                 thumnailFirstSort.insert(thumnail, at: 0)
                 
                 selfRef.coordinator?.moveTo(appFlow: AppFlow.tabBar(.common(.writeContent)), userData: ["images": thumnailFirstSort])
+                
+            } else {
+                selfRef.showToastMessageView(toastType: .error, title: "제목을 입력해주세요")
             }
         }
     }
