@@ -117,9 +117,15 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         }
         
         actionButton.onTapped { [weak self] in
-            let vc = ScoreBottomSheetViewController(snack: "삼겹살", drink: "처음처럼")
-            vc.modalPresentationStyle = .overFullScreen
-            self?.present(vc, animated: false)
+            guard let selfRef = self else { return }
+            
+            let isTextEmpty = selfRef.contentTextView.text.isEmpty
+
+            if !isTextEmpty {
+                let vc = ScoreBottomSheetViewController(snack: "삼겹살", drink: "처음처럼")
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: false)
+            }
         }
     }
     
@@ -304,10 +310,8 @@ extension WriteContentViewController: UITextViewDelegate {
             placeholderLabel.isHidden = !isTextEmpty
             
             if isTextEmpty {
-                actionButton.isUserInteractionEnabled = false
                 changeActionColor(DesignSystemAsset.gray300.color)
             } else {
-                actionButton.isUserInteractionEnabled = true
                 changeActionColor(DesignSystemAsset.main.color)
             }
         }
