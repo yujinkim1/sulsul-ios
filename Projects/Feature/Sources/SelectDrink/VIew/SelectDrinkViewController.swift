@@ -11,7 +11,7 @@ import Combine
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
-    var coordinator: AuthBaseCoordinator?
+    var coordinator: Coordinator?
     var cancelBag = Set<AnyCancellable>()
     private let viewModel: SelectDrinkViewModel
     
@@ -146,7 +146,12 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         
         viewModel.completeDrinkPreferencePublisher()
             .sink { [weak self] in
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+                guard let self = self else { return }
+                if let authCoordinator = self.coordinator as? AuthCoordinator {
+                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+                } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }.store(in: &cancelBag)
     }
     

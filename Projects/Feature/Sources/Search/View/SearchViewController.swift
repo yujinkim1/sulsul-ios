@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import DesignSystem
+import Service
 
 public final class SearchViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
@@ -89,7 +90,7 @@ public final class SearchViewController: BaseViewController {
     
     private func setTabEvents() {
         recentKeywordResetButton.onTapped { [weak self] in
-            UserDefaultsUtil.shared.remove(key: .recentKeyword)
+            UserDefaultsUtil.shared.remove(.recentKeyword)
             self?.recentKeywordCollectionView.reloadData()
             self?.setVisibilityKeywordLabel()
         }

@@ -15,7 +15,7 @@ protocol SearchSnack: AnyObject {
 
 public final class SelectSnackViewController: BaseViewController {
     
-    var coordinator: AuthBaseCoordinator?
+    var coordinator: Coordinator?
     private let viewModel: SelectSnackViewModel
     private lazy var cancelBag = Set<AnyCancellable>()
     
@@ -217,8 +217,12 @@ public final class SelectSnackViewController: BaseViewController {
     private func bind() {
         viewModel.completeSnackPreferencePublisher()
             .sink { [weak self] in
-                print("성공해서 메인화면으로 이동해야됨")
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: nil)
+                guard let self = self else { return }
+                if let authCoordinator = self.coordinator as? AuthCoordinator {
+                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: nil)
+                } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }.store(in: &cancelBag)
     }
     
@@ -227,7 +231,7 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     @objc private func didTabBackButton() {
-        
+        self.navigationController?.popViewController(animated: true)
     }
     
     @objc private func didTabNoFindSnackButton() {

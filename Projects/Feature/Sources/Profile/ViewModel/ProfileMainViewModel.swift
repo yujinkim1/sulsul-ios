@@ -16,10 +16,16 @@ struct ProfileMainViewModel {
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private let userMapper = UserMapper()
+    private let tempMapper = PairingModelMapper()
     
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
-    private var userInfo = PassthroughSubject<UserInfoModel, Never>()
+    private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
+                                                                           uid: "",
+                                                                           nickname: "",
+                                                                           image: "",
+                                                                           preference: .init(alcohols: [0], foods: [0]),
+                                                                           status: ""))
     
     init() {
     }
@@ -36,6 +42,8 @@ struct ProfileMainViewModel {
             case .success(let response):
                 if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
+                    print("여기>>>>")
+                    print(mappedUserInfo)
                     userInfo.send(mappedUserInfo)
                 } else {
                     print("디코딩 모델 에러5")
@@ -57,7 +65,10 @@ struct ProfileMainViewModel {
             switch result {
             case .success(let response):
                 if let myFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
-                    myFeeds.send(myFeedsData.content)
+                    let mappedData = tempMapper.feedModel(from: myFeedsData.content ?? [])
+                    myFeeds.send(mappedData)
+                    print(">>>>>>")
+                    print(myFeedsData)
                 } else {
                     print("디코딩 모델 에러6")
                 }
@@ -78,7 +89,8 @@ struct ProfileMainViewModel {
             switch result {
             case .success(let response):
                 if let likeFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
-                    likeFeeds.send(likeFeedsData.content)
+                    let mappedData = tempMapper.feedModel(from: likeFeedsData.content ?? [])
+                    likeFeeds.send(mappedData)
                 } else {
                     print("디코딩 모델 에러7")
                 }
