@@ -89,7 +89,8 @@ extension RankingCombinationViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RankingCombinationCell.reuseIdentifier, for: indexPath) as? RankingCombinationCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RankingCombinationCell.reuseIdentifier, for: indexPath) 
+                as? RankingCombinationCell else { return UICollectionViewCell() }
         
         if let model = viewModel?.combinationDatasource.first?.ranking?[indexPath.item] {
             print(model)
