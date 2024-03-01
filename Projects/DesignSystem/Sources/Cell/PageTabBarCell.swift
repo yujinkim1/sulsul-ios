@@ -7,19 +7,25 @@
 
 import UIKit
 
-/// 페이지를 전환하는 역할을 해주는 컴포넌트
+/// 뷰 컨트롤러를 전환해주는 탭바 컴포넌트
 open class PageTabBarCell: UICollectionViewCell {
     public static let reuseIdentifier = "PageTabBarCell"
     
     // MARK: - Custom Property
+    
     private let selectedColor = DesignSystemAsset.main.color
     private let unselectedColor = DesignSystemAsset.gray300.color
     private let selectedFontSize = Font.bold(size: 18)
     private let unselectedFontSize = Font.medium(size: 18)
     
-    private lazy var indicatorView = UIView()
+    private lazy var indicatorView = UIView().then {
+        $0.frame = .zero
+        $0.backgroundColor = unselectedColor
+    }
     private lazy var titleLabel = UILabel().then {
         $0.frame = .zero
+        $0.font = unselectedFontSize
+        $0.textColor = unselectedColor
         $0.setTextLineHeight(height: 28)
     }
     
