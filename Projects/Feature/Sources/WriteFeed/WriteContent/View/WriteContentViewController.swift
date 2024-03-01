@@ -97,6 +97,8 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
+    private lazy var infoEditView = InfoEditView()
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -183,7 +185,8 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             lineView,
             contentStackView,
             placeholderLabel,
-            iconContainerView
+            iconContainerView,
+            infoEditView
         ])
         
         contentStackView.addArrangedSubviews([
@@ -207,6 +210,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     open override func makeConstraints() {
         super.makeConstraints()
+        
+        infoEditView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         imageScrollView.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom)

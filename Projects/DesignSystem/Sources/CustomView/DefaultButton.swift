@@ -9,7 +9,7 @@ import UIKit
 
 public class DefaultButton: UIView {
     private lazy var titleLabel = UILabel().then {
-        $0.font = Font.bold(size: 18)
+        $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
     }
     
