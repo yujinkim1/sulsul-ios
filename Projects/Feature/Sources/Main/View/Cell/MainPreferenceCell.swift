@@ -17,19 +17,6 @@ final class MainPreferenceCell: BaseCollectionViewCell<Feed> {
     
     private lazy var feedImageView = UIImageView().then({
         $0.layer.cornerRadius = 12
-        $0.image = UIImage(systemName: "circle.fill")
-    })
-    
-    private lazy var feedTimeLabel = UILabel().then({
-        $0.text = "5분전"
-        $0.font = Font.regular(size: 10)
-        $0.textColor = DesignSystemAsset.white.color
-    })
-    
-    private lazy var feedTitleLabel = UILabel().then({
-        $0.text = "자연 친화적인 머시기"
-        $0.font = Font.bold(size: 16)
-        $0.textColor = DesignSystemAsset.white.color
     })
     
     override init(frame: CGRect) {
@@ -44,9 +31,7 @@ final class MainPreferenceCell: BaseCollectionViewCell<Feed> {
     
     private func addViews() {
         addSubview(containerView)
-        containerView.addSubviews([feedImageView,
-                                   feedTimeLabel,
-                                   feedTitleLabel])
+        containerView.addSubviews([feedImageView])
     }
     
     private func makeConstraints() {
