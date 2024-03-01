@@ -103,7 +103,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     }
     
     private func setTabEvents() {
-        tagAddButton.onTapped {
+        tagAddButton.onTapped { [weak self] in
+            self?.tagTextView.text = "#"
+            self?.tagTextView.becomeFirstResponder()
+            self?.tagContainerView.isHidden = false
         }
         
         imageAddButton.onTapped { [weak self] in
