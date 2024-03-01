@@ -97,7 +97,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
-    private lazy var infoEditView = InfoEditView()
+    private lazy var infoEditView = InfoEditView().then {
+        $0.isHidden = true
+    }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
