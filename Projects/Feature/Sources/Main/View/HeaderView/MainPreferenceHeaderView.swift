@@ -21,7 +21,7 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
     })
     
     private lazy var preferecneCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
-        $0.registerCell(MainPreferenceCell.self)
+        $0.registerCell(MainPreferenceHeaderViewCell.self)
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
     }
@@ -93,7 +93,10 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+        guard let cell = collectionView.dequeueReusableCell(MainPreferenceHeaderViewCell.self, indexPath: indexPath) else { return .init() }
+        cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            cell.updateView()
+        }
         return cell
     }
 }

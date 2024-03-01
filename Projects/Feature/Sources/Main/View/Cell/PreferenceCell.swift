@@ -10,8 +10,6 @@ import DesignSystem
 
 final class MainPreferenceCell: BaseCollectionViewCell<Feed> {
     
-    static let reuseIdentifer = "LikeFeedCell"
-    
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = .black
         $0.layer.cornerRadius = 12
