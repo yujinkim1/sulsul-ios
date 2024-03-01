@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoordinated {
+open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var coordinator: CommonBaseCoordinator?
     private lazy var images: [UIImage] = []
     
@@ -50,7 +50,7 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         $0.spacing = moderateScale(number: 16)
     }
     
-    private lazy var contentTextView = UITextView().then {
+    open lazy var contentTextView = UITextView().then {
         $0.isScrollEnabled = false
         $0.backgroundColor = .clear
         $0.font = Font.medium(size: 16)
@@ -65,9 +65,18 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         $0.text = "내용을 입력해주세요.\n#를 눌러 태그를 추가할 수 있어요."
     }
     
-    private lazy var tagContainerView = UIView().then {
+    open lazy var tagContainerView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.isHidden = true
+    }
+    
+    open lazy var tagTextView = UITextView().then {
+        $0.text = "#"
+        $0.font = Font.medium(size: 14)
+        $0.backgroundColor = .clear
+        $0.delegate = self
+        $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var iconContainerView = UIView()
@@ -85,7 +94,7 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
-    override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
         
         setHeaderText("내용입력", actionText: "게시", actionColor: DesignSystemAsset.gray300.color)
@@ -136,7 +145,7 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         }
     }
     
-    override func addViews() {
+    open override func addViews() {
         super.addViews()
         
         view.addSubviews([
@@ -155,6 +164,8 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
             tagContainerView
         ])
         
+        tagContainerView.addSubview(tagTextView)
+        
         iconContainerView.addSubviews([
             iconLineView,
             imageAddButton,
@@ -167,7 +178,7 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
         imageScrollView.addSubview(imageStackView)
     }
     
-    override func makeConstraints() {
+    open override func makeConstraints() {
         super.makeConstraints()
         
         imageScrollView.snp.makeConstraints {
@@ -212,6 +223,15 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
             $0.top.leading.equalTo(contentTextView).offset(moderateScale(number: 7))
         }
         
+        contentTextView.snp.makeConstraints {
+            $0.height.greaterThanOrEqualTo(placeholderLabel).offset(moderateScale(number: 8))
+        }
+        
+        tagTextView.snp.makeConstraints {
+            $0.height.greaterThanOrEqualTo(moderateScale(number: 19))
+            $0.edges.equalToSuperview().inset(moderateScale(number: 16))
+        }
+        
         iconContainerView.snp.makeConstraints {
             $0.width.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(moderateScale(number: 34))
@@ -248,7 +268,14 @@ final class WriteContentViewController: BaseHeaderViewController, CommonBaseCoor
 }
 
 extension WriteContentViewController: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text == "#" {
+            tagTextView.text = "#"
+            tagTextView.becomeFirstResponder()
+            tagContainerView.isHidden = false
+            return false
+        }
+        
         let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
         let numberOfChars = newText.count
         
@@ -259,16 +286,24 @@ extension WriteContentViewController: UITextViewDelegate {
         return numberOfChars <= 500
     }
     
-    func textViewDidChange(_ textView: UITextView) {
-        let isTextEmpty = textView.text.isEmpty
-        placeholderLabel.isHidden = !isTextEmpty
-        
-        if isTextEmpty {
-            actionButton.isUserInteractionEnabled = false
-            changeActionColor(DesignSystemAsset.gray300.color)
-        } else {
-            actionButton.isUserInteractionEnabled = true
-            changeActionColor(DesignSystemAsset.main.color)
+    open func textViewDidChange(_ textView: UITextView) {
+        if textView == tagTextView {
+            if textView.text.isEmpty {
+                tagContainerView.isHidden = true
+                contentTextView.becomeFirstResponder()
+            }
+            
+        } else if textView == contentTextView {
+            let isTextEmpty = textView.text.isEmpty
+            placeholderLabel.isHidden = !isTextEmpty
+            
+            if isTextEmpty {
+                actionButton.isUserInteractionEnabled = false
+                changeActionColor(DesignSystemAsset.gray300.color)
+            } else {
+                actionButton.isUserInteractionEnabled = true
+                changeActionColor(DesignSystemAsset.main.color)
+            }
         }
     }
 }
