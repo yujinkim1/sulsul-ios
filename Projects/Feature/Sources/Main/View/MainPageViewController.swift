@@ -13,6 +13,7 @@ import Kingfisher
 
 public final class MainPageViewController: BaseViewController {
     
+    private let temp = 0
     private var cancelBag = Set<AnyCancellable>()
     
     private lazy var topHeaderView = UIView()
@@ -27,7 +28,7 @@ public final class MainPageViewController: BaseViewController {
         $0.tintColor = DesignSystemAsset.gray900.color
     })
     
-    private lazy var couponCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
+    private lazy var mainCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
         $0.registerSupplimentaryView(MainPreferenceHeaderView.self,
                                      supplementaryViewOfKind: .header)
 //        $0.registerSupplimentaryView(LikeHeaderView.self,
@@ -51,7 +52,7 @@ public final class MainPageViewController: BaseViewController {
     
     public override func addViews() {
         view.addSubviews([topHeaderView,
-                          couponCollectionView])
+                          mainCollectionView])
         
         topHeaderView.addSubviews([searchTouchableIamgeView,
                                    settingTouchableImageView])
@@ -73,7 +74,7 @@ public final class MainPageViewController: BaseViewController {
             $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
             $0.size.equalTo(moderateScale(number: 24))
         }
-        couponCollectionView.snp.makeConstraints {
+        mainCollectionView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.bottom.equalToSuperview()
@@ -93,7 +94,13 @@ public final class MainPageViewController: BaseViewController {
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                     
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 46)))
+                var headerSize: NSCollectionLayoutSize
+                if self?.temp == 0 {
+                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118)))
+                } else {
+                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118-42)))
+                }
+                
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
                     layoutSize: headerSize,
                     elementKind: UICollectionView.elementKindSectionHeader,
@@ -128,6 +135,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let registerHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
+            registerHeaderView.updateUI(temp)
             return registerHeaderView
         }
         return UICollectionReusableView()
