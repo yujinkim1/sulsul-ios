@@ -149,12 +149,16 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             guard let selfRef = self else { return }
             
             let isTextEmpty = selfRef.contentTextView.text.isEmpty
-
+            
             if !isTextEmpty {
                 let vc = ScoreBottomSheetViewController(snack: "삼겹살", drink: "처음처럼")
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
             }
+        }
+        
+        recognizedStackView.onTapped { [weak self] in
+            self?.infoEditView.isHidden = false
         }
     }
     

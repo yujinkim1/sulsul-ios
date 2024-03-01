@@ -65,6 +65,10 @@ final class InfoEditView: UIView {
         
         attributes()
         layout()
+        
+        completeButton.onTapped { [weak self] in
+            self?.isHidden = true
+        }
     }
     
     required init?(coder: NSCoder) {
