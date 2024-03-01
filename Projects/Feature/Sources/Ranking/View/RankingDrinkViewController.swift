@@ -12,7 +12,7 @@ import DesignSystem
 /// 술 순위를 보여주는 뷰 컨트롤러
 final class RankingDrinkViewController: BaseViewController {
     var viewModel: RankingViewModel?
-    var detailViewController: DetailDrinkViewController?
+//    var detailViewController: DetailDrinkViewController?
     
     private var cancelBag = Set<AnyCancellable>()
     
@@ -105,16 +105,16 @@ extension RankingDrinkViewController: UICollectionViewDataSource {
 // MARK: - 콜렉션 뷰 델리게이트
 
 extension RankingDrinkViewController: UICollectionViewDelegate {
-    /// !! - DetailDrinkViewController 디자인 테스트
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        let rootViewController = RankingViewController()
-        let viewController = DetailDrinkViewController()
-        
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        navigationController.pushViewController(viewController, animated: true)
-        // present(viewController, animated: true, completion: nil)
-    }
+//    func collectionView(
+//        _ collectionView: UICollectionView,
+//        didSelectItemAt indexPath: IndexPath
+//    ) {
+//        let rootViewController = RankingViewController()
+//        let viewController = DetailDrinkViewController()
+//        
+//        let navigationController = UINavigationController(rootViewController: rootViewController)
+//        navigationController.pushViewController(viewController, animated: true)
+//        
+//        present(viewController, animated: true, completion: nil)
+//    }
 }
