@@ -7,8 +7,10 @@
 
 import UIKit
 import DesignSystem
+import Combine
 
 open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoordinated {
+    var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
     private lazy var images: [UIImage] = []
     
@@ -98,8 +100,23 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     open override func viewDidLoad() {
         super.viewDidLoad()
         
+        bind()
         setHeaderText("내용입력", actionText: "게시", actionColor: DesignSystemAsset.gray300.color)
         setTabEvents()
+    }
+    
+    private func bind() {
+        changedKeyboardHeight
+            .sink { [weak self] height in
+                guard let selfRef = self else { return }
+                
+                let inset = (height == 0) ? 34 : (height + moderateScale(number: 24))
+                
+                selfRef.iconContainerView.snp.updateConstraints {
+                    $0.bottom.equalToSuperview().inset(moderateScale(number: inset))
+                }
+            }
+            .store(in: &cancelBag)
     }
     
     private func setTabEvents() {

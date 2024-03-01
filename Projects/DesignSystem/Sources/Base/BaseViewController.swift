@@ -6,9 +6,12 @@
 //
 
 import UIKit
+import Combine
 
 open class BaseViewController: UIViewController {
     open lazy var keyboardHeight: CGFloat = 0
+    
+    open lazy var changedKeyboardHeight = PassthroughSubject<CGFloat, Never>()
 
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,12 +25,12 @@ open class BaseViewController: UIViewController {
         setupIfNeeded()
         
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillChange),
+                                               selector: #selector(keyboardShowChange),
                                                name: UIResponder.keyboardWillShowNotification,
                                                object: nil)
         
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillChange),
+                                               selector: #selector(keyboardHideChange),
                                                name: UIResponder.keyboardDidHideNotification,
                                                object: nil)
         
@@ -38,10 +41,24 @@ open class BaseViewController: UIViewController {
         deinitialize()
     }
     
-    @objc func keyboardWillChange(_ notification: Notification) {
+    
+    @objc func keyboardShowChange(_ notification: Notification) {
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRectangle = keyboardFrame.cgRectValue
             let keyboardHeight = keyboardRectangle.height
+            
+            changedKeyboardHeight.send(keyboardHeight)
+            
+            self.keyboardHeight = keyboardHeight
+        }
+    }
+    
+    @objc func keyboardHideChange(_ notification: Notification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            
+            changedKeyboardHeight.send(0)
             
             self.keyboardHeight = keyboardHeight
         }
