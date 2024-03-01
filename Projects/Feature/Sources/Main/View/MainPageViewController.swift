@@ -13,7 +13,8 @@ import Kingfisher
 
 public final class MainPageViewController: BaseViewController {
     
-    private let temp = 0
+    private let temp = 0 // 0이면 취향 등록 안한 사람, 그외는 한사람
+    private let nopreferenceTemp = 0 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
     private var cancelBag = Set<AnyCancellable>()
     
     private lazy var topHeaderView = UIView()
@@ -36,6 +37,7 @@ public final class MainPageViewController: BaseViewController {
 //        $0.registerSupplimentaryView(DifferenceHeaderView.self,
 //                                     supplementaryViewOfKind: .header)
         $0.registerCell(MainPreferenceCell.self)
+        $0.registerCell(MainNoPreferenceCell.self)
 //        $0.registerCell(MainLikeCell.self)
 //        $0.registerCell(MainDifferenceCell.self)
         $0.showsVerticalScrollIndicator = false
@@ -87,7 +89,7 @@ public final class MainPageViewController: BaseViewController {
             case 0:
                 var itemHeight: CGFloat = 0
                 
-                itemHeight = 68
+                itemHeight = 323
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -126,8 +128,13 @@ extension MainPageViewController: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
-        return cell
+        if nopreferenceTemp == 0 {
+            guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+            return cell
+        }
     }
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

@@ -9,9 +9,7 @@ import UIKit
 import DesignSystem
 
 final class MainPreferenceHeaderView: UICollectionReusableView {
-    private lazy var containerView = UIView().then({
-        $0.backgroundColor = .white
-    })
+    private lazy var containerView = UIView()
     
     private lazy var titleLabel = UILabel().then({
         $0.text = "소주랑 어울리는\n안주로 골라봤어요"
