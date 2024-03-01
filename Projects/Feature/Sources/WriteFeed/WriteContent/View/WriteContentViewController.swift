@@ -73,6 +73,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     open lazy var tagTextView = UITextView().then {
         $0.text = "#"
+        $0.isScrollEnabled = false
         $0.font = Font.medium(size: 14)
         $0.backgroundColor = .clear
         $0.delegate = self
@@ -229,7 +230,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         
         tagTextView.snp.makeConstraints {
             $0.height.greaterThanOrEqualTo(moderateScale(number: 19))
-            $0.edges.equalToSuperview().inset(moderateScale(number: 16))
+            $0.edges.equalToSuperview().inset(moderateScale(number: 10))
         }
         
         iconContainerView.snp.makeConstraints {
@@ -269,21 +270,26 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
 
 extension WriteContentViewController: UITextViewDelegate {
     open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if text == "#" {
-            tagTextView.text = "#"
-            tagTextView.becomeFirstResponder()
-            tagContainerView.isHidden = false
-            return false
+        if textView == tagTextView {
+            return true
+            
+        } else {
+            if text == "#" {
+                tagTextView.text = "#"
+                tagTextView.becomeFirstResponder()
+                tagContainerView.isHidden = false
+                return false
+            }
+            
+            let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
+            let numberOfChars = newText.count
+            
+            if !(numberOfChars <= 500) {
+                showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.")
+            }
+            
+            return numberOfChars <= 500
         }
-        
-        let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
-        let numberOfChars = newText.count
-        
-        if !(numberOfChars <= 500) {
-            showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.")
-        }
-        
-        return numberOfChars <= 500
     }
     
     open func textViewDidChange(_ textView: UITextView) {
