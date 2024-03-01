@@ -116,28 +116,31 @@ extension RankingViewController {
         viewControllers = [rankingDrinkViewController, rankingCombinationViewController]
         
         pageViewController.didMove(toParent: self)
-        pageViewController.setViewControllers([viewControllers.first!], direction: .forward, animated: false)
+        pageViewController.setViewControllers([viewControllers.first!], direction: .forward, animated: true)
     }
 }
 
-// MARK: - 페이지 탭바 콜렉션 뷰 DataSource
+// MARK: - PageTabBar CollectionView DataSource
 
 extension RankingViewController: UICollectionViewDataSource {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
         return viewControllers.count
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PageTabBarCell.reuseIdentifier, for: indexPath) as? PageTabBarCell else {
-            return UICollectionViewCell()
-        }
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PageTabBarCell.reuseIdentifier, for: indexPath)
+                as? PageTabBarCell else { return UICollectionViewCell() }
         
         if indexPath.item == 0 {
-            // cell.configure(text: "술")
             cell.title = "술"
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
         } else if indexPath.item == 1 {
-            // cell.configure(text: "술+안주")
             cell.title = "술+안주"
         }
         
@@ -145,20 +148,17 @@ extension RankingViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - 페이지 탭바 콜렉션 뷰 델리게이트
+// MARK: - PageTabBar CollectionView Delegate
 
 extension RankingViewController: UICollectionViewDelegate {
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let itemWidth = collectionView.bounds.width / CGFloat(2)
-        let position = CGFloat(indexPath.item) * itemWidth
-        
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         let selectedViewController = viewControllers[indexPath.item]
-        
         let direction: UIPageViewController.NavigationDirection = indexPath.item > 0 ? .forward : .reverse
         
-        pageViewController.setViewControllers([selectedViewController], direction: direction, animated: true) { [weak self] _ in
-            self?.updateTabIndex()
-        }
+        pageViewController.setViewControllers([selectedViewController], direction: direction, animated: true)
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -205,16 +205,16 @@ extension RankingViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - 페이지 뷰 컨트롤러 DataSource
+// MARK: - UIPageViewController DataSource
 
 extension RankingViewController: UIPageViewControllerDataSource {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
     ) -> UIViewController? {
-        guard let index = viewControllers.firstIndex(of: viewController) else { return nil }
+        guard let currentIndex = viewControllers.firstIndex(of: viewController) else { return nil }
         
-        let previousIndex = index - 1
+        let previousIndex = currentIndex - 1
         guard previousIndex >= 0 else { return nil }
         
         return viewControllers[previousIndex]
@@ -224,16 +224,16 @@ extension RankingViewController: UIPageViewControllerDataSource {
         _ pageViewController: UIPageViewController,
         viewControllerAfter viewController: UIViewController
     ) -> UIViewController? {
-        guard let index = viewControllers.firstIndex(of: viewController) else { return nil }
+        guard let currentIndex = viewControllers.firstIndex(of: viewController) else { return nil }
         
-        let nextIndex = index + 1
+        let nextIndex = currentIndex + 1
         guard nextIndex < viewControllers.count else { return nil }
         
         return viewControllers[nextIndex]
     }
 }
 
-// MARK: - 페이지 뷰 컨트롤러 델리게이트
+// MARK: - UIPageViewController Delegate
 
 extension RankingViewController: UIPageViewControllerDelegate {
     public func pageViewController(
@@ -247,6 +247,7 @@ extension RankingViewController: UIPageViewControllerDelegate {
               let currentIndex = viewControllers.firstIndex(of: currentViewController) else { return }
         
         let indexPath = IndexPath(item: currentIndex, section: 0)
+        
         pageTabBarView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
         collectionView(pageTabBarView, didSelectItemAt: indexPath)
     }
@@ -254,7 +255,5 @@ extension RankingViewController: UIPageViewControllerDelegate {
     private func updateTabIndex() {
         guard let currentViewController = pageViewController.viewControllers?.first,
               let currentIndex = viewControllers.firstIndex(of: currentViewController) else { return }
-        
-        print("Current selected tab index: \(currentIndex)")
     }
 }
