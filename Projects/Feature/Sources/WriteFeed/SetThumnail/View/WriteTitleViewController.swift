@@ -97,6 +97,8 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             }
             
             imageView.onTapped { [weak self] in
+                self?.imageScrollView.scrollRectToVisible(imageView.frame,
+                                                          animated: true)
                 self?.thumnailIndex = index
                 self?.thumnailImageView.image = image
                 self?.updateThumnailImage(index)
