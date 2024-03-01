@@ -25,6 +25,11 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.isLayoutMarginsRelativeArrangement = true
     }
     
+    private lazy var recognizedStackView = UIStackView().then {
+        $0.distribution = .equalSpacing
+        $0.spacing = moderateScale(number: 4)
+    }
+    
     private lazy var recognizedTitleLabel = UILabel().then {
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
@@ -182,13 +187,17 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         view.addSubviews([
             imageScrollView,
             recognizedTitleLabel,
-            recognizedContentLabel,
-            recognizedImageView,
+            recognizedStackView,
             lineView,
             contentStackView,
             placeholderLabel,
             iconContainerView,
             infoEditView
+        ])
+        
+        recognizedStackView.addArrangedSubviews([
+            recognizedContentLabel,
+            recognizedImageView
         ])
         
         contentStackView.addArrangedSubviews([
@@ -232,16 +241,13 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
         
-        recognizedImageView.snp.makeConstraints {
+        recognizedStackView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(moderateScale(number: 12))
             $0.centerY.equalTo(recognizedTitleLabel)
-            $0.size.equalTo(moderateScale(number: 24))
         }
         
-        recognizedContentLabel.snp.makeConstraints {
-            $0.leading.equalTo(recognizedTitleLabel.snp.trailing).offset(moderateScale(number: 5))
-            $0.trailing.equalTo(recognizedImageView.snp.leading).offset(moderateScale(number: -5))
-            $0.centerY.equalTo(recognizedImageView)
+        recognizedImageView.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 24))
         }
         
         lineView.snp.makeConstraints {
