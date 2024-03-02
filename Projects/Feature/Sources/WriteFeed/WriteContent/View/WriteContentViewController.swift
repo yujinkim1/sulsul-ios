@@ -130,9 +130,22 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     private func setTabEvents() {
         tagAddButton.onTapped { [weak self] in
-            self?.tagTextView.text = "#"
-            self?.tagTextView.becomeFirstResponder()
-            self?.tagContainerView.isHidden = false
+            guard let selfRef = self else { return }
+            
+            if selfRef.tagContainerView.isHidden {
+                self?.tagTextView.text = "#"
+                self?.tagTextView.becomeFirstResponder()
+                self?.tagContainerView.isHidden = false
+                
+            } else {
+                let lastText = selfRef.tagTextView.text.suffix(1)
+                
+                if lastText == " " {
+                    selfRef.tagTextView.text = "\(selfRef.tagTextView.text ?? "")#"
+                } else if lastText != " " && lastText != "#" {
+                    selfRef.tagTextView.text = "\(selfRef.tagTextView.text ?? "") #"
+                }
+            }
         }
         
         imageAddButton.onTapped { [weak self] in
@@ -316,7 +329,18 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
 extension WriteContentViewController: UITextViewDelegate {
     open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if textView == tagTextView {
-            return true
+            // MARK: " " + " " 막기
+            let isLastSpace = textView.text.suffix(1) == " "
+            let isLast2Space = isLastSpace && text == " "
+            
+            // MARK: # + " " 입력 막기
+            let isLastTag = textView.text.suffix(1) == "#"
+            let isLastTagAndSpace = isLastTag && text == " "
+            
+            // MARK: 태그 연속 입력 막기
+            let isLastTagAndTag = isLastTag && text == "#"
+            
+            return !isLast2Space && !isLastTagAndSpace && !isLastTagAndTag
             
         } else {
             if text == "#" {
@@ -342,6 +366,23 @@ extension WriteContentViewController: UITextViewDelegate {
             if textView.text.isEmpty {
                 tagContainerView.isHidden = true
                 contentTextView.becomeFirstResponder()
+                
+            } else {
+                let last2Text = textView.text.suffix(2)
+                let firstText = last2Text.prefix(1)
+                let lastText = last2Text.suffix(1)
+                
+                // MARK: " " + "글자" 입력할 시 자동으로 # 추가
+                if firstText == " " && lastText != "#" {
+                    let textAddedTag = "\(textView.text.dropLast())#\(lastText)"
+                    textView.text = textAddedTag
+                }
+                
+                // MARK: "글자" + "#" 입력할 시 자동으로 " " 추가
+                if lastText == "#" && firstText != " " {
+                    let textAddedSpace = "\(textView.text.dropLast()) #"
+                    textView.text = textAddedSpace
+                }
             }
             
         } else if textView == contentTextView {
