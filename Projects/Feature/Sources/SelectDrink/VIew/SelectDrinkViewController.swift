@@ -11,15 +11,27 @@ import Combine
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
+    var coordinator: Coordinator?
     var cancelBag = Set<AnyCancellable>()
-    private let viewModel = SelectDrinkViewModel()
-
+    private let viewModel: SelectDrinkViewModel
+    
+    init(viewModel: SelectDrinkViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private lazy var containerView = UIView()
     
     private lazy var numberLabel = UILabel().then({
         $0.text = "Q1."
         $0.font = Font.regular(size: 18)
-        $0.textColor = DesignSystemAsset.gray100.color
+        $0.textColor = DesignSystemAsset.gray900.color
     })
     private lazy var titleLabel = UILabel().then({
         $0.text = "주로 마시는 술"
@@ -56,12 +68,14 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }()
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
         bind()
     }
+    
     public override func addViews() {
         super.addViews()
         view.addSubview(containerView)
@@ -76,9 +90,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     public override func makeConstraints() {
         super.makeConstraints()
         containerView.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(topView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.bottom.equalTo(nextButtonBackgroundView.snp.top)
+            $0.bottom.equalTo(nextButtonBackgroundView.snp.top).offset(moderateScale(number: -25))
         }
         numberLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -107,6 +121,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+    
     private func bind() {
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.drinkCollectionView.reloadData()
@@ -128,10 +143,25 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                 }
             }
             .store(in: &cancelBag)
+        
+        viewModel.completeDrinkPreferencePublisher()
+            .sink { [weak self] in
+                guard let self = self else { return }
+                if let authCoordinator = self.coordinator as? AuthCoordinator {
+                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+                } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }.store(in: &cancelBag)
     }
     
     public override func setupIfNeeded() {
-        
+        topView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+        submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.viewModel.sendSetUserDrinkPreference()
+        }
     }
 }
 
@@ -145,7 +175,7 @@ extension SelectDrinkViewController: UICollectionViewDelegate, UICollectionViewD
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DrinkCell.reuseIdentifer, for: indexPath) as? DrinkCell else { return UICollectionViewCell() }
         
         let model = viewModel.getDataSource(indexPath.row)
-        cell.model = model
+        cell.bind(model)
         cell.setSelectColor(model.isSelect)
         
         return cell

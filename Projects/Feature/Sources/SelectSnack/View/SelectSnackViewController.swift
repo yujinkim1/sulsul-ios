@@ -14,7 +14,9 @@ protocol SearchSnack: AnyObject {
 }
 
 public final class SelectSnackViewController: BaseViewController {
-    private lazy var viewModel = SelectSnackViewModel()
+    
+    var coordinator: Coordinator?
+    private let viewModel: SelectSnackViewModel
     private lazy var cancelBag = Set<AnyCancellable>()
     
     private lazy var superViewInset = moderateScale(number: 20)
@@ -94,7 +96,8 @@ public final class SelectSnackViewController: BaseViewController {
         $0.setTitle("다음", for: .normal)
     }
     
-    public init() {
+    init(viewModel: SelectSnackViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
@@ -109,16 +112,19 @@ public final class SelectSnackViewController: BaseViewController {
         .store(in: &cancelBag)
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     public override func viewDidLoad() {
+        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
 
         addViews()
         makeConstraints()
+        bind()
     }
     
     public override func addViews() {
@@ -208,12 +214,24 @@ public final class SelectSnackViewController: BaseViewController {
         }
     }
     
+    private func bind() {
+        viewModel.completeSnackPreferencePublisher()
+            .sink { [weak self] in
+                guard let self = self else { return }
+                if let authCoordinator = self.coordinator as? AuthCoordinator {
+                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: nil)
+                } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }.store(in: &cancelBag)
+    }
+    
     @objc private func didTabAddSnackButton() {
         
     }
     
     @objc private func didTabBackButton() {
-        
+        self.navigationController?.popViewController(animated: true)
     }
     
     @objc private func didTabNoFindSnackButton() {
@@ -221,7 +239,7 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     @objc private func didTabNextButton() {
-        
+        self.viewModel.sendSetUserSnackPreference()
     }
 }
 
