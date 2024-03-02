@@ -8,16 +8,13 @@
 import UIKit
 import DesignSystem
 
-final class MainPreferenceCell: BaseCollectionViewCell<Feed> {
+final class MainPreferenceCell: UICollectionViewCell {
     
-    lazy var containerView = TouchableView().then({
-        $0.backgroundColor = .black
-        $0.layer.cornerRadius = 12
-    })
-    
-    private lazy var feedImageView = UIImageView().then({
-        $0.layer.cornerRadius = 12
-    })
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
+        $0.registerCell(MainPreferenceDetailCell.self)
+        $0.showsVerticalScrollIndicator = false
+        $0.dataSource = self
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,33 +27,37 @@ final class MainPreferenceCell: BaseCollectionViewCell<Feed> {
     }
     
     private func addViews() {
-        addSubview(containerView)
-        containerView.addSubviews([feedImageView])
+        addSubview(collectionView)
     }
     
     private func makeConstraints() {
-        containerView.snp.makeConstraints {
+        collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-        }
-        feedImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        feedTimeLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 8))
-            $0.bottom.equalTo(feedTitleLabel.snp.top)
-        }
-        feedTitleLabel.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 8))
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -8))
         }
     }
     
-    override func bind(_ model: Feed) {
-        super.bind(model)
-        feedTitleLabel.text = model.title
-        feedTimeLabel.text = model.updatedAt
-        if let imageURL = URL(string: model.representImage) {
-            feedImageView.kf.setImage(with: imageURL)
+    private func layout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+            let itemSize = NSCollectionLayoutSize(widthDimension: .absolute(moderateScale(number: 277)), heightDimension: .absolute(moderateScale(number: 323)))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: moderateScale(number: 16))
+            let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(moderateScale(number: 277)), heightDimension: .absolute(moderateScale(number: 323)))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .groupPaging
+            return section
         }
+    }
+}
+
+extension MainPreferenceCell: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 5
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(MainPreferenceDetailCell.self, indexPath: indexPath) else { return .init() }
+        return cell
     }
 }
