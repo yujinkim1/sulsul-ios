@@ -34,6 +34,8 @@ public final class MainPageViewController: BaseViewController {
                                      supplementaryViewOfKind: .header)
         $0.registerSupplimentaryView(MainLikeHeaderView.self,
                                      supplementaryViewOfKind: .header)
+        $0.registerSupplimentaryView(MainLikeFooterView.self,
+                                     supplementaryViewOfKind: .footer)
 //        $0.registerSupplimentaryView(DifferenceHeaderView.self,
 //                                     supplementaryViewOfKind: .header)
         $0.registerCell(MainPreferenceCell.self)
@@ -127,7 +129,14 @@ public final class MainPageViewController: BaseViewController {
                     layoutSize: headerSize,
                     elementKind: UICollectionView.elementKindSectionHeader,
                     alignment: .top)
-                section.boundarySupplementaryItems = [header]
+                
+                let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 52)))
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: footerSize,
+                    elementKind: UICollectionView.elementKindSectionFooter,
+                    alignment: .bottom)
+                
+                section.boundarySupplementaryItems = [header, footer]
                 return section
             default:
                 return nil
@@ -177,8 +186,13 @@ extension MainPageViewController: UICollectionViewDataSource {
             preferenceHeaderView.updateUI(temp)
             return preferenceHeaderView
         } else if indexPath.section == 1 {
-            guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
-            return likeHeaderView
+            if kind == UICollectionView.elementKindSectionHeader {
+                guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
+                return likeHeaderView
+            } else if kind == UICollectionView.elementKindSectionFooter {
+                guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }
+                return likeFooterView
+            }
         }
         return UICollectionReusableView()
     }
