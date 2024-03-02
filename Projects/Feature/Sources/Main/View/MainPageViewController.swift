@@ -38,7 +38,7 @@ public final class MainPageViewController: BaseViewController {
 //                                     supplementaryViewOfKind: .header)
         $0.registerCell(MainPreferenceCell.self)
         $0.registerCell(MainNoPreferenceCell.self)
-//        $0.registerCell(MainLikeCell.self)
+        $0.registerCell(MainLikeCell.self)
 //        $0.registerCell(MainDifferenceCell.self)
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.showsVerticalScrollIndicator = false
@@ -114,7 +114,7 @@ public final class MainPageViewController: BaseViewController {
             case 1:
                 var itemHeight: CGFloat = 0
                 
-                itemHeight = 323
+                itemHeight = 292
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -145,19 +145,27 @@ extension MainPageViewController: UICollectionViewDataSource {
         if section == 0 {
             return 1
         } else if section == 1 {
-            return 0
+            return 5
         } else {
             return 0
         }
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if nopreferenceTemp == 0 {
-            guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+        switch indexPath.section {
+        case 0:
+            if nopreferenceTemp == 0 {
+                guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                return cell
+            } else {
+                guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                return cell
+            }
+        case 1:
+            guard let cell = collectionView.dequeueReusableCell(MainLikeCell.self, indexPath: indexPath) else { return .init() }
             return cell
-        } else {
-            guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
-            return cell
+        default:
+            return UICollectionViewCell()
         }
     }
     
