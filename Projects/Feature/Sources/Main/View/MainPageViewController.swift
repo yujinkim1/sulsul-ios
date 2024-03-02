@@ -32,14 +32,15 @@ public final class MainPageViewController: BaseViewController {
     private lazy var mainCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
         $0.registerSupplimentaryView(MainPreferenceHeaderView.self,
                                      supplementaryViewOfKind: .header)
-//        $0.registerSupplimentaryView(LikeHeaderView.self,
-//                                     supplementaryViewOfKind: .header)
+        $0.registerSupplimentaryView(MainLikeHeaderView.self,
+                                     supplementaryViewOfKind: .header)
 //        $0.registerSupplimentaryView(DifferenceHeaderView.self,
 //                                     supplementaryViewOfKind: .header)
         $0.registerCell(MainPreferenceCell.self)
         $0.registerCell(MainNoPreferenceCell.self)
 //        $0.registerCell(MainLikeCell.self)
 //        $0.registerCell(MainDifferenceCell.self)
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
     }
@@ -91,7 +92,7 @@ public final class MainPageViewController: BaseViewController {
                 
                 itemHeight = 323
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 12)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
@@ -110,7 +111,24 @@ public final class MainPageViewController: BaseViewController {
                 section.boundarySupplementaryItems = [header]
                 
                 return section
-//            case 1:
+            case 1:
+                var itemHeight: CGFloat = 0
+                
+                itemHeight = 323
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+                let section = NSCollectionLayoutSection(group: group)
+                    
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 78)))
+                
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: headerSize,
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top)
+                section.boundarySupplementaryItems = [header]
+                return section
             default:
                 return nil
             }
@@ -120,11 +138,17 @@ public final class MainPageViewController: BaseViewController {
 
 extension MainPageViewController: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return 2
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        if section == 0 {
+            return 1
+        } else if section == 1 {
+            return 0
+        } else {
+            return 0
+        }
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -139,11 +163,14 @@ extension MainPageViewController: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if indexPath.section == 0 {
-            guard let registerHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
+            guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            registerHeaderView.updateUI(temp)
-            return registerHeaderView
+            preferenceHeaderView.updateUI(temp)
+            return preferenceHeaderView
+        } else if indexPath.section == 1 {
+            guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
+            return likeHeaderView
         }
         return UICollectionReusableView()
     }
