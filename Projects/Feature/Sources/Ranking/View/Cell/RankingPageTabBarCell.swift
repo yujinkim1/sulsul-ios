@@ -15,7 +15,7 @@ final class RankingPageTabBarCell: UICollectionViewCell {
         $0.frame = .zero
         $0.textColor = DesignSystemAsset.gray300.color
         $0.font = Font.medium(size: 18)
-        $0.setTextLineHeight(height: 28)
+        $0.setLineHeight(28)
         $0.textAlignment = .center
     }
     

@@ -18,14 +18,14 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var rankLabel = UILabel().then {
-        $0.setTextLineHeight(height: 36)
+        $0.setLineHeight(36)
         $0.textAlignment = .center
         $0.font = Font.bold(size: 24)
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var variationLabel = UILabel().then {
-        $0.setTextLineHeight(height: 32)
+        $0.setLineHeight(32)
         $0.font = Font.bold(size: 20)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.text = "-"
@@ -46,14 +46,14 @@ final class RankingDrinkCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var subtypeLabel = UILabel().then {
-        $0.setTextLineHeight(height: 16)
+        $0.setLineHeight(16)
         $0.font = Font.regular(size: 12)
         $0.textAlignment = .center
         $0.textColor = DesignSystemAsset.gray700.color
     }
     
     private lazy var drinkNameLabel = UILabel().then {
-        $0.setTextLineHeight(height: 32)
+        $0.setLineHeight(32)
         $0.font = Font.bold(size: 20)
         $0.textColor = DesignSystemAsset.gray900.color
     }

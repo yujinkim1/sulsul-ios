@@ -26,7 +26,7 @@ open class PageTabBarCell: UICollectionViewCell {
         $0.frame = .zero
         $0.font = unselectedFontSize
         $0.textColor = unselectedColor
-        $0.setTextLineHeight(height: 28)
+        $0.setLineHeight(28)
     }
     
     open var title: String? {
@@ -62,7 +62,7 @@ open class PageTabBarCell: UICollectionViewCell {
     override open func prepareForReuse() {
         super.prepareForReuse()
         
-        self.titleLabel.text = nil
+        self.titleLabel.text = ""
     }
     
     // MARK: - Custom Method

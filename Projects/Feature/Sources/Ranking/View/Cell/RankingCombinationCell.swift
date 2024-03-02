@@ -18,14 +18,14 @@ final class RankingCombinationCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var rankLabel = UILabel().then {
-        $0.setTextLineHeight(height: 36)
+        $0.setLineHeight(36)
         $0.textAlignment = .center
         $0.font = Font.bold(size: 24)
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var variationLabel = UILabel().then {
-        $0.setTextLineHeight(height: 32)
+        $0.setLineHeight(32)
         $0.font = Font.bold(size: 20)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.text = "-"
@@ -48,13 +48,13 @@ final class RankingCombinationCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var drinkNameLabel = UILabel().then {
-        $0.setTextLineHeight(height: 28)
+        $0.setLineHeight(28)
         $0.font = Font.bold(size: 18)
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var snackNameLabel = UILabel().then {
-        $0.setTextLineHeight(height: 28)
+        $0.setLineHeight(28)
         $0.font = Font.bold(size: 18)
         $0.textColor = DesignSystemAsset.gray900.color
     }
