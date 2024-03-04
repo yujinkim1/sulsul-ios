@@ -12,6 +12,8 @@ import Combine
 open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
+    
+    private lazy var viewModel = WriteContentViewModel()
     private lazy var images: [UIImage] = []
     
     private lazy var imageScrollView = UIScrollView().then {
@@ -104,6 +106,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     private lazy var infoEditView = InfoEditView().then {
         $0.isHidden = true
+    }
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        viewModel.uploadImages(images)
     }
     
     open override func viewDidLoad() {
