@@ -17,9 +17,7 @@ final class WriteContentViewModel {
     private lazy var imageServerURLs: [String] = []
     
     private lazy var uploadOneImage = PassthroughSubject<Void, Never>()
-    
-    // MARK: output
-    lazy var completeUpload = PassthroughSubject<Void, Never>()
+    private lazy var completeUpload = PassthroughSubject<Void, Never>()
     
     init() {
         uploadOneImage
@@ -29,6 +27,12 @@ final class WriteContentViewModel {
                 if selfRef.imageCount == selfRef.imageServerURLs.count {
                     selfRef.completeUpload.send(())
                 }
+            }
+            .store(in: &cancelBag)
+        
+        completeUpload
+            .sink { [weak self] in
+                
             }
             .store(in: &cancelBag)
     }
