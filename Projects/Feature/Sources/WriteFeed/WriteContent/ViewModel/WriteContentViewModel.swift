@@ -67,9 +67,11 @@ final class WriteContentViewModel {
                     
                     selfRef.completeRecognizeAI.send(decodedData)
                 } else {
+                    selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                     print("[/feeds/classifications] Fail Decode")
                 }
             case .failure(let error):
+                selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                 print("[/feeds/classifications] Fail : \(error)")
             }
         }

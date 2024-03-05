@@ -235,12 +235,14 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         }
         
         actionButton.onTapped { [weak self] in
-            guard let selfRef = self else { return }
+            guard let selfRef = self,
+                  let snack = selfRef.recognizedSnackLabel.text,
+                  let drink = selfRef.recognizedDrinkLabel.text else { return }
             
             let isTextEmpty = selfRef.contentTextView.text.isEmpty
             
             if !isTextEmpty {
-                let vc = ScoreBottomSheetViewController(snack: "삼겹살", drink: "처음처럼")
+                let vc = ScoreBottomSheetViewController(snack: snack, drink: drink)
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
             }
