@@ -74,6 +74,16 @@ final class InfoEditView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func bind(_ recognized: WriteContentModel.Recognized) {
+        if let alchol = recognized.alcohols.first {
+            drinkTextField.text = alchol
+        }
+        
+        if let food = recognized.foods.first {
+            snackTextField.text = food
+        }
+    }
 }
 
 extension InfoEditView {

@@ -73,12 +73,19 @@ open class BaseViewController: UIViewController {
     open func deinitialize() {}
     
     open func showAlertView(withType type: AlertType,
-                       title: String,
-                       description: String?,
-                       submitCompletion: (() -> Void)?,
-                       cancelCompletion: (() -> Void)?) {
+                            title: String,
+                            description: String?,
+                            cancelText: String? = nil,
+                            submitText: String? = nil,
+                            isSubmitColorYellow: Bool = false,
+                            submitCompletion: (() -> Void)?,
+                            cancelCompletion: (() -> Void)?) {
         let alertView = AlertView(alertType: type)
-        alertView.bind(title: title, description: description, submitCompletion: submitCompletion, cancelCompletion: cancelCompletion)
+        alertView.bind(title: title, description: description, cancelText: cancelText, submitText: submitText, submitCompletion: submitCompletion, cancelCompletion: cancelCompletion)
+        
+        if isSubmitColorYellow {
+            alertView.submitTouchableLabel.setClickable(true)
+        }
         
         view.addSubview(alertView)
         view.bringSubviewToFront(alertView)

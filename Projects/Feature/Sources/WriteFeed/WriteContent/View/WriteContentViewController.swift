@@ -111,6 +111,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     open override func viewWillAppear(_ animated: Bool) {
         if let thumnailImage = images.first {
             viewModel.uploadImage(thumnailImage)
+            
+            recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
+            recognizedImageView.image = UIImage(named: "writeFeed_progress")
         }
     }
     
@@ -137,11 +140,29 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         
         viewModel.completeRecognizeAI
             .sink { [weak self] recognized in
-                guard let firstSnack = recognized.foods.first,
-                      let firstDrink = recognized.alcohols.first else { return }
-                
-                self?.recognizedContentLabel.text = "\(firstDrink) & \(firstSnack)"
-                self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+                if let firstSnack = recognized.foods.first,
+                   let firstDrink = recognized.alcohols.first {
+                    self?.recognizedContentLabel.text = "\(firstDrink) & \(firstSnack)"
+                    self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+                    
+                } else {
+                    self?.recognizedContentLabel.text = "정보 직접 입력하기"
+                    self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+                    
+                    self?.showAlertView(withType: .verticalTwoButton,
+                                        title: "앗! 인식하지 못했어요.",
+                                        description: "썸네일로 선택한 사진에서 술 & 안주 정보를 인식하지 못했어요. 사진을 변경하거나 정보를 직접 입력해주세요.",
+                                        cancelText: "사진을 변경할게요",
+                                        submitText: "정보를 직접 입력할게요",
+                                        isSubmitColorYellow: true,
+                                        submitCompletion: {
+                        self?.infoEditView.bind(recognized)
+                        self?.infoEditView.isHidden = false
+                        
+                    }, cancelCompletion: {
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectPhoto), userData: nil)
+                    })
+                }
             }
             .store(in: &cancelBag)
     }

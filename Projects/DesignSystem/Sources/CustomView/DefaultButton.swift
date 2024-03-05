@@ -8,14 +8,17 @@
 import UIKit
 
 public class DefaultButton: UIView {
+    private lazy var alwaysClickable: Bool = false
+    
     private lazy var titleLabel = UILabel().then {
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
     }
     
-    public convenience init(title: String) {
+    public convenience init(title: String, alwaysClickable: Bool = false) {
         self.init(frame: .zero)
         
+        self.alwaysClickable = alwaysClickable
         titleLabel.text = title
     }
     
@@ -36,9 +39,13 @@ public class DefaultButton: UIView {
         super.init(coder: coder)
     }
     
+    public func title(_ text: String) {
+        titleLabel.text = text
+    }
+    
     public func setClickable(_ canClick: Bool) {
         if canClick {
-            isUserInteractionEnabled = false
+            isUserInteractionEnabled = alwaysClickable || false
             backgroundColor = DesignSystemAsset.main.color
             titleLabel.textColor = DesignSystemAsset.gray050.color
             
