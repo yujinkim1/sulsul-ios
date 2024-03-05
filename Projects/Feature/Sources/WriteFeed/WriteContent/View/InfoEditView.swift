@@ -9,6 +9,8 @@ import UIKit
 import DesignSystem
 
 final class InfoEditView: UIView {
+    private lazy var initSnack: String? = nil
+    private lazy var initDrink: String? = nil
     private lazy var containerView = UIView().then {
         $0.layer.cornerRadius = moderateScale(number: 24)
         $0.backgroundColor = DesignSystemAsset.gray100.color
@@ -36,12 +38,14 @@ final class InfoEditView: UIView {
         $0.placeholder = "술을 입력해주세요."
         $0.font = Font.semiBold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
+        $0.addTarget(self, action: #selector(handleTextFieldDidChange), for: .editingChanged)
     }
     
     private lazy var snackLabel = UILabel().then {
         $0.text = "안주"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
+        
     }
     
     private lazy var snackTextFieldView = UIView().then {
@@ -54,20 +58,27 @@ final class InfoEditView: UIView {
         $0.placeholder = "안주를 입력해주세요."
         $0.font = Font.semiBold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
+        $0.addTarget(self, action: #selector(handleTextFieldDidChange), for: .editingChanged)
     }
     
-    private lazy var completeButton = DefaultButton(title: "수정 완료!").then {
-        $0.setClickable(false)
-    }
+    private lazy var completeButton = DefaultButton(title: "수정 완료!")
     
-    override init(frame: CGRect) {
+    init(delegate: OnSelectedValue) {
         super.init(frame: .zero)
         
         attributes()
         layout()
         
         completeButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
             self?.isHidden = true
+            
+            if let snack = selfRef.snackTextField.text,
+               let drink = selfRef.drinkTextField.text {
+                
+                delegate.selectedValue(["writtenText": [drink, snack]])
+            }
         }
     }
     
@@ -77,12 +88,22 @@ final class InfoEditView: UIView {
     
     func bind(_ recognized: WriteContentModel.Recognized) {
         if let alchol = recognized.alcohols.first {
+            initDrink = alchol
             drinkTextField.text = alchol
         }
         
         if let food = recognized.foods.first {
+            initSnack = food
             snackTextField.text = food
         }
+        
+        completeButton.setClickable(false)
+    }
+    
+    @objc private func handleTextFieldDidChange() {
+        let isTextEmpty = snackTextField.text == nil || drinkTextField.text == nil
+        
+        completeButton.setClickable(!isTextEmpty)
     }
 }
 

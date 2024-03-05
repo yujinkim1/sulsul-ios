@@ -45,12 +45,12 @@ public class DefaultButton: UIView {
     
     public func setClickable(_ canClick: Bool) {
         if canClick {
-            isUserInteractionEnabled = alwaysClickable || false
+            isUserInteractionEnabled = alwaysClickable || true
             backgroundColor = DesignSystemAsset.main.color
             titleLabel.textColor = DesignSystemAsset.gray050.color
             
         } else {
-            isUserInteractionEnabled = true
+            isUserInteractionEnabled = false
             backgroundColor = DesignSystemAsset.gray200.color
             titleLabel.textColor = DesignSystemAsset.gray700.color
         }

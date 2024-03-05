@@ -9,6 +9,10 @@ import UIKit
 import DesignSystem
 import Combine
 
+protocol OnSelectedValue {
+    func selectedValue(_ value: [String: Any])
+}
+
 open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
@@ -104,7 +108,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
-    private lazy var infoEditView = InfoEditView().then {
+    private lazy var infoEditView = InfoEditView(delegate: self).then {
         $0.isHidden = true
     }
     
@@ -210,7 +214,11 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         }
         
         recognizedStackView.onTapped { [weak self] in
-            self?.infoEditView.isHidden = false
+            guard let selfRef = self else { return }
+            
+            if selfRef.recognizedContentLabel.text != "AI가 열심히 찾고있어요!" {
+                self?.infoEditView.isHidden = false
+            }
         }
     }
     
@@ -434,5 +442,13 @@ extension WriteContentViewController: UITextViewDelegate {
                 changeActionColor(DesignSystemAsset.main.color)
             }
         }
+    }
+}
+
+extension WriteContentViewController: OnSelectedValue {
+    func selectedValue(_ value: [String : Any]) {
+        guard let writtenText = value["writtenText"] as? [String] else { return }
+        
+        recognizedContentLabel.text = "\(writtenText[0]) & \(writtenText[1])"
     }
 }
