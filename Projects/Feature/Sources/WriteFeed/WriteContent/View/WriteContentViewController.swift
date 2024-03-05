@@ -32,7 +32,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     }
     
     private lazy var recognizedStackView = UIStackView().then {
-        $0.distribution = .equalSpacing
+        $0.distribution = .fill
         $0.spacing = moderateScale(number: 4)
     }
     
@@ -40,6 +40,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
+        $0.setContentCompressionResistancePriority(.init(1000), for: .horizontal)
     }
     
     private lazy var recognizedContentLabel = UILabel().then {
@@ -47,6 +48,33 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.textColor = DesignSystemAsset.gray400.color
         $0.font = Font.medium(size: 16)
         $0.adjustsFontSizeToFitWidth = true
+        $0.textAlignment = .right
+    }
+    
+    private lazy var drinkSnackStackView = UIStackView().then {
+        $0.distribution = .fillProportionally
+        $0.isHidden = true
+    }
+    
+    private lazy var recognizedDrinkLabel = UILabel().then {
+        $0.textColor = DesignSystemAsset.gray400.color
+        $0.font = Font.medium(size: 16)
+        $0.lineBreakMode = .byTruncatingTail
+        $0.textAlignment = .right
+    }
+    
+    private lazy var andLabel = UILabel().then {
+        $0.text = "&"
+        $0.textColor = DesignSystemAsset.gray400.color
+        $0.font = Font.medium(size: 16)
+        $0.setContentCompressionResistancePriority(.init(1000), for: .horizontal)
+    }
+    
+    private lazy var recognizedSnackLabel = UILabel().then {
+        $0.textColor = DesignSystemAsset.gray400.color
+        $0.font = Font.medium(size: 16)
+        $0.lineBreakMode = .byTruncatingTail
+        $0.textAlignment = .left
     }
     
     private lazy var recognizedImageView = UIImageView().then {
@@ -146,10 +174,15 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             .sink { [weak self] recognized in
                 if let firstSnack = recognized.foods.first,
                    let firstDrink = recognized.alcohols.first {
-                    self?.recognizedContentLabel.text = "\(firstDrink) & \(firstSnack)"
+                    self?.recognizedContentLabel.isHidden = true
+                    self?.drinkSnackStackView.isHidden = false
+                    self?.recognizedDrinkLabel.text = "\(firstDrink)"
+                    self?.recognizedSnackLabel.text = "\(firstSnack)"
                     self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
                     
                 } else {
+                    self?.recognizedContentLabel.isHidden = false
+                    self?.drinkSnackStackView.isHidden = true
                     self?.recognizedContentLabel.text = "정보 직접 입력하기"
                     self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
                     
@@ -259,8 +292,15 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             infoEditView
         ])
         
+        drinkSnackStackView.addArrangedSubviews([
+            recognizedDrinkLabel,
+            andLabel,
+            recognizedSnackLabel
+        ])
+        
         recognizedStackView.addArrangedSubviews([
             recognizedContentLabel,
+            drinkSnackStackView,
             recognizedImageView
         ])
         
@@ -306,6 +346,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         }
         
         recognizedStackView.snp.makeConstraints {
+            $0.leading.equalTo(recognizedTitleLabel.snp.trailing).offset(moderateScale(number: 12))
             $0.trailing.equalToSuperview().inset(moderateScale(number: 12))
             $0.centerY.equalTo(recognizedTitleLabel)
         }
@@ -449,6 +490,9 @@ extension WriteContentViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
         guard let writtenText = value["writtenText"] as? [String] else { return }
         
-        recognizedContentLabel.text = "\(writtenText[0]) & \(writtenText[1])"
+        recognizedContentLabel.isHidden = true
+        drinkSnackStackView.isHidden = false
+        recognizedDrinkLabel.text = "\(writtenText[0])"
+        recognizedSnackLabel.text = "\(writtenText[1])"
     }
 }

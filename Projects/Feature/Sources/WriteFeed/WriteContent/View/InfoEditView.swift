@@ -36,6 +36,7 @@ final class InfoEditView: UIView {
     
     private lazy var drinkTextField = UITextField().then {
         $0.placeholder = "술을 입력해주세요."
+        $0.delegate = self
         $0.font = Font.semiBold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.addTarget(self, action: #selector(handleTextFieldDidChange), for: .editingChanged)
@@ -57,6 +58,7 @@ final class InfoEditView: UIView {
     private lazy var snackTextField = UITextField().then {
         $0.placeholder = "안주를 입력해주세요."
         $0.font = Font.semiBold(size: 16)
+        $0.delegate = self
         $0.textColor = DesignSystemAsset.gray900.color
         $0.addTarget(self, action: #selector(handleTextFieldDidChange), for: .editingChanged)
     }
@@ -176,5 +178,17 @@ extension InfoEditView {
             $0.bottom.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 52))
         }
+    }
+}
+
+extension InfoEditView: UITextFieldDelegate {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let textFieldText = textField.text,
+            let rangeOfTextToReplace = Range(range, in: textFieldText) else {
+                return false
+        }
+        let substringToReplace = textFieldText[rangeOfTextToReplace]
+        let count = textFieldText.count - substringToReplace.count + string.count
+        return count <= 10
     }
 }
