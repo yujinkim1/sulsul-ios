@@ -9,4 +9,9 @@ import Foundation
 
 struct WriteContentModel: Decodable {
     let url: String
+    
+    struct Recognized: Decodable {
+        let foods: [String]
+        let alcohols: [String]
+    }
 }

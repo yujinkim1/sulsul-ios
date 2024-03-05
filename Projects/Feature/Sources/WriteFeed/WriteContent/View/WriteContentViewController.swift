@@ -109,7 +109,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     }
     
     open override func viewWillAppear(_ animated: Bool) {
-        viewModel.uploadImages(images)
+        if let thumnailImage = images.first {
+            viewModel.uploadImage(thumnailImage)
+        }
     }
     
     open override func viewDidLoad() {
@@ -130,6 +132,16 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                 selfRef.iconContainerView.snp.updateConstraints {
                     $0.bottom.equalToSuperview().inset(moderateScale(number: inset))
                 }
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.completeRecognizeAI
+            .sink { [weak self] recognized in
+                guard let firstSnack = recognized.foods.first,
+                      let firstDrink = recognized.alcohols.first else { return }
+                
+                self?.recognizedContentLabel.text = "\(firstDrink) & \(firstSnack)"
+                self?.recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
             }
             .store(in: &cancelBag)
     }

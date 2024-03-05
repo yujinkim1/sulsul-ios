@@ -14,52 +14,63 @@ final class WriteContentViewModel {
     private var cancelBag = Set<AnyCancellable>()
 
     private lazy var imageCount = 0
-    private lazy var imageServerURLs: [String] = []
+    private lazy var imageServerURL: String? = nil
     
-    private lazy var uploadOneImage = PassthroughSubject<Void, Never>()
+    // MARK: trigger
     private lazy var completeUpload = PassthroughSubject<Void, Never>()
+    private lazy var recognizeImageToAI = PassthroughSubject<Void, Never>()
+    
+    // MARK: output
+    lazy var completeRecognizeAI = PassthroughSubject<WriteContentModel.Recognized, Never>()
     
     init() {
-        uploadOneImage
-            .sink { [weak self] in
-                guard let selfRef = self else { return }
-                
-                if selfRef.imageCount == selfRef.imageServerURLs.count {
-                    selfRef.completeUpload.send(())
-                }
-            }
-            .store(in: &cancelBag)
-        
         completeUpload
             .sink { [weak self] in
-                
+                self?.recognizeImageToAI.send(())
+            }
+            .store(in: &cancelBag)
+        
+        recognizeImageToAI
+            .sink { [weak self] in
+                self?.requestRecognizeImage()
             }
             .store(in: &cancelBag)
     }
-
-    func uploadImages(_ images: [UIImage]) {
-        imageServerURLs = []
-        imageCount = images.count
-        
-        images.forEach { image in
-            uploadImage(image)
-        }
-    }
     
-    private func uploadImage(_ image: UIImage) {
+    func uploadImage(_ image: UIImage) {
         NetworkWrapper.shared.postUploadImage(stringURL: "/files/upload?directory=images", image: image) { [weak self] result in
             guard let selfRef = self else { return }
             
             switch result {
             case .success(let response):
                 if let decodedData = try? selfRef.jsonDecoder.decode(WriteContentModel.self, from: response) {
-                    selfRef.imageServerURLs.append(decodedData.url)
-                    selfRef.uploadOneImage.send(())
+                    selfRef.imageServerURL = decodedData.url
+                    selfRef.completeUpload.send(())
                 } else {
                     print("[/users/id] Fail Decode")
                 }
             case .failure(let error):
                 print("[/files/upload] Fail : \(error)")
+            }
+        }
+    }
+    
+    private func requestRecognizeImage() {
+        guard let url = imageServerURL else { return }
+        
+        NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/classifications?image_url=\(url)") { [weak self] result in
+            guard let selfRef = self else { return }
+
+            switch result {
+            case .success(let response):
+                if let decodedData = try? selfRef.jsonDecoder.decode(WriteContentModel.Recognized.self, from: response) {
+                    
+                    selfRef.completeRecognizeAI.send(decodedData)
+                } else {
+                    print("[/feeds/classifications] Fail Decode")
+                }
+            case .failure(let error):
+                print("[/feeds/classifications] Fail : \(error)")
             }
         }
     }
