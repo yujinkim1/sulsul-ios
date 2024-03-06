@@ -230,7 +230,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             if selfRef.images.count == 5 {
                 selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요")
             } else {
-                // TODO: 갤러리 오픈
+                if let galleryVC = selfRef.coordinator?.currentNavigationViewController?.viewControllers[1] {
+                    self?.coordinator?.currentNavigationViewController?.popToViewController(galleryVC, animated: true)
+                }
             }
         }
         
