@@ -197,7 +197,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                         self?.infoEditView.isHidden = false
                         
                     }, cancelCompletion: {
-                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectPhoto), userData: nil)
+                        if let galleryVC = self?.coordinator?.currentNavigationViewController?.viewControllers[1] {
+                            self?.coordinator?.currentNavigationViewController?.popToViewController(galleryVC, animated: true)
+                        }
                     })
                 }
             }
