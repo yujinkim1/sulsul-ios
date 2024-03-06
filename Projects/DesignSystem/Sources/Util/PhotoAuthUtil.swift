@@ -10,16 +10,15 @@ import Photos
 import Combine
 
 public class PhotoAuthUtil {
-    public static let shared = PhotoAuthUtil()
-    
     private var photoLoadResult: PHFetchResult<PHAsset>?
     private var allPhotoImage: [UIImage] = []
     private var photoWidth = (UIScreen.main.bounds.width - 17.01) / 4
     private lazy var photoSize = CGSize(width: photoWidth, height: photoWidth)
-    
+
+    // MARK: output
     private var allImagesLoaded = CurrentValueSubject<[UIImage], Never>([])
     
-    private init() {
+    public init() {
         requestGalleryAuth { [weak self] in
             self?.fetchAllPhotos()
         }

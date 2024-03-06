@@ -11,6 +11,8 @@ import DesignSystem
 
 final class SelectPhotoViewModel {
     
+    private let photoUtil = PhotoAuthUtil()
+    
     private var cancelBag = Set<AnyCancellable>()
     
     private var images: [UIImage] = []
@@ -25,8 +27,9 @@ final class SelectPhotoViewModel {
     var updateData = PassthroughSubject<Void, Never>()
     
     init() {
+        
         fetchImages
-            .flatMap(PhotoAuthUtil.shared.shouldUpateData(_:))
+            .flatMap(photoUtil.shouldUpateData(_:))
             .sink { [weak self] images in
                 self?.selection = Array(repeating: false, count: images.count)
                 self?.images = images
