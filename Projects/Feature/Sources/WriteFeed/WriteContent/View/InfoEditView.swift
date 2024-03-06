@@ -103,9 +103,11 @@ final class InfoEditView: UIView {
     }
     
     @objc private func handleTextFieldDidChange() {
-        let isTextEmpty = snackTextField.text == nil || drinkTextField.text == nil
+        guard let snack = snackTextField.text, let drink = drinkTextField.text else { return }
         
-        completeButton.setClickable(!isTextEmpty)
+        let isNotTextEmpty = (snack.removeSpace() != "") && (drink.removeSpace() != "")
+        
+        completeButton.setClickable(isNotTextEmpty)
     }
 }
 
