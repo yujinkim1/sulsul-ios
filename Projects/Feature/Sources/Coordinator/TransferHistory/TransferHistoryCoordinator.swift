@@ -15,7 +15,7 @@ final class TransferHistoryCoordinator: NSObject, TransferHistoryBaseCoordinator
     
     func start() -> UIViewController {
 
-        let transferHistoryVC = TransferHistoryViewController()
+        let transferHistoryVC = RamdomFeedViewController()
         transferHistoryVC.coordinator = self
         rootViewController = UINavigationController(rootViewController: transferHistoryVC)
         rootNavigationController?.delegate = self
