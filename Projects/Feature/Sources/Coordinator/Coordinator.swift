@@ -45,7 +45,7 @@ enum TabBarFlow: Flow {
     case auth(AuthFlow)
     case common(CommonScene)
     case home(HomeScene)
-    case benefit(BenefitScene)
+    case ranking(RankingScene)
     case transfer(TransferScene)
     case transferHistory(TransferHistoryScene)
     case more(ProfileScene)
@@ -95,7 +95,9 @@ enum HomeScene {
     case main
 }
 
-enum BenefitScene {
+// MARK: - 랭킹페이지
+
+enum RankingScene {
     case main
 }
 
