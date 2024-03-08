@@ -11,16 +11,30 @@ import DesignSystem
 
 public final class RankingViewController: BaseViewController {
     var coordinator: RankingBaseCoordinator?
-    var viewModel: RankingViewModel?
+    var viewModel: RankingViewModel
     
-    private var viewControllers: [UIViewController] = []
     private var cancelBag = Set<AnyCancellable>()
+    private var viewControllers: [UIViewController] = []
     
     private lazy var rankingDrinkViewController = RankingDrinkViewController()
     private lazy var rankingCombinationViewController = RankingCombinationViewController()
     private lazy var pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal).then {
         $0.dataSource = self
         $0.delegate = self
+    }
+    
+    private lazy var topHeaderView = UIView().then {
+        $0.frame = .zero
+    }
+    
+    private lazy var searchTouchableImageView = TouchableImageView(frame: .zero).then {
+        $0.image = UIImage(named: "common_search")
+        $0.tintColor = DesignSystemAsset.gray900.color
+    }
+    
+    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then {
+        $0.image = UIImage(named: "common_alarm")
+        $0.tintColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var titleLabel = UILabel().then {
@@ -53,11 +67,19 @@ public final class RankingViewController: BaseViewController {
         $0.register(PageTabBarCell.self, forCellWithReuseIdentifier: PageTabBarCell.reuseIdentifier)
     }
     
-    public override func viewDidLoad() {
-        view.backgroundColor = DesignSystemAsset.black.color
-        overrideUserInterfaceStyle = .dark
+    init(viewModel: RankingViewModel) {
+        self.viewModel = viewModel
         
-        viewModel = RankingViewModel()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
         
         bind()
         addViews()
@@ -67,14 +89,42 @@ public final class RankingViewController: BaseViewController {
     
     public override func addViews() {
         pageTabBarContainerView.addSubview(pageTabBarView)
-        view.addSubviews([titleLabel, weekendLabel, pageTabBarContainerView, pageViewController.view])
+        
+        topHeaderView.addSubviews([
+            searchTouchableImageView,
+            alarmTouchableImageView
+        ])
+        
+        view.addSubviews([
+            topHeaderView,
+            titleLabel,
+            weekendLabel,
+            pageTabBarContainerView,
+            pageViewController.view
+        ])
+        
         addChild(pageViewController)
     }
     
     public override func makeConstraints() {
+        topHeaderView.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 52))
+            $0.width.centerX.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        searchTouchableImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalTo(alarmTouchableImageView.snp.leading).offset(moderateScale(number: -12))
+            $0.size.equalTo(moderateScale(number: 24))
+        }
+        alarmTouchableImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.size.equalTo(moderateScale(number: 24))
+        }
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.top.equalToSuperview().offset(moderateScale(number: 52))
+            $0.top.equalTo(topHeaderView.snp.bottom)
         }
         weekendLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(moderateScale(number: 8))
@@ -95,13 +145,22 @@ public final class RankingViewController: BaseViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
+    
+    public override func setupIfNeeded() {
+        searchTouchableImageView.setOpaqueTapGestureRecognizer {
+            #warning("검색 화면으로 이동해야 함")
+        }
+        alarmTouchableImageView.setOpaqueTapGestureRecognizer {
+            #warning("알림 화면으로 이동해야 함")
+        }
+    }
 }
 
 // MARK: - Custom Method
 
 extension RankingViewController {
     private func bind() {
-        viewModel?
+        viewModel
             .rankingBasePublisher
             .sink { [weak self] data in
                 guard let self = self,
