@@ -9,6 +9,7 @@ import UIKit
 import DesignSystem
 
 final class DetailDrinkViewController: BaseViewController {
+    var coordinator: RankingBaseCoordinator?
     // MARK: - Custom Property
     private let descriptionOfList = ["종류", "도수", "원산지"]
     private let dummyOfList = ["희석식 소주", "16%", "한국"]
@@ -114,31 +115,6 @@ final class DetailDrinkViewController: BaseViewController {
             $0.leading.equalTo(drinkImageView.snp.trailing)
             $0.top.equalTo(drinkImageView)
             $0.size.equalTo(moderateScale(number: 24))
-        }
-    }
-    
-    private func createCompositionalLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout {
-            (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
-            let leadingItem = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(0.4), heightDimension: .fractionalHeight(1.0)))
-            
-            let trailingItem = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3)))
-            
-            let trailingGroupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3))
-            
-            if #available(iOS 16.0, *) {
-                let trailingGroup = NSCollectionLayoutGroup.vertical(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3)), repeatingSubitem: trailingItem, count: 2)
-            } else {
-                let trailingGroup = NSCollectionLayoutGroup.vertical(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3)), subitem: trailingItem, count: 2)
-            }
-            
-            let nestedGroup = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.8), heightDimension: .fractionalHeight(1.0)), subitems: [leadingItem, trailingGroup])
-            
-            let section = NSCollectionLayoutSection(group: nestedGroup)
-            
-            return section
         }
     }
 }
