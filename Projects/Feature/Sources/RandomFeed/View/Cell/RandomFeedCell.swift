@@ -107,13 +107,21 @@ final class RamdomFeedCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind() {
-        profileImage.backgroundColor = .gray
-        titleLabel.text = "제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱제목이 요롱롱"
-        contentLabel.text = "내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ내용 ㅋㅋ"
-        nameLabel.text = "김유진ㅋ"
-        relateDataLabel.text = "10분 전"
-        heartCountLabel.text = "99+"
+    func bind(_ randomFeed: RandomFeedModel.Feed) {
+        profileImage.backgroundColor = .lightGray
+        titleLabel.text = randomFeed.title
+        contentLabel.text = randomFeed.content
+        nameLabel.text = randomFeed.user_nickname
+        relateDataLabel.text = randomFeed.updated_at
+        heartCountLabel.text = "\(randomFeed.likes_count)"
+        
+        if let imageURL = URL(string: randomFeed.user_image ?? "") {
+            profileImage.kf.setImage(with: imageURL)
+        }
+        
+        if let imageURL = URL(string: randomFeed.represent_image) {
+            imageView.kf.setImage(with: imageURL)
+        }
     }
 }
 

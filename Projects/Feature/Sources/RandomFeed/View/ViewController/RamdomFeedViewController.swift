@@ -6,10 +6,15 @@
 //
 
 import UIKit
+import Combine
 import DesignSystem
 
 public final class RamdomFeedViewController: BaseViewController, TransferHistoryBaseCoordinated {
     var coordinator: TransferHistoryBaseCoordinator?
+    
+    private var cancelBag = Set<AnyCancellable>()
+    
+    private lazy var viewModel = RandomFeedViewModel()
    
     private lazy var feedTitleLabel = UILabel().then {
         $0.text = "피드"
@@ -42,6 +47,16 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        bind()
+    }
+    
+    private func bind() {
+        viewModel.reloadData()
+            .sink { [weak self] in
+                self?.feedCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -79,13 +94,13 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
 
 extension RamdomFeedViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return viewModel.randomFeeds.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(RamdomFeedCell.self, indexPath: indexPath) else { return UICollectionViewCell() }
         
-        cell.bind()
+        cell.bind(viewModel.randomFeeds[indexPath.row])
         
         return cell
     }
