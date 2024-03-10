@@ -8,31 +8,36 @@
 import UIKit
 
 public final class PaddableLabel: UILabel {
-    fileprivate var padding = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+    fileprivate var topInset: CGFloat
+    fileprivate var leftInset: CGFloat
+    fileprivate var bottomInset: CGFloat
+    fileprivate var rightInset: CGFloat
     
-    convenience init(padding: UIEdgeInsets) {
-        self.init()
-        self.padding = padding
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    required public init(edgeInsets top: CGFloat, _ left: CGFloat, _ bottom: CGFloat, _ right: CGFloat) {
+        self.topInset = top
+        self.leftInset = left
+        self.bottomInset = bottom
+        self.rightInset = right
+        
+        super.init(frame: .zero)
     }
     
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override public var intrinsicContentSize: CGSize {
         var contentSize = super.intrinsicContentSize
-        contentSize.width += padding.left + padding.right
-        contentSize.height += padding.top + padding.bottom
+        contentSize.width += leftInset + rightInset
+        contentSize.height += topInset + bottomInset
         
         return contentSize
     }
     
     override public func drawText(in rect: CGRect) {
-        super.drawText(in: rect.inset(by: padding))
+        let edgeInsets = UIEdgeInsets(top: topInset, left: leftInset, bottom: bottomInset, right: rightInset)
+        
+        super.drawText(in: rect.inset(by: edgeInsets))
     }
 }
