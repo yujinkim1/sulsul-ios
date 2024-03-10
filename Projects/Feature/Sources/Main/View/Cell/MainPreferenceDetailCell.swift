@@ -49,7 +49,7 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
     }
     
     private lazy var scoreImageView = UIImageView().then({
-        $0.image = UIImage(systemName: "circle.fill")
+        $0.image = UIImage(named: "rate")
     })
     
     private lazy var scoreLabel = UILabel().then({

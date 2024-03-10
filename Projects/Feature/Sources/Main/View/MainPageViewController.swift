@@ -16,6 +16,7 @@ public final class MainPageViewController: BaseViewController {
     private let temp = 0 // 0이면 취향 등록 안한 사람, 그외는 한사람
     private let nopreferenceTemp = 1 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
     private var cancelBag = Set<AnyCancellable>()
+    private let viewModel: MainPageViewModel = MainPageViewModel() // 수정
     
     private lazy var topHeaderView = UIView()
     
@@ -46,6 +47,15 @@ public final class MainPageViewController: BaseViewController {
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
     }
+    
+//    init(viewModel: MainPageViewModel) {
+//        self.viewModel = viewModel
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -216,6 +226,7 @@ extension MainPageViewController: UICollectionViewDataSource {
         } else if indexPath.section == 1 {
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
+                likeHeaderView.updateView(title: "좋아요 많은 조합", subTitle: "자주, 늘 먹는데에는 이유가 있는 법!")
                 return likeHeaderView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }

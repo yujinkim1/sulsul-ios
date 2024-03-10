@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 import Service
-import Alamofire // TODO: - Alamofire는 Service에서만 사용되도록 로직 수정 필요
+import Alamofire
 
 struct ProfileMainViewModel {
 
@@ -42,8 +42,6 @@ struct ProfileMainViewModel {
             case .success(let response):
                 if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
-                    print("여기>>>>")
-                    print(mappedUserInfo)
                     userInfo.send(mappedUserInfo)
                 } else {
                     print("디코딩 모델 에러5")
@@ -67,8 +65,6 @@ struct ProfileMainViewModel {
                 if let myFeedsData = try? self.jsonDecoder.decode(RemoteFeedsItem.self, from: response) {
                     let mappedData = tempMapper.feedModel(from: myFeedsData.content ?? [])
                     myFeeds.send(mappedData)
-                    print(">>>>>>")
-                    print(myFeedsData)
                 } else {
                     print("디코딩 모델 에러6")
                 }
