@@ -9,10 +9,10 @@ import Foundation
 
 struct RemotePopularFeedsItem: Decodable {
     let title: String?
-    let feeds: [RemotePopularFeed]?
+    let feeds: [RemotePopularDetailFeed]?
 }
 
-struct RemotePopularFeed: Decodable {
+struct RemotePopularDetailFeed: Decodable {
     let feedId: Int?
     let title: String?
     let content: String?
@@ -25,4 +25,19 @@ struct RemotePopularFeed: Decodable {
     let userImage: String?
     let createdAt: String?
     let updatedAt: String?
+    
+    private enum CodingKeys: String, CodingKey {
+        case feedId = "feed_id"
+        case title
+        case content
+        case representImage = "represent_image"
+        case pairingIds = "pairing_ids"
+        case images
+        case likeCount = "like_count"
+        case userId = "user_id"
+        case userNickname = "user_nickname"
+        case userImage = "user_image"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
 }

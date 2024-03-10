@@ -8,20 +8,28 @@
 import Foundation
 
 struct MainPageMapper {
-    func popularFeeds(from remotePopularFeeds: [RemotePopularFeed]) -> [PopularFeed] {
-        return remotePopularFeeds.map { feed -> PopularFeed in
-            return PopularFeed(feedId: feed.feedId ?? 0,
-                               title: feed.title ?? "",
-                               content: feed.content ?? "",
-                               representImage: feed.representImage ?? "",
-                               pairingIds: feed.pairingIds ?? [],
-                               images: feed.images ?? [],
-                               likeCount: feed.likeCount ?? 0,
-                               userId: feed.userId ?? 0,
-                               userNickname: feed.userNickname ?? "",
-                               userImage: feed.userImage ?? "",
-                               createdAt: feed.createdAt ?? "",
-                               updatedAt: feed.updatedAt ?? "")
-        }
-    }
+    func popularFeeds(from remotePopularFeeds: [RemotePopularFeedsItem]) -> [PopularFeed] {
+           return remotePopularFeeds.map { feed -> PopularFeed in
+               let detailFeeds = feed.feeds ?? []
+               return PopularFeed(
+                title: feed.title ?? "",
+                   feeds: detailFeeds.map { detailFeed in
+                       return PopularFeed.PopularDetailFeed(
+                           feedId: detailFeed.feedId ?? 0,
+                           title: detailFeed.title ?? "",
+                           content: detailFeed.content ?? "",
+                           representImage: detailFeed.representImage ?? "",
+                           pairingIds: detailFeed.pairingIds ?? [],
+                           images: detailFeed.images ?? [],
+                           likeCount: detailFeed.likeCount ?? 0,
+                           userId: detailFeed.userId ?? 0,
+                           userNickname: detailFeed.userNickname ?? "",
+                           userImage: detailFeed.userImage ?? "",
+                           createdAt: detailFeed.createdAt ?? "",
+                           updatedAt: detailFeed.updatedAt ?? ""
+                       )
+                   }
+               )
+           }
+       }
 }

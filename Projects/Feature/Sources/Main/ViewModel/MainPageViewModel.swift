@@ -12,8 +12,9 @@ import Service
 
 struct MainPageViewModel {
     private var cancelBag = Set<AnyCancellable>()
-    
-//    private let popularFeeds = CurrentValueSubject<[
+    private let jsonDecoder = JSONDecoder()
+    private let mainPageMapper = MainPageMapper()
+    private let popularFeeds = CurrentValueSubject<[PopularFeed], Never> ([])
     
     init() {
         getPopularFeeds()
@@ -31,10 +32,19 @@ struct MainPageViewModel {
         NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/popular", header: headers) { result in
             switch result {
             case .success(let response):
-                print(response)
+                if let popularFeedList = try? self.jsonDecoder.decode([RemotePopularFeedsItem].self, from: response) {
+                    let mappedPopularFeeds = self.mainPageMapper.popularFeeds(from: popularFeedList)
+                    popularFeeds.send(mappedPopularFeeds)
+                } else {
+                    print("디코딩 에러")
+                }
             case .failure(let error):
                 print(error)
             }
         }
+    }
+    
+    func popularFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
+        return popularFeeds.eraseToAnyPublisher()
     }
 }
