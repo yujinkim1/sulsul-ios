@@ -99,6 +99,10 @@ enum HomeScene {
 
 enum RankingScene {
     case main
+    case search
+    case alarm
+    case detailDrink
+    case detailCombination
 }
 
 enum TransferScene {

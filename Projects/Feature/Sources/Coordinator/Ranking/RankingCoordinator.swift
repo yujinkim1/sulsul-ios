@@ -14,8 +14,8 @@ final class RankingCoordinator: NSObject, RankingBaseCoordinator {
     var rootViewController: UIViewController = UIViewController()
     
     func start() -> UIViewController {
-        let viewModel = RankingViewModel()
-        let viewController = RankingViewController(viewModel: viewModel)
+        let viewModel = RankingMainViewModel()
+        let viewController = RankingMainViewController(viewModel: viewModel)
         
         viewController.coordinator = self
         rootViewController = UINavigationController(rootViewController: viewController)
@@ -40,6 +40,22 @@ final class RankingCoordinator: NSObject, RankingBaseCoordinator {
         switch scene {
         case .main:
             rootNavigationController?.popToRootViewController(animated: true)
+        case .search:
+            let searchVC = SearchViewController()
+            searchVC.rankingCoordinator = self
+            
+            currentNavigationViewController?.pushViewController(searchVC, animated: true)
+        case .alarm: return
+        case .detailDrink: return
+//            let detailDrinkVC = DetailDrinkViewController()
+//            detailDrinkVC.coordinator = self
+//            
+//            currentNavigationViewController?.pushViewController(detailDrinkVC, animated: true)
+        case .detailCombination: return
+//            let detailCombinationVC = DetailCombinationViewController()
+//            detailCombinationVC.coordinator = self
+//            
+//            currentNavigationViewController?.pushViewController(detailCombinationVC, animated: true)
         }
     }
 }
@@ -52,7 +68,7 @@ extension RankingCoordinator: UINavigationControllerDelegate {
         willShow viewController: UIViewController,
         animated: Bool
     ) {
-        guard viewController is RankingViewController else { return }
+        guard viewController is RankingMainViewController else { return }
         
         let tabBarController = parentCoordinator?.rootViewController as? UITabBarController
         tabBarController?.setTabBarHidden(false)

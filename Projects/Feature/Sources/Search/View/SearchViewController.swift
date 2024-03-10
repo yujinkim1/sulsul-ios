@@ -11,6 +11,8 @@ import DesignSystem
 import Service
 
 public final class SearchViewController: BaseViewController {
+    var rankingCoordinator: RankingBaseCoordinator?
+    
     private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = SearchViewModel()
     
@@ -18,6 +20,7 @@ public final class SearchViewController: BaseViewController {
         $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
         $0.setTitle("검색", for: .normal)
         $0.titleLabel?.font = Font.bold(size: 18)
+        $0.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
     }
     
     private lazy var titleLabel = UILabel().then {
@@ -227,5 +230,9 @@ extension SearchViewController {
     
     @objc private func didTabsearchResetButton() {
         
+    }
+    
+    @objc private func didTapBackButton() {
+        self.navigationController?.popViewController(animated: true)
     }
 }
