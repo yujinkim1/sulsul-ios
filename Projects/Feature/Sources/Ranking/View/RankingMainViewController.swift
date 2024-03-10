@@ -147,13 +147,10 @@ public final class RankingMainViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
-        #warning("연결하는 작업이 필요해요")
         searchTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.detailDrink), userData: nil)
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.search), userData: nil)
         }
-//        alarmTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-//            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.alarm), userData: nil)
-//        }
     }
     
     // MARK: - Custom Method

@@ -107,7 +107,7 @@ extension RankingDrinkViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.detailDrink), userData: nil)
-        print("\(indexPath). DrinkCell is pressed.")
+//        self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.detailDrink), userData: nil)
+        #warning("술 상세 화면 MVP에서 제외")
     }
 }
