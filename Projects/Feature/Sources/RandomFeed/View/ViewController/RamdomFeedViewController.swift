@@ -118,7 +118,7 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         
         cell.heartView.onTapped { [weak self] in
             if UserDefaultsUtil.shared.isLogin() {
-                
+                self?.viewModel.didTabHeart()
                 
             } else {
                 self?.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")

@@ -21,6 +21,7 @@ final class RandomFeedViewModel {
 
     // MARK: trigger
     let loadRandomFeed = CurrentValueSubject<RandomFeedModel.Request, Never>(.init(exclude_feed_ids: ""))
+    private lazy var updateHeart = PassthroughSubject<Void, Never>()
     
     // MARK: output
     private let reloadRandomFeeds = CurrentValueSubject<Void, Never>(())
@@ -36,6 +37,12 @@ final class RandomFeedViewModel {
                 self?.reloadRandomFeeds.send(())
             }
             .store(in: &cancelBag)
+        
+        updateHeart
+    }
+    
+    func didTabHeart() {
+        
     }
     
     func loadMoreData() {
