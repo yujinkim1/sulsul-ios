@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import DesignSystem
+import Service
 
 public final class RamdomFeedViewController: BaseViewController, TransferHistoryBaseCoordinated {
     var coordinator: TransferHistoryBaseCoordinator?
@@ -50,6 +51,10 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
         super.viewDidLoad()
         
         bind()
+        
+        seeMyPostLabel.onTapped { [weak self] in
+            // TODO: 마이페이지 이동
+        }
     }
     
     private func bind() {
@@ -102,6 +107,22 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(RamdomFeedCell.self, indexPath: indexPath) else { return UICollectionViewCell() }
         
         cell.bind(viewModel.randomFeeds[indexPath.row])
+        
+        cell.seeAllLabel.onTapped { [weak self] in
+            // TODO: 피드 상세 이동
+        }
+        
+        cell.spamView.onTapped { [weak self] in
+            // TODO: 신고 이동
+        }
+        
+        cell.heartView.onTapped { [weak self] in
+            if UserDefaultsUtil.shared.isLogin() {
+                print("|| 로그인됨")
+            } else {
+                print("|| 로그인안됨")
+            }
+        }
         
         return cell
     }

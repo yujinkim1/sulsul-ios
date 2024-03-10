@@ -41,13 +41,13 @@ final class RamdomFeedCell: UICollectionViewCell {
         $0.numberOfLines = 2
     }
     
-    private lazy var seeAllLabel = UILabel().then {
+    lazy var seeAllLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.semiBold(size: 12)
         $0.text = "전체보기"
     }
     
-    private lazy var heartView = UIView()
+    lazy var heartView = UIView()
     
     private lazy var heartImageView = UIImageView().then {
         $0.image = UIImage(named: "randomFeed_heart")
@@ -58,7 +58,7 @@ final class RamdomFeedCell: UICollectionViewCell {
         $0.font = Font.regular(size: 12)
     }
     
-    private lazy var spamView = UIView()
+    lazy var spamView = UIView()
     
     private lazy var spamImageView = UIImageView().then {
         $0.image = UIImage(named: "randomFeed_spam")

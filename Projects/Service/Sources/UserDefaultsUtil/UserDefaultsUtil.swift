@@ -19,6 +19,11 @@ public struct UserDefaultsUtil {
         case recentKeyword
     }
     
+    public func isLogin() -> Bool {
+        let accessToke = KeychainStore.shared.read(label: "accessToken")
+        return getInstallationId() != 0 && accessToke != nil
+    }
+    
     public func setRecentKeywordList(_ dataList: [String]) {
         defaults.setValue(dataList, forKey: UserDefaultKey.recentKeyword.rawValue)
     }
