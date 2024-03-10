@@ -11,16 +11,26 @@ import DesignSystem
 
 /// 술 순위를 보여주는 뷰 컨트롤러
 final class RankingDrinkViewController: BaseViewController {
-    var viewModel: RankingViewModel?
-//    var detailViewController: DetailDrinkViewController?
+    var coordinator: RankingBaseCoordinator?
+    var viewModel: RankingDrinkViewModel?
     
     private var cancelBag = Set<AnyCancellable>()
     
+    private lazy var rankingDrinkCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).then {
+        $0.backgroundColor = .clear
+        $0.showsVerticalScrollIndicator = false
+        $0.dataSource = self
+        $0.delegate = self
+        $0.register(RankingDrinkCell.self, forCellWithReuseIdentifier: RankingDrinkCell.reuseIdentifier)
+    }
+    
     private lazy var layout = UICollectionViewCompositionalLayout { (section, environment) -> NSCollectionLayoutSection? in
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), 
+                                              heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(86))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), 
+                                               heightDimension: .absolute(86))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
@@ -30,20 +40,10 @@ final class RankingDrinkViewController: BaseViewController {
         return section
     }
     
-    private lazy var rankingDrinkCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).then {
-        $0.backgroundColor = .clear
-        $0.showsVerticalScrollIndicator = false
-        $0.dataSource = self
-        $0.delegate = self
-        $0.register(RankingDrinkCell.self, forCellWithReuseIdentifier: RankingDrinkCell.reuseIdentifier)
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = DesignSystemAsset.black.color
-        overrideUserInterfaceStyle = .dark
         
-        viewModel = RankingViewModel()
+        viewModel = RankingDrinkViewModel()
         
         bind()
         addViews()
@@ -59,23 +59,24 @@ final class RankingDrinkViewController: BaseViewController {
             $0.edges.equalToSuperview()
         }
     }
-}
-
-// MARK: - Custom Method
-
-extension RankingDrinkViewController {
+    
+    // MARK: - Custom Method
+    
     private func bind() {
+        viewModel?.requestRankingAlcohol()
+        
         viewModel?
             .rankingDrinkPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.rankingDrinkCollectionView.reloadData()
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.rankingDrinkCollectionView.reloadData()
             }
             .store(in: &cancelBag)
     }
 }
 
-// MARK: - 콜렉션 뷰 DataSource
+// MARK: - Drink CollectionView DataSource
 
 extension RankingDrinkViewController: UICollectionViewDataSource {
     func collectionView(
@@ -93,28 +94,20 @@ extension RankingDrinkViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        if let model = viewModel?.drinkDatasource.first?.ranking?[indexPath.item] {
-            print(model)
-            cell.bind(model)
-        }
+        if let model = viewModel?.getDrinkDatasource(to: indexPath) { cell.bind(model) }
         
         return cell
     }
 }
 
-// MARK: - 콜렉션 뷰 델리게이트
+// MARK: - Drink CollectionView Delegate
 
 extension RankingDrinkViewController: UICollectionViewDelegate {
-//    func collectionView(
-//        _ collectionView: UICollectionView,
-//        didSelectItemAt indexPath: IndexPath
-//    ) {
-//        let rootViewController = RankingViewController()
-//        let viewController = DetailDrinkViewController()
-//        
-//        let navigationController = UINavigationController(rootViewController: rootViewController)
-//        navigationController.pushViewController(viewController, animated: true)
-//        
-//        present(viewController, animated: true, completion: nil)
-//    }
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.detailDrink), userData: nil)
+        print("\(indexPath). DrinkCell is pressed.")
+    }
 }

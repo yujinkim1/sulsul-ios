@@ -1,5 +1,5 @@
 //
-//  RankingViewModel.swift
+//  RankingDrinkViewModel.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-01-07.
@@ -9,7 +9,7 @@ import Combine
 import Foundation
 import Service
 
-final class RankingViewModel {
+final class RankingDrinkViewModel {
     
     private let jsonDecoder = JSONDecoder()
     
