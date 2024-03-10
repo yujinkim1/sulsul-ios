@@ -7,6 +7,7 @@
 
 import UIKit
 import DesignSystem
+import Service
 
 final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordinated {
     var coordinator: CommonBaseCoordinator?
@@ -52,6 +53,23 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         $0.text = "사진을 다시 선택하고 싶어요."
         $0.textColor = DesignSystemAsset.gray400.color
         $0.font = Font.bold(size: 16)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let text = UserDefaultsUtil.shared.getFeedTitle() {
+            titleTextView.text = text
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        setTextViewUI()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        if let text = titleTextView.text {
+            UserDefaultsUtil.shared.setFeedTitle(text)
+            titlePlaceholderLabel.isHidden = true
+        }
     }
     
     override func viewDidLoad() {
@@ -167,6 +185,18 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             $0.edges.equalToSuperview()
         }
     }
+    
+    private func setTextViewUI() {
+        let numberOfLine = Int(titleTextView.contentSize.height / titleTextView.font!.lineHeight)
+        guard let height = heightByLine[numberOfLine] else { return }
+        
+        titleTextView.snp.remakeConstraints {
+            $0.leading.trailing.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
+            $0.height.equalTo(moderateScale(number: height))
+        }
+        
+        titlePlaceholderLabel.isHidden = !titleTextView.text.isEmpty
+    }
 }
 
 extension WriteTitleViewController: UITextViewDelegate {
@@ -177,14 +207,6 @@ extension WriteTitleViewController: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        let numberOfLine = Int(textView.contentSize.height / textView.font!.lineHeight)
-        guard let height = heightByLine[numberOfLine] else { return }
-        
-        titleTextView.snp.remakeConstraints {
-            $0.leading.trailing.bottom.equalTo(thumnailImageView).inset(moderateScale(number: 16))
-            $0.height.equalTo(moderateScale(number: height))
-        }
-        
-        titlePlaceholderLabel.isHidden = !textView.text.isEmpty
+        setTextViewUI()
     }
 }

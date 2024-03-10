@@ -8,6 +8,7 @@
 import UIKit
 import DesignSystem
 import Combine
+import Service
 
 protocol OnSelectedValue {
     func selectedValue(_ value: [String: Any])
@@ -146,6 +147,17 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             
             recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
             recognizedImageView.image = UIImage(named: "writeFeed_progress")
+        }
+        
+        if let text = UserDefaultsUtil.shared.getFeedContent() {
+            contentTextView.text = text
+            setTextViewUI()
+        }
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        if let text = contentTextView.text {
+            UserDefaultsUtil.shared.setFeedContent(text)
         }
     }
     
@@ -480,14 +492,18 @@ extension WriteContentViewController: UITextViewDelegate {
             }
             
         } else if textView == contentTextView {
-            let isTextEmpty = textView.text.isEmpty
-            placeholderLabel.isHidden = !isTextEmpty
-            
-            if isTextEmpty {
-                changeActionColor(DesignSystemAsset.gray300.color)
-            } else {
-                changeActionColor(DesignSystemAsset.main.color)
-            }
+            setTextViewUI()
+        }
+    }
+    
+    private func setTextViewUI() {
+        let isTextEmpty = contentTextView.text.isEmpty
+        placeholderLabel.isHidden = !isTextEmpty
+        
+        if isTextEmpty {
+            changeActionColor(DesignSystemAsset.gray300.color)
+        } else {
+            changeActionColor(DesignSystemAsset.main.color)
         }
     }
 }
