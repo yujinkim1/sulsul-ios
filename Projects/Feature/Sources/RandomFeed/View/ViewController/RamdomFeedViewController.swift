@@ -34,6 +34,7 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
         $0.backgroundColor = .clear
         $0.dataSource = self
         $0.contentInsetAdjustmentBehavior = .never
+        $0.bounces = false
         
         $0.isPagingEnabled = true
         let flowLayout = UICollectionViewFlowLayout()

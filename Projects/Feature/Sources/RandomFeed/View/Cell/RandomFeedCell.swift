@@ -80,6 +80,7 @@ final class RamdomFeedCell: UICollectionViewCell {
         topGradientLayer.opacity = 1
         topGradientLayer.locations = [0, 0.2]
         $0.layer.addSublayer(topGradientLayer)
+        topGradientLayer.frame = CGRect(x: 0, y: 0, width: Int(UIScreen.main.bounds.width), height: Int(moderateScale(number: 400)))
     }
     
     private lazy var bottomGradientView = UIView().then {
@@ -89,11 +90,7 @@ final class RamdomFeedCell: UICollectionViewCell {
         bottomGradientLayer.opacity = 1
         bottomGradientLayer.locations = [0, 0.2]
         $0.layer.addSublayer(bottomGradientLayer)
-    }
-    
-    override func layoutSubviews() {
-        topGradientLayer.frame = topGradientView.bounds
-        bottomGradientLayer.frame = bottomGradientView.bounds
+        bottomGradientLayer.frame = CGRect(x: 0, y: 0, width: Int(UIScreen.main.bounds.width), height: Int(moderateScale(number: 270)))
     }
     
     override init(frame: CGRect) {
