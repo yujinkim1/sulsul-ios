@@ -1,5 +1,5 @@
 //
-//  RankingViewController.swift
+//  RankingMainViewController.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-01-05.
@@ -9,9 +9,9 @@ import Combine
 import UIKit
 import DesignSystem
 
-public final class RankingViewController: BaseViewController {
+public final class RankingMainViewController: BaseViewController {
     var coordinator: RankingBaseCoordinator?
-    var viewModel: RankingViewModel
+    var viewModel: RankingMainViewModel
     
     private var cancelBag = Set<AnyCancellable>()
     private var viewControllers: [UIViewController] = []
@@ -67,7 +67,7 @@ public final class RankingViewController: BaseViewController {
         $0.register(PageTabBarCell.self, forCellWithReuseIdentifier: PageTabBarCell.reuseIdentifier)
     }
     
-    init(viewModel: RankingViewModel) {
+    init(viewModel: RankingMainViewModel) {
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -84,7 +84,7 @@ public final class RankingViewController: BaseViewController {
         bind()
         addViews()
         makeConstraints()
-        configurePageViewController()
+        preparePageViewController()
     }
     
     public override func addViews() {
@@ -128,7 +128,7 @@ public final class RankingViewController: BaseViewController {
         }
         weekendLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(moderateScale(number: 8))
-            $0.top.bottom.equalTo(titleLabel)
+            $0.bottom.equalTo(titleLabel)
         }
         pageTabBarContainerView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
@@ -147,31 +147,31 @@ public final class RankingViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
-        searchTouchableImageView.setOpaqueTapGestureRecognizer {
-            #warning("검색 화면으로 이동해야 함")
+        #warning("연결하는 작업이 필요해요")
+        searchTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.detailDrink), userData: nil)
         }
-        alarmTouchableImageView.setOpaqueTapGestureRecognizer {
-            #warning("알림 화면으로 이동해야 함")
-        }
+//        alarmTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+//            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.alarm), userData: nil)
+//        }
     }
-}
-
-// MARK: - Custom Method
-
-extension RankingViewController {
+    
+    // MARK: - Custom Method
+    
     private func bind() {
+        viewModel.requestRankingDate()
+        
         viewModel
-            .rankingBasePublisher
-            .sink { [weak self] data in
-                guard let self = self,
-                      let startDate = data.first?.startDate,
-                      let endDate = data.first?.endDate else { return }
-                self.weekendLabel.text = "\(startDate) ~ \(endDate)"
+            .rankingDatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.weekendLabel.text = "\(value.startDate) ~ \(value.endDate)"
             }
             .store(in: &cancelBag)
     }
     
-    private func configurePageViewController() {
+    private func preparePageViewController() {
         viewControllers = [rankingDrinkViewController, rankingCombinationViewController]
         
         pageViewController.didMove(toParent: self)
@@ -181,7 +181,7 @@ extension RankingViewController {
 
 // MARK: - PageTabBar CollectionView DataSource
 
-extension RankingViewController: UICollectionViewDataSource {
+extension RankingMainViewController: UICollectionViewDataSource {
     public func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -209,7 +209,7 @@ extension RankingViewController: UICollectionViewDataSource {
 
 // MARK: - PageTabBar CollectionView Delegate
 
-extension RankingViewController: UICollectionViewDelegate {
+extension RankingMainViewController: UICollectionViewDelegate {
     public func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
@@ -235,7 +235,7 @@ extension RankingViewController: UICollectionViewDelegate {
 
 // MARK: - 페이지 탭바 CollectionViewFlowLayout 델리게이트
 
-extension RankingViewController: UICollectionViewDelegateFlowLayout {
+extension RankingMainViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -266,7 +266,7 @@ extension RankingViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - UIPageViewController DataSource
 
-extension RankingViewController: UIPageViewControllerDataSource {
+extension RankingMainViewController: UIPageViewControllerDataSource {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
@@ -294,7 +294,7 @@ extension RankingViewController: UIPageViewControllerDataSource {
 
 // MARK: - UIPageViewController Delegate
 
-extension RankingViewController: UIPageViewControllerDelegate {
+extension RankingMainViewController: UIPageViewControllerDelegate {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,
