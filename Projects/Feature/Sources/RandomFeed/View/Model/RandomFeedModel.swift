@@ -22,13 +22,18 @@ struct RandomFeedModel {
         let user_id: Int
         let user_nickname: String
         let user_image: String?
-        let likes_count: Int
+        var likes_count: Int
         let updated_at: String
         let comments_count: Int
-        let is_liked: Bool
+        var is_liked: Bool
     }
     
     struct Request {
         let exclude_feed_ids: String
+    }
+    
+    struct Heart: Decodable {
+        let feed_id: Int
+        let is_liked: Bool
     }
 }

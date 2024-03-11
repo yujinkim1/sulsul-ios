@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Service
 import DesignSystem
 
 final class RamdomFeedCell: UICollectionViewCell {
@@ -118,6 +119,13 @@ final class RamdomFeedCell: UICollectionViewCell {
         
         if let imageURL = URL(string: randomFeed.represent_image) {
             imageView.kf.setImage(with: imageURL)
+        }
+        
+        if UserDefaultsUtil.shared.isLogin(), randomFeed.is_liked {
+            heartImageView.image = UIImage(named: "randomFeed_heartFill")
+            
+        } else {
+            heartImageView.image = UIImage(named: "randomFeed_heart")
         }
     }
 }

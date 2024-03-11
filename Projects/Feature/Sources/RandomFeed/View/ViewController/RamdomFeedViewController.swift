@@ -63,6 +63,14 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
                 self?.feedCollectionView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        viewModel.reloadItem
+            .sink { [weak self] index in
+                UIView.performWithoutAnimation {
+                    self?.feedCollectionView.reloadItems(at: [index])
+                }
+            }
+            .store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -118,7 +126,7 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         
         cell.heartView.onTapped { [weak self] in
             if UserDefaultsUtil.shared.isLogin() {
-                self?.viewModel.didTabHeart()
+                self?.viewModel.didTabHeart(indexPath)
                 
             } else {
                 self?.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")
