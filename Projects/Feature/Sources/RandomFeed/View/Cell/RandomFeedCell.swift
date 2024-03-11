@@ -110,7 +110,6 @@ final class RamdomFeedCell: UICollectionViewCell {
         titleLabel.text = randomFeed.title
         contentLabel.text = randomFeed.content
         nameLabel.text = randomFeed.user_nickname
-        relateDataLabel.text = randomFeed.updated_at
         heartCountLabel.text = "\(randomFeed.likes_count)"
         
         if let imageURL = URL(string: randomFeed.user_image ?? "") {
@@ -126,6 +125,12 @@ final class RamdomFeedCell: UICollectionViewCell {
             
         } else {
             heartImageView.image = UIImage(named: "randomFeed_heart")
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        if let date = dateFormatter.date(from: randomFeed.updated_at) {
+            relateDataLabel.text = date.relativeDate()
         }
     }
 }
