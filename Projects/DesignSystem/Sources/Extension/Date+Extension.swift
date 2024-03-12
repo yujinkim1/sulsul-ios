@@ -8,12 +8,13 @@
 import Foundation
 
 public enum DateFormat: String {
-    case yyyy년_MM월_dd일 = "yyyy년 MM월 dd일"
+    case MM_DD = "MM.DD"
 }
 
 extension Date {
-    public func relativeDate(_ format: DateFormat = .yyyy년_MM월_dd일) -> String {
-        if (Date().timeIntervalSince1970 - self.timeIntervalSince1970) > 2592000 {
+    public func relativeDate(_ format: DateFormat = .MM_DD) -> String {
+        // MARK: 12시간 = 12 * 60 * 60 = 43200초
+        if (Date().timeIntervalSince1970 - self.timeIntervalSince1970) > 43200 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format.rawValue
             dateFormatter.locale = Locale(identifier: "ko_KR")
