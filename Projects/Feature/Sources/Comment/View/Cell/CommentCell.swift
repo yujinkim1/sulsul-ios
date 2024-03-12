@@ -11,7 +11,7 @@ import DesignSystem
 final class CommentCell: UITableViewCell {
     static let id = "CommentCell"
     
-    func bind(_ comment: CommentModel) {
+    func bind(_ comment: Comment) {
         
     }
 }

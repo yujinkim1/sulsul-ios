@@ -7,37 +7,23 @@
 
 import Foundation
 
-struct CommentModel {
-    let commentId: Int
-    let userInfo: UserInfo
-    let content: String
-    let createdAt: Date
-    let updatedAt: Date
-    let isReported: Bool
-    let isWriter: Bool
-    let childrenComments: [String]
-
-    enum CodingKeys: String, CodingKey {
-      case commentId = "comment_id"
-      case userInfo = "user_info"
-      case content
-      case createdAt = "created_at"
-      case updatedAt = "updated_at"
-      case isReported = "is_reported"
-      case isWriter = "is_writer"
-      case childrenComments = "children_comments"
-    }
+struct CommentModel: Decodable {
+    let comments: [Comment]
 }
 
-// MARK: - UserInfo
-struct UserInfo: Decodable {
-  let userId: Int
-  let nickname: String
-  let image: String
+struct Comment: Decodable {
+    let comment_id: Int
+    let user_info: UserInfo
+    let content: String
+    let created_at: String
+    let updated_at: String
+    let is_reported: Bool
+    let is_writer: Bool
+    let children_comments: [Comment]?
+}
 
-  enum CodingKeys: String, CodingKey {
-    case userId = "user_id"
-    case nickname
-    case image
-  }
+struct UserInfo: Decodable {
+    let user_id: Int
+    let nickname: String
+    let image: String?
 }

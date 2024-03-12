@@ -10,7 +10,7 @@ import DesignSystem
 
 public final class CommentViewController: BaseHeaderViewController {
     
-    private lazy var viewModel = CommentViewModel()
+    private lazy var viewModel = CommentViewModel(feedId: 1)
     
     private lazy var commentCountView = UIView()
     
@@ -136,14 +136,14 @@ public final class CommentViewController: BaseHeaderViewController {
 
 extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.comment.count
+        return viewModel.comments.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentCell.id,
                                                        for: indexPath) as? CommentCell else { return UITableViewCell() }
         cell.selectionStyle = .none
-        cell.bind(viewModel.comment[indexPath.row])
+        cell.bind(viewModel.comments[indexPath.row])
         
         return cell
     }
