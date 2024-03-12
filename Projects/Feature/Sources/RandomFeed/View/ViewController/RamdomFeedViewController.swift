@@ -53,7 +53,7 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
         bind()
         
         seeMyPostLabel.onTapped { [weak self] in
-            // TODO: 마이페이지 이동
+            self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.more(.main)), userData: nil)
         }
     }
     
