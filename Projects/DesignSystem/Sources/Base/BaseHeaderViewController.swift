@@ -35,7 +35,7 @@ open class BaseHeaderViewController: BaseViewController {
         }
     }
     
-    open func setHeaderText(_ titleText: String, actionText: String, actionColor: UIColor? = nil) {
+    open func setHeaderText(_ titleText: String, actionText: String? = nil, actionColor: UIColor? = nil) {
         titleLabel.text = titleText
         actionButton.text = actionText
         
