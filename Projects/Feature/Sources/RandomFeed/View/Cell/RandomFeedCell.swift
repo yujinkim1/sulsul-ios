@@ -114,6 +114,8 @@ final class RamdomFeedCell: UICollectionViewCell {
         
         if let imageURL = URL(string: randomFeed.user_image ?? "") {
             profileImage.kf.setImage(with: imageURL)
+        } else {
+            profileImage.image = UIImage(named: "randomFeed_profile")
         }
         
         if let imageURL = URL(string: randomFeed.represent_image) {
