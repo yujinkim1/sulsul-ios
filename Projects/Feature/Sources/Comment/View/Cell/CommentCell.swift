@@ -63,7 +63,7 @@ final class CommentCell: UITableViewCell {
         $0.image = UIImage(named: "comment_reply")
     }
     
-    private lazy var replayLabel = UILabel().then {
+    lazy var replayLabel = UILabel().then {
         $0.font = Font.semiBold(size: 12)
         $0.textColor = DesignSystemAsset.gray300.color
         $0.text = "답글 달기"

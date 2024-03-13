@@ -85,8 +85,6 @@ public final class CommentViewController: BaseHeaderViewController {
                     $0.leading.trailing.bottom.equalToSuperview()
                     $0.height.equalTo(moderateScale(number: newHeight))
                 }
-                
-                self?.view.layoutIfNeeded()
             }
             .store(in: &cancelBag)
     }
@@ -181,6 +179,10 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
                                                        for: indexPath) as? CommentCell else { return UITableViewCell() }
         cell.selectionStyle = .none
         cell.bind(viewModel.comments[indexPath.row])
+        
+        cell.replayLabel.onTapped { [weak self] in
+            self?.commentTextField.becomeFirstResponder()
+        }
         
         return cell
     }
