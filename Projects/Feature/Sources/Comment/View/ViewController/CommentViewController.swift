@@ -94,11 +94,10 @@ public final class CommentViewController: BaseHeaderViewController {
     private func setTabEvents() {
         submitButton.onTapped { [weak self] in
             if let text = self?.commentTextField.text,
-               text.removeSpace() != "",
-               let content = text.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-                
+               text.removeSpace() != "" {
+                self?.commentTextField.text = ""
                 self?.viewModel.didTabWriteComment(1,
-                                                   content: content,
+                                                   content: text,
                                                    parentId: 0)
             }
         }
