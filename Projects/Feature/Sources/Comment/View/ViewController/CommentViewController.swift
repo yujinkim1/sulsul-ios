@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import Service
 import DesignSystem
 
 public final class CommentViewController: BaseHeaderViewController {
@@ -194,8 +195,8 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         cell.moreButton.onTapped { [weak self] in
-            // TODO: 작성자 유무 분기처리
-            if comment.is_writer {
+            let userId = UserDefaultsUtil.shared.getInstallationId()
+            if userId == comment.user_info.user_id {
                 let vc = CommentMoreBottomSheet()
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
