@@ -111,6 +111,8 @@ final class CommentCell: UITableViewCell {
         
         if let comments = comment.children_comments, comments.count > 0 {
             replayLabel.text = "답글 \(comments.count)개  ・  답글 달기"
+        } else {
+            replayLabel.text = "답글 달기"
         }
 
         if let isChildren = comment.isChildren {

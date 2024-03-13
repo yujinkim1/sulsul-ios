@@ -33,6 +33,7 @@ public final class CommentViewController: BaseHeaderViewController {
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
+        $0.showsVerticalScrollIndicator = false
     }
     
     private lazy var commentInputView = UIView().then {
