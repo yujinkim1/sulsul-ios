@@ -21,6 +21,13 @@ struct Comment: Decodable {
     let is_writer: Bool
     let children_comments: [Comment]?
     var isChildren: Bool? = false
+    var parent_comment_id: Int? = 0
+}
+
+struct WriteCommentRequest {
+    let feed_id: Int
+    let content: String
+    let parent_comment_id: Int
 }
 
 struct UserInfo: Decodable {

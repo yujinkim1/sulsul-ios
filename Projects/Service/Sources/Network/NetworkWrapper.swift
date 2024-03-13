@@ -198,6 +198,7 @@ public struct NetworkWrapper {
         
         var headers: HTTPHeaders = [ "Accept": "application/json" ]
         if let accessToken = KeychainStore.shared.read(label: "accessToken") {
+            print("[AccessToken] \(accessToken)")
             headers.add(HTTPHeader(name: "authorization", value: "Bearer \(accessToken)"))
         }
         

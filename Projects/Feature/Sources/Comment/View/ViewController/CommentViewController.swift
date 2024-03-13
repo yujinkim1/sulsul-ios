@@ -72,8 +72,13 @@ public final class CommentViewController: BaseHeaderViewController {
             .store(in: &cancelBag)
         
         submitButton.onTapped { [weak self] in
-            if let text = self?.commentTextField.text, text.removeSpace() != "" {
-                // TODO: 댓글 등록 API 호출
+            if let text = self?.commentTextField.text,
+               text.removeSpace() != "",
+               let content = text.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                
+                self?.viewModel.didTabWriteComment(1,
+                                                   content: content,
+                                                   parentId: 0)
             }
         }
         

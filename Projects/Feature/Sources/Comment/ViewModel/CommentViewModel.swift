@@ -8,12 +8,16 @@
 import Foundation
 import Combine
 import Service
+import Alamofire
 
 final class CommentViewModel {
     private var cancelBag = Set<AnyCancellable>()
     
     // MARK: Datasource
     var comments: [Comment] = []
+    
+    // MARK: Trigger
+    private lazy var writeComment = PassthroughSubject<WriteCommentRequest, Never>()
     
     // MARK: Output
     lazy var reloadData = CurrentValueSubject<Void, Never>(())
@@ -26,10 +30,55 @@ final class CommentViewModel {
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
+        
+        writeComment
+            .flatMap(postComments(_:))
+            .sink { [weak self] comment in
+                self?.comments.append(comment)
+                self?.reloadData.send(())
+            }
+            .store(in: &cancelBag)
+    }
+    
+    func didTabWriteComment(_ feedId: Int, content: String, parentId: Int) {
+        writeComment.send(.init(feed_id: feedId,
+                                content: content,
+                                parent_comment_id: parentId))
     }
     
     func errorPublisher() -> AnyPublisher<NetworkError, Never> {
         return errorSubject.dropFirst().eraseToAnyPublisher()
+    }
+    
+    private func postComments(_ request: WriteCommentRequest) -> AnyPublisher<Comment, Never> {
+        return Future<Comment, Never> { promise in
+            
+            let parameters: Parameters = [
+                "content": request.content,
+                "parent_comment_id": request.parent_comment_id
+            ]
+            
+            NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/\(request.feed_id)/comments", parameters: parameters, needToken: true) { [weak self] result in
+                guard let selfRef = self else { return }
+                
+                switch result {
+                case .success(let success):
+                    let decoder = JSONDecoder()
+                    
+                    if let data = try? decoder.decode(Comment.self, from: success) {
+                        return promise(.success(data))
+                    } else {
+                        print("[/feeds/id/comments] fail Decoding")
+                        selfRef.errorSubject.send(.init(message: "[/feeds/id/comments] fail Decoding"))
+                    }
+                case .failure(let failure):
+                    print("[/feeds/id/comments] fail API : \(failure)")
+                    selfRef.errorSubject.send(.init(message: "[/feeds/id/comments] fail API"))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+        
     }
     
     private func getComments(_ feedId: Int) -> AnyPublisher<[Comment], Never> {
