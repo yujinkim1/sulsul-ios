@@ -42,7 +42,7 @@ public final class CommentViewController: BaseHeaderViewController {
     
     private lazy var commentTextFieldView = UIView().then {
         $0.layer.borderWidth = moderateScale(number: 1)
-        $0.layer.borderColor = DesignSystemAsset.gray300.color.cgColor
+        $0.layer.borderColor = DesignSystemAsset.gray900.color.cgColor
         $0.layer.cornerRadius = moderateScale(number: 8)
     }
     
@@ -54,8 +54,9 @@ public final class CommentViewController: BaseHeaderViewController {
     
     private lazy var commentTextField = UITextField().then {
         $0.placeholder = "댓글을 입력해볼까요?"
-        $0.textColor = DesignSystemAsset.gray300.color
+        $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.semiBold(size: 16)
+        $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
     private lazy var inputShadowView = UIView()
@@ -70,6 +71,12 @@ public final class CommentViewController: BaseHeaderViewController {
                 self?.commentTableView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        submitButton.onTapped { [weak self] in
+            if let text = self?.commentTextField.text, text.removeSpace() != "" {
+                // TODO: 댓글 등록 API 호출
+            }
+        }
     }
     
     public override func addViews() {
@@ -164,5 +171,18 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
+    }
+}
+
+extension CommentViewController: UITextFieldDelegate {
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if let text = textField.text, text.removeSpace() != "" {
+            commentTextFieldView.layer.borderColor = DesignSystemAsset.gray300.color.cgColor
+            submitButton.textColor = DesignSystemAsset.main.color
+            
+        } else {
+            commentTextFieldView.layer.borderColor = DesignSystemAsset.gray900.color.cgColor
+            submitButton.textColor = DesignSystemAsset.gray500.color
+        }
     }
 }
