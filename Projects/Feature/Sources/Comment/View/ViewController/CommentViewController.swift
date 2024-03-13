@@ -184,6 +184,15 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
             self?.commentTextField.becomeFirstResponder()
         }
         
+        cell.moreButton.onTapped { [weak self] in
+            // TODO: 작성자 유무 분기처리
+            let vc = CommentMoreBottomSheet()
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: false)
+            
+            // TODO: 신고 바텀시트 표시 로직 추가
+        }
+        
         return cell
     }
     

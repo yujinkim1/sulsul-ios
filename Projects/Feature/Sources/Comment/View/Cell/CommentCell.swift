@@ -85,7 +85,7 @@ final class CommentCell: UITableViewCell {
         $0.text = "작성자"
     }
     
-    private lazy var moreButton = UIImageView().then {
+    lazy var moreButton = UIImageView().then {
         $0.image = UIImage(named: "writeFeed_progress")
     }
     
