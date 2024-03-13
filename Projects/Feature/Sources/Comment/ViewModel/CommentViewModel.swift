@@ -45,12 +45,12 @@ final class CommentViewModel {
                         
                         // MARK: Children을 기본 Comment와 동일한 depth에 위치하도록 세팅하는 코드 (flatMap 처리)
                         var dataWithChildren = data.comments
-                        
+                
                         dataWithChildren.enumerated().forEach { index, data in
-                            data.children_comments?.forEach {
-                                var childrenComment = $0
+                            data.children_comments?.enumerated().forEach { cIndex, cData in
+                                var childrenComment = cData
                                 childrenComment.isChildren = true
-                                dataWithChildren.insert(childrenComment, at: index + 1)
+                                dataWithChildren.insert(childrenComment, at: index + 1 + cIndex)
                             }
                         }
                         
