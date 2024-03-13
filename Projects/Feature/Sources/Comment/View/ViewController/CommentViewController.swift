@@ -33,7 +33,6 @@ public final class CommentViewController: BaseHeaderViewController {
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
-        $0.bounces = false
     }
     
     private lazy var commentInputView = UIView().then {
@@ -77,6 +76,19 @@ public final class CommentViewController: BaseHeaderViewController {
                 // TODO: 댓글 등록 API 호출
             }
         }
+        
+        changedKeyboardHeight
+            .sink { [weak self] height in
+                let newHeight: CGFloat = (height == 0) ? 90 : height + moderateScale(number: 70)
+                
+                self?.commentInputView.snp.remakeConstraints {
+                    $0.leading.trailing.bottom.equalToSuperview()
+                    $0.height.equalTo(moderateScale(number: newHeight))
+                }
+                
+                self?.view.layoutIfNeeded()
+            }
+            .store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -123,7 +135,7 @@ public final class CommentViewController: BaseHeaderViewController {
         
         commentTableView.snp.makeConstraints {
             $0.top.equalTo(commentCountView.snp.bottom)
-            $0.bottom.equalTo(commentInputView.snp.top)
+            $0.bottom.equalToSuperview().inset(moderateScale(number: 90))
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         
@@ -148,6 +160,14 @@ public final class CommentViewController: BaseHeaderViewController {
             $0.trailing.equalToSuperview().inset(moderateScale(number: 12))
             $0.centerY.equalToSuperview()
         }
+    }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        view.endEditing(true)
     }
 }
 
