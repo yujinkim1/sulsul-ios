@@ -177,8 +177,11 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentCell.id,
                                                        for: indexPath) as? CommentCell else { return UITableViewCell() }
+        
+        let comment = viewModel.comments[indexPath.row]
+        
         cell.selectionStyle = .none
-        cell.bind(viewModel.comments[indexPath.row])
+        cell.bind(comment)
         
         cell.replayLabel.onTapped { [weak self] in
             self?.commentTextField.becomeFirstResponder()
@@ -186,13 +189,16 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.moreButton.onTapped { [weak self] in
             // TODO: 작성자 유무 분기처리
-//            let vc = CommentMoreBottomSheet()
-//            vc.modalPresentationStyle = .overFullScreen
-//            self?.present(vc, animated: false)
-            
-            let vc = SpamBottomSheet()
-            vc.modalPresentationStyle = .overFullScreen
-            self?.present(vc, animated: false)
+            if comment.is_writer {
+                let vc = CommentMoreBottomSheet()
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: false)
+                
+            } else {
+                let vc = SpamBottomSheet()
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: false)
+            }
         }
         
         return cell

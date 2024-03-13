@@ -131,9 +131,7 @@ final class CommentCell: UITableViewCell {
         nameLabel.text = comment.user_info.nickname
         contentLabel.text = comment.content
         
-        
-        // TODO: 작성자일 시 작성자 라벨 표시
-        writerStackView.isHidden = true
+        writerStackView.isHidden = !comment.is_writer
     }
 }
 
