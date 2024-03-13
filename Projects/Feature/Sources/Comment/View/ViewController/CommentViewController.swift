@@ -68,22 +68,16 @@ public final class CommentViewController: BaseHeaderViewController {
         
         setHeaderText("댓글")
         
+        bind()
+        setTabEvents()
+    }
+    
+    private func bind() {
         viewModel.reloadData
             .sink { [weak self] in
                 self?.commentTableView.reloadData()
             }
             .store(in: &cancelBag)
-        
-        submitButton.onTapped { [weak self] in
-            if let text = self?.commentTextField.text,
-               text.removeSpace() != "",
-               let content = text.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-                
-                self?.viewModel.didTabWriteComment(1,
-                                                   content: content,
-                                                   parentId: 0)
-            }
-        }
         
         changedKeyboardHeight
             .sink { [weak self] height in
@@ -95,6 +89,19 @@ public final class CommentViewController: BaseHeaderViewController {
                 }
             }
             .store(in: &cancelBag)
+    }
+    
+    private func setTabEvents() {
+        submitButton.onTapped { [weak self] in
+            if let text = self?.commentTextField.text,
+               text.removeSpace() != "",
+               let content = text.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                
+                self?.viewModel.didTabWriteComment(1,
+                                                   content: content,
+                                                   parentId: 0)
+            }
+        }
     }
     
     public override func addViews() {
