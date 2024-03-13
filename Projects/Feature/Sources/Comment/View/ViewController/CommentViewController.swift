@@ -6,9 +6,12 @@
 //
 
 import UIKit
+import Combine
 import DesignSystem
 
 public final class CommentViewController: BaseHeaderViewController {
+    
+    private var cancelBag = Set<AnyCancellable>()
     
     private lazy var viewModel = CommentViewModel(feedId: 1)
     
@@ -26,10 +29,11 @@ public final class CommentViewController: BaseHeaderViewController {
     
     private lazy var commentTableView = UITableView().then {
         $0.backgroundColor = .clear
-        $0.register(SnackSortTableViewCell.self, forCellReuseIdentifier: SnackSortTableViewCell.reuseIdentifier)
+        $0.register(CommentCell.self, forCellReuseIdentifier: CommentCell.id)
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
+        $0.bounces = false
     }
     
     private lazy var commentInputView = UIView().then {
@@ -60,6 +64,12 @@ public final class CommentViewController: BaseHeaderViewController {
         super.viewDidLoad()
         
         setHeaderText("댓글")
+        
+        viewModel.reloadData
+            .sink { [weak self] in
+                self?.commentTableView.reloadData()
+            }
+            .store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -88,7 +98,7 @@ public final class CommentViewController: BaseHeaderViewController {
         super.makeConstraints()
         
         commentCountView.snp.makeConstraints {
-            $0.height.equalTo(moderateScale(number: 29))
+            $0.height.equalTo(moderateScale(number: 57))
             $0.leading.trailing.centerX.equalToSuperview()
             $0.top.equalTo(headerView.snp.bottom)
         }
@@ -106,8 +116,8 @@ public final class CommentViewController: BaseHeaderViewController {
         
         commentTableView.snp.makeConstraints {
             $0.top.equalTo(commentCountView.snp.bottom)
-            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(commentInputView.snp.top)
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         
         commentInputView.snp.makeConstraints {
@@ -146,5 +156,13 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
         cell.bind(viewModel.comments[indexPath.row])
         
         return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    
+    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
 }

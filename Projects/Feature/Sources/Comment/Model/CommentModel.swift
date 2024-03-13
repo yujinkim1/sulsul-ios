@@ -20,6 +20,7 @@ struct Comment: Decodable {
     let is_reported: Bool
     let is_writer: Bool
     let children_comments: [Comment]?
+    var isChildren: Bool? = false
 }
 
 struct UserInfo: Decodable {

@@ -16,12 +16,14 @@ final class CommentViewModel {
     var comments: [Comment] = []
     
     // MARK: Output
+    lazy var reloadData = CurrentValueSubject<Void, Never>(())
     private lazy var errorSubject = CurrentValueSubject<NetworkError, Never>(NetworkError(message: "Init"))
     
     init(feedId: Int) {
         getComments(feedId)
             .sink { [weak self] comments in
                 self?.comments = comments
+                self?.reloadData.send(())
             }
             .store(in: &cancelBag)
     }
@@ -40,7 +42,19 @@ final class CommentViewModel {
                     let decoder = JSONDecoder()
                     
                     if let data = try? decoder.decode(CommentModel.self, from: success) {
-                        return promise(.success(data.comments))
+                        
+                        // MARK: Children을 기본 Comment와 동일한 depth에 위치하도록 세팅하는 코드 (flatMap 처리)
+                        var dataWithChildren = data.comments
+                        
+                        dataWithChildren.enumerated().forEach { index, data in
+                            data.children_comments?.forEach {
+                                var childrenComment = $0
+                                childrenComment.isChildren = true
+                                dataWithChildren.insert(childrenComment, at: index + 1)
+                            }
+                        }
+                        
+                        return promise(.success(dataWithChildren))
                     } else {
                         print("[/comments] fail Decoding")
                         return selfRef.errorSubject.send(.init(message: "[/comments] fail Decoding"))
