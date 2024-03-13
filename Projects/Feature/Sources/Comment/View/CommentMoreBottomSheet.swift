@@ -22,11 +22,16 @@ final class CommentMoreBottomSheet: BaseViewController {
     }
     
     private lazy var bottomSheetView = UIView().then {
-        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.backgroundColor = DesignSystemAsset.gray050.color
         $0.layer.cornerRadius = moderateScale(number: 24)
     }
     
     lazy var editView = UIView()
+    
+    private lazy var editColorSelectionView = TouchColorChangeView().then {
+        $0.layer.cornerRadius = moderateScale(number: 8)
+    }
+    
     private lazy var editImageView = UIImageView(image: UIImage(named: "comment_edit"))
     private lazy var editLabel = UILabel().then {
         $0.text = "댓글 수정하기"
@@ -35,6 +40,11 @@ final class CommentMoreBottomSheet: BaseViewController {
     }
     
     lazy var deleteView = UIView()
+    
+    private lazy var deleteColorSelectionView = TouchColorChangeView().then {
+        $0.layer.cornerRadius = moderateScale(number: 8)
+    }
+    
     private lazy var deleteImageView = UIImageView(image: UIImage(named: "comment_delete"))
     private lazy var deleteLabel = UILabel().then {
         $0.text = "댓글 삭제하기"
@@ -65,9 +75,11 @@ final class CommentMoreBottomSheet: BaseViewController {
             deleteView
         ])
         
+        editView.addSubview(editColorSelectionView)
         editView.addSubview(editImageView)
         editView.addSubview(editLabel)
         
+        deleteView.addSubview(deleteColorSelectionView)
         deleteView.addSubview(deleteImageView)
         deleteView.addSubview(deleteLabel)
     }
@@ -95,7 +107,7 @@ final class CommentMoreBottomSheet: BaseViewController {
         
         editImageView.snp.makeConstraints {
             $0.size.equalTo(moderateScale(number: 24))
-            $0.leading.equalToSuperview().inset(moderateScale(number: 18))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 28))
             $0.centerY.equalToSuperview()
         }
         
@@ -107,18 +119,28 @@ final class CommentMoreBottomSheet: BaseViewController {
         deleteView.snp.makeConstraints {
             $0.height.equalTo(moderateScale(number: 44))
             $0.width.centerX.equalTo(editView)
-            $0.top.equalTo(editView.snp.bottom)
+            $0.top.equalTo(editView.snp.bottom).offset(moderateScale(number: 4))
         }
         
         deleteImageView.snp.makeConstraints {
             $0.size.equalTo(moderateScale(number: 24))
-            $0.leading.equalToSuperview().inset(moderateScale(number: 18))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 28))
             $0.centerY.equalToSuperview()
         }
         
         deleteLabel.snp.makeConstraints {
             $0.leading.equalTo(deleteImageView.snp.trailing).offset(moderateScale(number: 8))
             $0.centerY.equalToSuperview()
+        }
+        
+        editColorSelectionView.snp.makeConstraints {
+            $0.top.bottom.equalTo(editView)
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 10))
+        }
+        
+        deleteColorSelectionView.snp.makeConstraints {
+            $0.top.bottom.equalTo(deleteView)
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 10))
         }
     }
 }
