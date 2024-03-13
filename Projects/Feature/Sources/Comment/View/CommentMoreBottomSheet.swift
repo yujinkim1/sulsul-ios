@@ -12,6 +12,9 @@ import DesignSystem
 final class CommentMoreBottomSheet: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
     
+    var viewModel: CommentViewModel?
+    var requestModel: DeleteCommentRequest?
+    
     private let bottomHeight: CGFloat = moderateScale(number: 116)
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!
@@ -58,6 +61,13 @@ final class CommentMoreBottomSheet: BaseViewController {
         view.backgroundColor = .clear
         
         setupGestureRecognizer()
+        
+        deleteView.onTapped { [weak self] in
+            guard let requestModel = self?.requestModel else { return }
+            
+            self?.viewModel?.didTabDeleteComment(requestModel)
+            self?.hideBottomSheetAndGoBack()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

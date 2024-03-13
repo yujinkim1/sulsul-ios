@@ -30,6 +30,11 @@ struct WriteCommentRequest {
     let parent_comment_id: Int
 }
 
+struct DeleteCommentRequest {
+    let feed_id: Int
+    let comment_id: Int
+}
+
 struct UserInfo: Decodable {
     let user_id: Int
     let nickname: String

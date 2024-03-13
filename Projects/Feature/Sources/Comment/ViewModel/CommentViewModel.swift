@@ -18,6 +18,7 @@ final class CommentViewModel {
     
     // MARK: Trigger
     private lazy var writeComment = PassthroughSubject<WriteCommentRequest, Never>()
+    private lazy var deleteComment = CurrentValueSubject<DeleteCommentRequest, Never>(.init(feed_id: 0, comment_id: 0))
     
     // MARK: Output
     lazy var reloadData = CurrentValueSubject<Void, Never>(())
@@ -38,6 +39,22 @@ final class CommentViewModel {
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
+        
+        deleteComment
+            .dropFirst()
+            .flatMap(deleteComment(_:))
+            .sink { [weak self] in
+                guard let selfRef = self else { return }
+                
+                let commentId = selfRef.deleteComment.value.comment_id
+                self?.comments.removeAll(where: { $0.comment_id == commentId })
+                self?.reloadData.send(())
+            }
+            .store(in: &cancelBag)
+    }
+    
+    func didTabDeleteComment(_ request: DeleteCommentRequest) {
+        deleteComment.send(request)
     }
     
     func didTabWriteComment(_ feedId: Int, content: String, parentId: Int) {
@@ -48,6 +65,26 @@ final class CommentViewModel {
     
     func errorPublisher() -> AnyPublisher<NetworkError, Never> {
         return errorSubject.dropFirst().eraseToAnyPublisher()
+    }
+}
+
+// MARK: API Request Functions
+extension CommentViewModel {
+    private func deleteComment(_ request: DeleteCommentRequest) -> AnyPublisher<Void, Never> {
+        return Future<Void, Never> { promise in
+            NetworkWrapper.shared.deleteBasicTask(stringURL: "/feeds/\(request.feed_id)/comments/\(request.comment_id)", needToken: true) { [weak self] result in
+                guard let selfRef = self else { return }
+                
+                switch result {
+                case .success(let success):
+                    return promise(.success(()))
+                case .failure(let failure):
+                    print("[delete: /feeds/id/comments/commentId] fail API : \(failure)")
+                    selfRef.errorSubject.send(.init(message: "[delete: /feeds/id/comments/commentId] fail API"))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
     
     private func postComments(_ request: WriteCommentRequest) -> AnyPublisher<Comment, Never> {

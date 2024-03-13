@@ -10,6 +10,7 @@ import Combine
 import Service
 import DesignSystem
 
+// MARK: VC 생성할 때 FeedId 전달받을 수 있도록 처리
 public final class CommentViewController: BaseHeaderViewController {
     
     private var cancelBag = Set<AnyCancellable>()
@@ -198,11 +199,14 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
             let userId = UserDefaultsUtil.shared.getInstallationId()
             if userId == comment.user_info.user_id {
                 let vc = CommentMoreBottomSheet()
+                vc.viewModel = self?.viewModel
+                vc.requestModel = .init(feed_id: 1, comment_id: comment.comment_id)
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
                 
             } else {
                 let vc = SpamBottomSheet()
+                vc.viewModel = self?.viewModel
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
             }

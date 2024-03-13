@@ -12,6 +12,8 @@ import DesignSystem
 final class SpamBottomSheet: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
     
+    var viewModel: CommentViewModel?
+    
     private let bottomHeight: CGFloat = moderateScale(number: 68)
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!

@@ -77,8 +77,12 @@ public struct NetworkWrapper {
         }
     }
     
-    public func deleteBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
+    public func deleteBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, needToken: Bool = false, completion: @escaping (Result<Data, Error>) -> Void) {
         var defaultHeader = configureHeader()
+        
+        if needToken {
+            defaultHeader = tokenHeader()
+        }
         header?.forEach { defaultHeader[$0.name] = $0.value }
         
         AF.request("\(apiDomain)\(stringURL)", method: .delete, encoding: JSONEncoding.default, headers: defaultHeader).validate(statusCode: 200..<300).responseJSON { response in
