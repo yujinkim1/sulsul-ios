@@ -186,11 +186,13 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.moreButton.onTapped { [weak self] in
             // TODO: 작성자 유무 분기처리
-            let vc = CommentMoreBottomSheet()
+//            let vc = CommentMoreBottomSheet()
+//            vc.modalPresentationStyle = .overFullScreen
+//            self?.present(vc, animated: false)
+            
+            let vc = SpamBottomSheet()
             vc.modalPresentationStyle = .overFullScreen
             self?.present(vc, animated: false)
-            
-            // TODO: 신고 바텀시트 표시 로직 추가
         }
         
         return cell
