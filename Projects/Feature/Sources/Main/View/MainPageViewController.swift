@@ -69,6 +69,10 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         searchTouchableIamgeView.onTapped { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
         }
+        
+        settingTouchableImageView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.comment), userData: nil)
+        }
     }
     
     public override func addViews() {

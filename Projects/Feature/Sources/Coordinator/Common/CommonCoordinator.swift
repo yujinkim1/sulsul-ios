@@ -42,13 +42,19 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToWriteContent(userData)
         case .search:
             moveToSearch()
+        case .comment:
+            moveToComment()
         }
+    }
+    
+    private func moveToComment() {
+        let vc = CommentViewController()
+        currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToSearch() {
         let vc = SearchViewController()
         currentNavigationViewController?.pushViewController(vc, animated: true)
-
     }
     
     private func moveToWriteContent(_ userData: [String: Any]?) {

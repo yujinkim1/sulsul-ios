@@ -68,6 +68,8 @@ public final class CommentViewController: BaseHeaderViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        tabBarController?.setTabBarHidden(true)
+        
         setHeaderText("댓글")
         
         bind()
