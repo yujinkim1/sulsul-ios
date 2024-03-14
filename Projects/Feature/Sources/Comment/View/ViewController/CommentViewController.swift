@@ -77,6 +77,10 @@ public final class CommentViewController: BaseHeaderViewController {
     private func bind() {
         viewModel.reloadData
             .sink { [weak self] in
+                guard let selfRef = self else { return }
+                
+                let allCount = selfRef.viewModel.comments.count
+                self?.commentCountLabel.text = "전체댓글 \(allCount)"
                 self?.commentTableView.reloadData()
             }
             .store(in: &cancelBag)
