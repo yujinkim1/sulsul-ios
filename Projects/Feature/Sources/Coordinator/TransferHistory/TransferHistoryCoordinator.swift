@@ -47,7 +47,7 @@ final class TransferHistoryCoordinator: NSObject, TransferHistoryBaseCoordinator
 // MARK: - UINavigationControllerDelegate
 extension TransferHistoryCoordinator: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        guard viewController is TransferHistoryViewController else { return }
+        guard viewController is RamdomFeedViewController else { return }
         
         let tabBarController = parentCoordinator?.rootViewController as? UITabBarController
         tabBarController?.setTabBarHidden(false)
