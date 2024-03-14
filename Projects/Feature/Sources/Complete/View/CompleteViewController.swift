@@ -105,11 +105,11 @@ public final class CompleteViewController: BaseViewController {
 
 extension CompleteViewController {
     @objc private func backButtonDidTap() {
-        #warning("함께 먹는 안주 화면으로 이동하는 것을 구현해야 해요.")
-        self.dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
     }
+    
     @objc private func mainButtonDidTap() {
-        #warning("메인 화면으로 이동하는 것을 구현해야 해요.")
+        self.coordinator?.currentNavigationViewController?.popToRootViewController(animated: false)
         self.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
     }
 }
