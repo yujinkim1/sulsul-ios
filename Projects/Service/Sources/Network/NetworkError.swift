@@ -21,6 +21,12 @@ public struct NetworkError: Error, Decodable {
     var statusCode: Int? = 0
     var error: String? = ""
     var message: String? = ""
+    
+    public init(statusCode: Int? = nil, error: String? = nil, message: String? = nil) {
+        self.statusCode = statusCode
+        self.error = error
+        self.message = message
+    }
 }
 
 struct NetworkCommonErrors {
