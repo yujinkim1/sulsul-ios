@@ -20,9 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         currentScene = scene
         mainCoordinator = MainCoordinator()
-//        setRootViewController(mainCoordinator!.start())
-        let vc = CommentViewController()
-        setRootViewController(vc)
+        setRootViewController(mainCoordinator!.start())
+//        let vc = CommentViewController()
+//        setRootViewController(vc)
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

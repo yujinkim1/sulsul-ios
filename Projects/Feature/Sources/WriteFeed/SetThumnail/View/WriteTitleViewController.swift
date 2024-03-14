@@ -128,7 +128,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
     
     private func updateThumnailImage(_ selectedIndex: Int) {
         imageStackView.arrangedSubviews.enumerated().forEach { index, imageView in
-            let imageView = imageView as! SelectableImageView
+            guard let imageView = imageView as? SelectableImageView else { return }
             
             imageView.isSelected = (index == selectedIndex)
             imageView.updateSelection()
