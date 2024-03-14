@@ -10,21 +10,9 @@ import Combine
 import DesignSystem
 import Service
 
-public final class SearchViewController: BaseViewController {
+public final class SearchViewController: BaseHeaderViewController {
     private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = SearchViewModel()
-    
-    private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
-        $0.setTitle("검색", for: .normal)
-        $0.titleLabel?.font = Font.bold(size: 18)
-    }
-    
-    private lazy var titleLabel = UILabel().then {
-        $0.font = Font.bold(size: 18)
-        $0.textColor = DesignSystemAsset.gray900.color
-        $0.text = "검색"
-    }
     
     private lazy var searchTextField = UITextField().then {
         $0.placeholder = "검색어를 입력해주세요"
@@ -51,7 +39,6 @@ public final class SearchViewController: BaseViewController {
         $0.setTitle("모두 삭제", for: .normal)
         $0.titleLabel?.font = Font.semiBold(size: 14)
         $0.titleLabel?.textColor = DesignSystemAsset.gray700.color
-        $0.addTarget(self, action: #selector(didTabRecentKeywordResetButton), for: .touchUpInside)
     }
     
     private lazy var recentKeywordCollectionView = UICollectionView(frame: .zero, collectionViewLayout: generateLayout()).then {
@@ -66,6 +53,8 @@ public final class SearchViewController: BaseViewController {
     
     public init() {
         super.init(nibName: nil, bundle: nil)
+        
+        titleLabel.text = "검색"
 
         bind()
         setTabEvents()
@@ -73,6 +62,10 @@ public final class SearchViewController: BaseViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
     }
     
     private func bind() {
@@ -119,9 +112,9 @@ public final class SearchViewController: BaseViewController {
     }
     
     public override func addViews() {
+        super.addViews()
+        
         view.addSubviews([
-            backButton,
-            titleLabel,
             searchTextField,
             searchResetButton,
             lineView,
@@ -132,20 +125,11 @@ public final class SearchViewController: BaseViewController {
     }
     
     public override func makeConstraints() {
-        backButton.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(moderateScale(number: 16))
-            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
-            $0.size.equalTo(moderateScale(number: 24))
-        }
-        
-        titleLabel.snp.makeConstraints {
-            $0.centerY.equalTo(backButton)
-            $0.centerX.equalToSuperview()
-        }
+        super.makeConstraints()
         
         searchTextField.snp.makeConstraints {
-            $0.top.equalTo(backButton.snp.bottom).offset(moderateScale(number: 28))
-            $0.leading.equalTo(backButton)
+            $0.top.equalTo(headerView.snp.bottom).offset(moderateScale(number: 28))
+            $0.leading.equalTo(headerView).offset(moderateScale(number: 20))
             $0.trailing.equalTo(searchResetButton.snp.leading).offset(moderateScale(number: -8))
             $0.height.equalTo(moderateScale(number: 40))
         }
@@ -164,7 +148,7 @@ public final class SearchViewController: BaseViewController {
         
         recentKeywordTitleLabel.snp.makeConstraints {
             $0.top.equalTo(lineView.snp.bottom).offset(moderateScale(number: 21))
-            $0.leading.equalTo(backButton)
+            $0.leading.equalTo(headerView).offset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 28))
         }
         
@@ -175,7 +159,7 @@ public final class SearchViewController: BaseViewController {
         
         recentKeywordCollectionView.snp.makeConstraints {
             $0.top.equalTo(recentKeywordTitleLabel.snp.bottom).offset(moderateScale(number: 8))
-            $0.leading.equalTo(backButton)
+            $0.leading.equalTo(headerView).offset(moderateScale(number: 20))
             $0.trailing.equalTo(searchResetButton)
             $0.bottom.equalToSuperview()
         }
@@ -221,11 +205,7 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
 }
 
 extension SearchViewController {
-    @objc private func didTabRecentKeywordResetButton() {
-        
-    }
-    
     @objc private func didTabsearchResetButton() {
-        
+        searchTextField.text = ""
     }
 }

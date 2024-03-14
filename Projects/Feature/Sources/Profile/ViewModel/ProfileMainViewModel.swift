@@ -18,6 +18,8 @@ struct ProfileMainViewModel {
     private let userMapper = UserMapper()
     private let tempMapper = PairingModelMapper()
     
+    private let goFeedButtonIsTapped = PassthroughSubject<Void, Never>()
+    private let loginButtonIsTapped = PassthroughSubject<Void, Never>()
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
     private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
@@ -72,6 +74,22 @@ struct ProfileMainViewModel {
                 print(error)
             }
         }
+    }
+    
+    func sendLoginButtonIsTapped() {
+        loginButtonIsTapped.send(())
+    }
+    
+    func loginButtonIsTappedPublisher() -> AnyPublisher<Void, Never> {
+        return loginButtonIsTapped.eraseToAnyPublisher()
+    }    
+    
+    func sendGoFeedButtonIsTapped() {
+        goFeedButtonIsTapped.send(())
+    }
+    
+    func goFeedButtonIsTappedPublisher() -> AnyPublisher<Void, Never> {
+        return goFeedButtonIsTapped.eraseToAnyPublisher()
     }
     
     func getFeedsLikeByMe() {

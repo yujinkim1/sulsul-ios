@@ -11,7 +11,9 @@ import Service
 import Combine
 import Kingfisher
 
-public final class MainPageViewController: BaseViewController {
+public final class MainPageViewController: BaseViewController, HomeBaseCoordinated {
+    
+    var coordinator: HomeBaseCoordinator?
     
     private let temp = 0 // 0이면 취향 등록 안한 사람, 그외는 한사람
     private let nopreferenceTemp = 1 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
@@ -63,6 +65,14 @@ public final class MainPageViewController: BaseViewController {
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
+        
+        searchTouchableIamgeView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
+        }
+        
+        settingTouchableImageView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.comment), userData: nil)
+        }
     }
     
     public override func addViews() {

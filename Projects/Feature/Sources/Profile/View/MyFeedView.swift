@@ -166,6 +166,8 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
             cell.updateView(withType: .logOutMyFeed)
             cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
                 print("로그인하러 가기")
+                guard let selfRef = self else { return }
+                selfRef.viewModel.sendLoginButtonIsTapped()
             }
             
             return cell

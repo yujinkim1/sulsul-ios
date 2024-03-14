@@ -107,6 +107,18 @@ public final class ProfileMainViewController: BaseViewController {
             }.store(in: &cancelBag)
         
         viewModel.getUserInfo()
+        
+        viewModel.loginButtonIsTappedPublisher()
+              .receive(on: DispatchQueue.main)
+              .sink { [weak self] _ in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)
+              }.store(in: &cancelBag)    
+        
+        viewModel.goFeedButtonIsTappedPublisher()
+              .receive(on: DispatchQueue.main)
+              .sink { [weak self] _ in
+                  self?.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
+              }.store(in: &cancelBag)
     }
     
     public override func addViews() {

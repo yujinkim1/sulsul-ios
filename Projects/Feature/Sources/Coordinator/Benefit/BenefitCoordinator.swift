@@ -15,8 +15,8 @@ final class BenefitCoordinator: NSObject, BenefitBaseCoordinator {
     
     func start() -> UIViewController {
 
-        let benefitVC = BenefitViewController()
-        benefitVC.coordinator = self
+        let benefitVC = RankingViewController()
+        // benefitVC.coordinator = self
         rootViewController = UINavigationController(rootViewController: benefitVC)
         rootNavigationController?.delegate = self
         return rootViewController
