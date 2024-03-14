@@ -31,7 +31,6 @@ public final class SelectSnackViewController: BaseViewController {
     private lazy var noFindSnackButton = UIButton().then {
         $0.setTitle("찾는 안주가 없어요", for: .normal)
         $0.titleLabel?.font = Font.semiBold(size: 14)
-        $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
     private lazy var resultEmptyView = SearchResultEmptyView().then {
@@ -125,6 +124,11 @@ public final class SelectSnackViewController: BaseViewController {
         addViews()
         makeConstraints()
         bind()
+        
+        noFindSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     public override func addViews() {

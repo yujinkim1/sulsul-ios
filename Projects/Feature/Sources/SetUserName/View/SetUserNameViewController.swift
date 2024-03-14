@@ -109,6 +109,10 @@ public final class SetUserNameViewController: BaseViewController {
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         
+        backButton.onTapped { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+        
         viewModel.requestRandomNickname()
         
         bind()

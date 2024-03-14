@@ -332,18 +332,18 @@ extension DetailFeedViewController: UICollectionViewDataSource {
         }
     }
     
-    public func collectionView(
-        _ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String,
-        at indexPath: IndexPath
-    ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              let header = collectionView.dequeueReusableSupplementaryView(
-                ofKind: <#T##String#>,
-                withReuseIdentifier: <#T##String#>,
-                for: indexPath
-              )
-    }
+//    public func collectionView(
+//        _ collectionView: UICollectionView,
+//        viewForSupplementaryElementOfKind kind: String,
+//        at indexPath: IndexPath
+//    ) -> UICollectionReusableView {
+//        guard kind == UICollectionView.elementKindSectionHeader,
+//              let header = collectionView.dequeueReusableSupplementaryView(
+//                ofKind: <#T##String#>,
+//                withReuseIdentifier: <#T##String#>,
+//                for: indexPath
+//              )
+//    }
 }
 
 // MARK: - Comment TextField Delegate

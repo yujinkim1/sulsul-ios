@@ -58,6 +58,12 @@ enum AuthFlow: Flow {
 
 enum CommonScene {
     case web
+    case selectPhoto
+    case writePostText
+    case writeContent
+    case reportContent
+    case search
+    case comment
 }
 
 enum LoginScene {

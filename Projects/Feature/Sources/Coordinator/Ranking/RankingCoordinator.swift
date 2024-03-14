@@ -40,11 +40,7 @@ final class RankingCoordinator: NSObject, RankingBaseCoordinator {
         switch scene {
         case .main:
             rootNavigationController?.popToRootViewController(animated: true)
-        case .search:
-            let searchVC = SearchViewController()
-            searchVC.rankingCoordinator = self
-            
-            currentNavigationViewController?.pushViewController(searchVC, animated: true)
+        case .search: return
         case .alarm: return
         case .detailDrink: return
 //            let detailDrinkVC = DetailDrinkViewController()

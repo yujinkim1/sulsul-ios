@@ -39,7 +39,6 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         rankingVC.tabBarItem = UITabBarItem(title: "랭킹", image: UIImage(named: "tabBar_ranking"), selectedImage: UIImage(named: "tabBar_selectRanking"))
         
         let transferVC = transferCoordinator.start()
-        transferCoordinator.parentCoordinator = self
         transferVC.tabBarItem = UITabBarItem(title: "새 피드 작성", image: UIImage(named: "tabBar_newFeed"), selectedImage: nil)
         
         let transferHistoryVC = transferHistoryCoordinator.start()
@@ -95,7 +94,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         case .ranking:
             startBenefitFlow(tabBarFlow, userData: userData)
         case .transfer:
-            startTransferFlow(tabBarFlow, userData: userData)
+            startCommonFlow(tabBarFlow, userData: userData)
         case .transferHistory:
             startTransferHistoryFlow(tabBarFlow, userData: userData)
         case .more:
@@ -117,12 +116,6 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         currentFlowManager?.currentCoordinator = rankingCoordinator
         (rootViewController as? UITabBarController)?.selectedIndex = TabType.ranking.rawValue
         rankingCoordinator.moveTo(appFlow: flow, userData: userData)
-    }
-    
-    private func startTransferFlow(_ flow: Flow, userData: [String: Any]?) {
-        currentFlowManager?.currentCoordinator = transferCoordinator
-        (rootViewController as? UITabBarController)?.selectedIndex = TabType.transfer.rawValue
-        transferCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
     private func startTransferHistoryFlow(_ flow: Flow, userData: [String: Any]?) {
@@ -178,8 +171,16 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
         }
         
         switch tabType {
-        case .home, .ranking, .transfer, .transferHistory, .more:
+//<<<<<<< HEAD
+        case .home, .ranking, .transferHistory, .more:
+//=======
+//        case .home, .benefit, .transferHistory, .more:
+//>>>>>>> feature/1.0.0
             return true
+
+        case .transfer:
+            startCommonFlow(TabBarFlow.common(.selectPhoto), userData: nil)
+            return false
         }
     }
 }
