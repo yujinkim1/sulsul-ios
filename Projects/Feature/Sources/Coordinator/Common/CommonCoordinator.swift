@@ -40,6 +40,8 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToWritePostText(userData)
         case .writeContent:
             moveToWriteContent(userData)
+        case .reportContent:
+            moveToReportContent(userData)
         }
     }
     
@@ -65,6 +67,13 @@ final class CommonCoordinator: CommonBaseCoordinator {
     
     private func moveToSelectPhoto() {
         let vc = SelectPhotoViewController()
+        vc.coordinator = self
+        
+        currentNavigationViewController?.pushViewController(vc, animated: true)
+    }
+    
+    private func moveToReportContent(_ userData: [String: Any]?) {
+        let vc = ReportViewController()
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)

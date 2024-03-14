@@ -61,6 +61,7 @@ enum CommonScene {
     case selectPhoto
     case writePostText
     case writeContent
+    case reportContent
 }
 
 enum LoginScene {

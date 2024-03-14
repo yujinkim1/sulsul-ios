@@ -122,6 +122,7 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         
         cell.spamView.onTapped { [weak self] in
             // TODO: 신고 이동
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: nil)
         }
         
         cell.heartView.onTapped { [weak self] in
