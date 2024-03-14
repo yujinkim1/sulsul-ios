@@ -41,8 +41,11 @@ final class CommentViewModel {
                 let parentId = selfRef.writeComment.value.parent_comment_id
                 
                 if parentId == 0 {
+                    // MARK: 기본 댓글 추가
                     self?.comments.append(comment)
+                    
                 } else {
+                    // MARK: 대댓글 추가
                     var commentWithParentId = comment
                     commentWithParentId.parent_comment_id = parentId
                     commentWithParentId.isChildren = true
@@ -64,10 +67,15 @@ final class CommentViewModel {
                 guard let selfRef = self else { return }
                 
                 let commentId = selfRef.deleteComment.value.comment_id
+                
+                // MARK: 기본 댓글 제거
                 self?.comments.removeAll(where: { $0.comment_id == commentId })
+                
                 self?.comments.enumerated().forEach({ index, data in
+                    // MARK: 대댓글까지 제거
                     self?.comments[index].children_comments?.removeAll(where: { $0.comment_id == commentId })
                 })
+                
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
