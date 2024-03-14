@@ -19,7 +19,7 @@ struct Comment: Decodable {
     let updated_at: String
     let is_reported: Bool
     let is_writer: Bool
-    let children_comments: [Comment]?
+    var children_comments: [Comment]?
     var isChildren: Bool? = false
     var parent_comment_id: Int? = 0
 }

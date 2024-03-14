@@ -23,6 +23,8 @@ public final class CommentViewController: BaseHeaderViewController {
         $0.image = UIImage(named: "comment_comment")
     }
     
+    private lazy var parentId = 0
+    
     private lazy var commentCountLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
@@ -93,12 +95,16 @@ public final class CommentViewController: BaseHeaderViewController {
     
     private func setTabEvents() {
         submitButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
             if let text = self?.commentTextField.text,
                text.removeSpace() != "" {
+                self?.commentTextFieldView.layer.borderColor = DesignSystemAsset.gray900.color.cgColor
+                self?.submitButton.textColor = DesignSystemAsset.gray500.color
                 self?.commentTextField.text = ""
                 self?.viewModel.didTabWriteComment(1,
                                                    content: text,
-                                                   parentId: 0)
+                                                   parentId: selfRef.parentId)
             }
         }
     }
@@ -198,6 +204,7 @@ extension CommentViewController: UITableViewDelegate, UITableViewDataSource {
         cell.bind(comment)
         
         cell.replayLabel.onTapped { [weak self] in
+            self?.parentId = comment.comment_id
             self?.commentTextField.becomeFirstResponder()
         }
         

@@ -17,7 +17,7 @@ final class CommentViewModel {
     var comments: [Comment] = []
     
     // MARK: Trigger
-    private lazy var writeComment = PassthroughSubject<WriteCommentRequest, Never>()
+    private lazy var writeComment = CurrentValueSubject<WriteCommentRequest, Never>(.init(feed_id: 0, content: "", parent_comment_id: 0))
     private lazy var deleteComment = CurrentValueSubject<DeleteCommentRequest, Never>(.init(feed_id: 0, comment_id: 0))
     
     // MARK: Output
@@ -33,9 +33,26 @@ final class CommentViewModel {
             .store(in: &cancelBag)
         
         writeComment
+            .dropFirst()
             .flatMap(postComments(_:))
             .sink { [weak self] comment in
-                self?.comments.append(comment)
+                guard let selfRef = self else { return }
+                
+                let parentId = selfRef.writeComment.value.parent_comment_id
+                
+                if parentId == 0 {
+                    self?.comments.append(comment)
+                } else {
+                    var commentWithParentId = comment
+                    commentWithParentId.parent_comment_id = parentId
+                    commentWithParentId.isChildren = true
+                    
+                    if let parentIndex = self?.comments.firstIndex(where: { $0.comment_id == parentId }),
+                       let originChildrenCount = selfRef.comments[parentIndex].children_comments?.count {
+                        self?.comments.insert(commentWithParentId, at: parentIndex + originChildrenCount + 1)
+                        self?.comments[parentIndex].children_comments?.append(commentWithParentId)
+                    }
+                }
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
@@ -48,6 +65,9 @@ final class CommentViewModel {
                 
                 let commentId = selfRef.deleteComment.value.comment_id
                 self?.comments.removeAll(where: { $0.comment_id == commentId })
+                self?.comments.enumerated().forEach({ index, data in
+                    self?.comments[index].children_comments?.removeAll(where: { $0.comment_id == commentId })
+                })
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
