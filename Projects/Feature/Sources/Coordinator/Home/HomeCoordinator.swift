@@ -15,7 +15,7 @@ final class HomeCoordinator: NSObject, HomeBaseCoordinator {
     
     func start() -> UIViewController {
 
-        let homeVC = HomeViewController()
+        let homeVC = MainPageViewController()
         homeVC.coordinator = self
         rootViewController = UINavigationController(rootViewController: homeVC)
         rootNavigationController?.delegate = self
