@@ -53,7 +53,7 @@ public final class SearchViewController: BaseHeaderViewController {
     
     private lazy var resultTableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundColor = DesignSystemAsset.black.color
-        $0.register(SearchResultCell.self, forCellReuseIdentifier: SearchResultCell.id)
+        $0.register(SearchFeedCell.self, forCellReuseIdentifier: SearchFeedCell.id)
 //        $0.register(SnackSortHeaderView.self, forHeaderFooterViewReuseIdentifier: SnackSortHeaderView.id)
 //        $0.register(SnackFooterLineView.self, forHeaderFooterViewReuseIdentifier: SnackFooterLineView.id)
         $0.delegate = self
@@ -249,8 +249,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultCell.id,
-                                                       for: indexPath) as? SearchResultCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchFeedCell.id,
+                                                       for: indexPath) as? SearchFeedCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
         cell.bind(viewModel.searchSectionModel[indexPath.section].searchModel[indexPath.row])
