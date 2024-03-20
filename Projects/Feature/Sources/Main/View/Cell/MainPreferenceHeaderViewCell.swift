@@ -42,6 +42,10 @@ final class MainPreferenceHeaderViewCell: UICollectionViewCell {
         }
     }
     
+    func bind(_ title: String) {
+        titleLabel.text = title
+    }
+    
     func updateView() {
         containerView.layer.cornerRadius = moderateScale(number: 16)
         containerView.backgroundColor = DesignSystemAsset.main.color

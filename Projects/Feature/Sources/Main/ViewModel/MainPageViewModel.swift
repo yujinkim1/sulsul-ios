@@ -113,4 +113,8 @@ struct MainPageViewModel {
     func differenceFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
         return differenceFeeds.eraseToAnyPublisher()
     }
+    
+    func getKindOfAlcoholValue() -> [String] {
+        return kindOfAlcohol.value
+    }
 }

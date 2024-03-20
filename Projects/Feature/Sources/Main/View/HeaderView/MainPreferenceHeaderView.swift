@@ -91,14 +91,20 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
 
 extension MainPreferenceHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel?.getKindOfAlcoholValue().count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainPreferenceHeaderViewCell.self, indexPath: indexPath) else { return .init() }
+        var alcohol = viewModel?.getKindOfAlcoholValue()[indexPath.item]
+        guard let alcohol = alcohol else { return cell }
+        
+        cell.bind(alcohol)
+        
         cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             cell.updateView()
         }
+        
         return cell
     }
 }
