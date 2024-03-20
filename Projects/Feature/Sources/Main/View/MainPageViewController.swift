@@ -231,7 +231,10 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            preferenceHeaderView.updateUI(temp)
+            preferenceHeaderView.updateUI(temp) // MARK: - 비로그인, 로그인 때 업뎃
+            if preferenceHeaderView.viewModel == nil {
+                preferenceHeaderView.viewModel = self.viewModel
+            }
             return preferenceHeaderView
         } else if indexPath.section == 1 {
             if kind == UICollectionView.elementKindSectionHeader {

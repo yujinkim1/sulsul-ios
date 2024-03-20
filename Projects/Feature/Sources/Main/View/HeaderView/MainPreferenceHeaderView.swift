@@ -9,6 +9,9 @@ import UIKit
 import DesignSystem
 
 final class MainPreferenceHeaderView: UICollectionReusableView {
+    
+    var viewModel: MainPageViewModel?
+    
     private lazy var containerView = UIView()
     
     private lazy var titleLabel = UILabel().then({
