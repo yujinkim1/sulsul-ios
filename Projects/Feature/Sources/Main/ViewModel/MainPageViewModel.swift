@@ -110,6 +110,10 @@ struct MainPageViewModel {
         return popularFeeds.eraseToAnyPublisher()
     }
     
+    func getPopularFeedsValue() -> [PopularFeed] {
+        return popularFeeds.value
+    }
+    
     func differenceFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
         return differenceFeeds.eraseToAnyPublisher()
     }

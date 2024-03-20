@@ -99,4 +99,20 @@ final class MainLikeCell: UICollectionViewCell {
             $0.bottom.equalTo(firstFeedImageView)
         }
     }
+    
+    func bind(_ feed: PopularFeed) {
+        titleLabel.text = feed.title
+        
+        let imageViews = [firstFeedImageView, secondFeedImageView, thirdFeedImageView]
+        
+        for index in 0..<feed.feeds.count {
+            if let url = URL(string: feed.feeds[index].representImage ?? "") {
+                if index <= imageViews.count {
+                    imageViews[index].kf.setImage(with: url)
+                }
+            } else {
+                print("사진 없어")
+            }
+        }
+    }
 }

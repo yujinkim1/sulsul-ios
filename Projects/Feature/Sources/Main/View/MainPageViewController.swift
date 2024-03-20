@@ -198,8 +198,8 @@ extension MainPageViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
             return 1
-        } else if section == 1 {
-            return 5
+        } else if section == 1 { // MARK: - 좋아요 많은 조합
+            return viewModel.getPopularFeedsValue().count
         } else {
             return 3
         }
@@ -215,8 +215,9 @@ extension MainPageViewController: UICollectionViewDataSource {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
                 return cell
             }
-        case 1:
+        case 1: // MARK: - 좋아요 많은 조합
             guard let cell = collectionView.dequeueReusableCell(MainLikeCell.self, indexPath: indexPath) else { return .init() }
+            cell.bind(viewModel.getPopularFeedsValue()[indexPath.item])
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
