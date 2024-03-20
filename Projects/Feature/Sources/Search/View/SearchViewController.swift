@@ -241,11 +241,13 @@ extension SearchViewController {
 
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.searchSectionModel.count
+//        return viewModel.searchSectionModel.count
+        return 1
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.searchSectionModel[section].searchModel.count
+        // return viewModel.searchSectionModel[section].searchModel.count
+        return 5
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -253,7 +255,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
                                                        for: indexPath) as? SearchFeedCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
-        cell.bind(viewModel.searchSectionModel[indexPath.section].searchModel[indexPath.row])
+        cell.bind()
         
         cell.onTapped { [weak self] in
             
@@ -263,7 +265,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return moderateScale(number: 90)
+        return moderateScale(number: 102)
     }
     
 //    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {

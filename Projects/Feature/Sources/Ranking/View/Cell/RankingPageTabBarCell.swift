@@ -14,8 +14,7 @@ final class RankingPageTabBarCell: UICollectionViewCell {
     private lazy var titleLabel = UILabel().then {
         $0.frame = .zero
         $0.textColor = DesignSystemAsset.gray300.color
-        $0.font = Font.medium(size: 18)
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.medium(size: 18))
         $0.textAlignment = .center
     }
     

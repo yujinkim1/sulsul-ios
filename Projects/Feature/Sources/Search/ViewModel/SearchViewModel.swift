@@ -96,6 +96,10 @@ extension SearchViewModel {
         }
     }
     
+    private func getFeeds() {
+        
+    }
+    
     private func setSearchSectionModels() {
         searchSectionModel = []
         

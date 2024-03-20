@@ -10,22 +10,26 @@ import DesignSystem
 
 final class PaddingLabel: UIStackView {
     
+    private lazy var padding: UIEdgeInsets = .init(top: moderateScale(number: 4),
+                                                   left: moderateScale(number: 8),
+                                                   bottom: moderateScale(number: 4),
+                                                   right: moderateScale(number: 8))
+    
     private lazy var label = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.font = Font.regular(size: 12)
     }
     
-    convenience init(text: String = "", padding: UIEdgeInsets = .init(top: moderateScale(number: 2),
-                                                                 left: moderateScale(number: 8),
-                                                                 bottom: moderateScale(number: 2),
-                                                                 right: moderateScale(number: 8))) {
-                
-        self.init(frame: .zero)
+    convenience init(text: String = "", padding: UIEdgeInsets) {
         
-        setText(text)
-        self.isLayoutMarginsRelativeArrangement = true
-        self.addArrangedSubview(label)
-        self.layoutMargins = padding
+        self.init(frame: .zero)
+        self.padding = padding
+        
+        if text != "" {
+            setText("asdfasdf")
+            self.addArrangedSubview(label)
+            self.isLayoutMarginsRelativeArrangement = true
+            self.layoutMargins = padding
+        }
     }
     
     override init(frame: CGRect) {
@@ -37,6 +41,9 @@ final class PaddingLabel: UIStackView {
     }
     
     func setText(_ text: String) {
-        label.text = text
+        label.setLineHeight(18, text: text, font: Font.regular(size: 12))
+        self.addArrangedSubview(label)
+        self.isLayoutMarginsRelativeArrangement = true
+        self.layoutMargins = padding
     }
 }

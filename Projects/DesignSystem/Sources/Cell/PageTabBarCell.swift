@@ -26,7 +26,7 @@ open class PageTabBarCell: UICollectionViewCell {
         $0.frame = .zero
         $0.font = unselectedFontSize
         $0.textColor = unselectedColor
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.regular(size: 18))
     }
     
     open var title: String? {

@@ -14,6 +14,7 @@ final class SearchFeedCell: UITableViewCell {
     private lazy var feedImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = moderateScale(number: 8.55)
+        $0.backgroundColor = .brown
     }
     
     private lazy var firstTagLabel = PaddingLabel().then {
@@ -23,7 +24,7 @@ final class SearchFeedCell: UITableViewCell {
     
     private lazy var andLabel = UILabel().then {
         $0.text = "&"
-        $0.textColor = DesignSystemAsset.gray200.color
+        $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.regular(size: 12)
     }
     
@@ -34,12 +35,11 @@ final class SearchFeedCell: UITableViewCell {
     
     private lazy var titleLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray500.color
-        $0.font = Font.bold(size: 18)
         $0.numberOfLines = 2
     }
     
     private lazy var lineView = UIView().then {
-        $0.backgroundColor = DesignSystemAsset.gray500.color
+        $0.backgroundColor = DesignSystemAsset.gray200.color
     }
     
     private lazy var nextButton = UIImageView(image: UIImage(named: "common_rightArrow")?.withTintColor(DesignSystemAsset.gray700.color))
@@ -57,10 +57,15 @@ final class SearchFeedCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind(_ model: Pairing) {
-        if let url = URL(string: model.image ?? "") {
-            feedImageView.kf.setImage(with: url)
-        }
+    func bind() {
+//        if let url = URL(string: model.image ?? "") {
+//            feedImageView.kf.setImage(with: url)
+//        }
+        
+        firstTagLabel.setText("소주")
+        secondTagLabel.setText("피자")
+        
+        titleLabel.setLineHeight(28, text: "제목 데이터", font: Font.bold(size: 18))
     }
 }
 
@@ -79,7 +84,8 @@ extension SearchFeedCell {
     private func makeConstraints() {
         feedImageView.snp.makeConstraints {
             $0.size.equalTo(moderateScale(number: 86))
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
         
         firstTagLabel.snp.makeConstraints {
@@ -98,15 +104,16 @@ extension SearchFeedCell {
         }
         
         titleLabel.snp.makeConstraints {
-            $0.bottom.equalTo(feedImageView)
+            $0.bottom.equalTo(feedImageView).offset(moderateScale(number: -3))
             $0.leading.equalTo(firstTagLabel)
             $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         
         lineView.snp.makeConstraints {
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(moderateScale(number: 8))
             $0.leading.equalTo(feedImageView)
             $0.trailing.equalTo(titleLabel)
+            $0.height.equalTo(moderateScale(number: 1))
         }
     }
 }
