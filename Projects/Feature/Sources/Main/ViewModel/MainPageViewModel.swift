@@ -106,6 +106,10 @@ struct MainPageViewModel {
         }
     }
     
+//    func getFeedsByAlcoholName(_ name: String) -> {
+//        
+//    }
+    
     func popularFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
         return popularFeeds.eraseToAnyPublisher()
     }
@@ -116,6 +120,10 @@ struct MainPageViewModel {
     
     func differenceFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
         return differenceFeeds.eraseToAnyPublisher()
+    }
+    
+    func getDifferenceFeedsValue() -> [PopularFeed] {
+        return differenceFeeds.value
     }
     
     func getKindOfAlcoholValue() -> [String] {

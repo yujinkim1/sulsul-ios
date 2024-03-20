@@ -157,4 +157,24 @@ final class MainDifferenceCell: UICollectionViewCell {
             $0.bottom.equalToSuperview().offset(moderateScale(number: -16))
         }
     }
+    
+    func bind(_ feed: PopularFeed) {
+//        for index in 0..<feed.feeds.count {
+//            if let url = URL(string: feed.feeds[index].representImage ?? "") {
+//                
+//            } else {
+//                print("사진 없어")
+//            }
+//        }
+        for feed in feed.feeds {
+            contentLabel.text = feed.title
+            detailContentLabel.text = feed.content
+            nickNameLabel.text = feed.userNickname
+            if let url = URL(string: feed.representImage) {
+                feedImageView.kf.setImage(with: url)
+            } else {
+                print("사진 읎어")
+            }
+        }
+    }
 }

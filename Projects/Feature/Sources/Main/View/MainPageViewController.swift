@@ -201,7 +201,7 @@ extension MainPageViewController: UICollectionViewDataSource {
         } else if section == 1 { // MARK: - 좋아요 많은 조합
             return viewModel.getPopularFeedsValue().count
         } else {
-            return 3
+            return viewModel.getDifferenceFeedsValue().count
         }
     }
     
@@ -221,6 +221,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
+            cell.bind(viewModel.getDifferenceFeedsValue()[indexPath.item])
             return cell
         default:
             return UICollectionViewCell()
