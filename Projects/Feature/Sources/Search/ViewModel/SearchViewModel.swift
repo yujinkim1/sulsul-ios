@@ -10,29 +10,43 @@ import Combine
 import DesignSystem
 import Service
 
+struct SearchSectionModel {
+    let headerTitle: String
+    let totalCount: Int
+    let unShowedCount: Int
+    let showFooterLine: Bool
+    let searchModel: [Pairing]
+}
+
 final class SearchViewModel {
     private lazy var jsonDecoder = JSONDecoder()
     private lazy var mapper = PairingModelMapper()
     
-    private lazy var searchKeywordList: [String] = []
     private lazy var drinkList: [Pairing] = []
-    private lazy var snackList: [Pairing] = []
+    private lazy var snackList: [Pairing] = []  
+    private lazy var resultDrinkList: [Pairing] = []
+    private lazy var resultSnackList: [Pairing] = []
     
-    private lazy var reloadCollectionViewSubject = PassthroughSubject<Void, Never>()
+    // MARK: Datasource
+    private lazy var searchKeywordList: [String] = []
+    lazy var searchSectionModel: [SearchSectionModel] = []
+    
+    // MARK: output
+    lazy var reloadRecentKeywordData = PassthroughSubject<Void, Never>()
+    lazy var reloadSearchData = PassthroughSubject<Void, Never>()
     
     init() {
         getPairings()
     }
     
-    func search(text: String?) -> (drink: [Pairing], snack: [Pairing]) {
+    func search(text: String?) -> () {
         if let searchText = text {
-            let drinkSearchResult = drinkList.filter({ $0.subtype?.contains(searchText) == true })
-            let snackSearchResult = snackList.filter({ $0.subtype?.contains(searchText) == true })
+            resultDrinkList = drinkList.filter({ $0.subtype?.contains(searchText) == true })
+            resultSnackList = snackList.filter({ $0.subtype?.contains(searchText) == true })
             
-            return (drinkSearchResult, snackSearchResult)
+            setSearchSectionModels()
+            reloadSearchData.send(())
         }
-        
-        return ([], [])
     }
     
     func searchKeywords() -> [String] {
@@ -50,21 +64,17 @@ final class SearchViewModel {
         UserDefaultsUtil.shared.remove(.recentKeyword)
         UserDefaultsUtil.shared.setRecentKeywordList(updatedKeywords)
         
-        reloadCollectionViewSubject.send(())
+        reloadRecentKeywordData.send(())
     }
     
     // MARK: Output Method
-    func reloadCollectionViewPublisher() -> AnyPublisher<Void, Never> {
-        return reloadCollectionViewSubject.eraseToAnyPublisher()
-    }
-    
     func keywordCount() -> Int {
         return searchKeywords().count
     }
 }
 
 extension SearchViewModel {
-    func getPairings() {
+    private func getPairings() {
         if let encodedURL = "/pairings?type=전체".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { [weak self] result in
                 guard let selfRef = self else { return }
@@ -83,6 +93,28 @@ extension SearchViewModel {
                     print("[/pairings] Fail : \(error)")
                 }
             }
+        }
+    }
+    
+    private func setSearchSectionModels() {
+        searchSectionModel = []
+        
+        if !resultDrinkList.isEmpty {
+            let unShowedCount = drinkList.count > 3 ? drinkList.count - 1 : 0
+            searchSectionModel.append(.init(headerTitle: "술",
+                                            totalCount: resultDrinkList.count,
+                                            unShowedCount: unShowedCount,
+                                            showFooterLine: !resultSnackList.isEmpty,
+                                            searchModel: resultDrinkList))
+        }
+        
+        if !resultSnackList.isEmpty {
+            let unShowedCount = snackList.count > 3 ? snackList.count - 1 : 0
+            searchSectionModel.append(.init(headerTitle: "안주",
+                                            totalCount: resultSnackList.count,
+                                            unShowedCount: unShowedCount,
+                                            showFooterLine: !resultDrinkList.isEmpty,
+                                            searchModel: resultSnackList))
         }
     }
 }

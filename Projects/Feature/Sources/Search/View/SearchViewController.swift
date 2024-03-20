@@ -51,6 +51,18 @@ public final class SearchViewController: BaseHeaderViewController {
         $0.dataSource = self
     }
     
+    private lazy var resultTableView = UITableView(frame: .zero, style: .grouped).then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+        $0.register(SearchResultCell.self, forCellReuseIdentifier: SearchResultCell.id)
+//        $0.register(SnackSortHeaderView.self, forHeaderFooterViewReuseIdentifier: SnackSortHeaderView.id)
+//        $0.register(SnackFooterLineView.self, forHeaderFooterViewReuseIdentifier: SnackFooterLineView.id)
+        $0.delegate = self
+        $0.dataSource = self
+        $0.separatorStyle = .none
+        $0.sectionFooterHeight = 0
+        $0.isHidden = true
+    }
+    
     public init() {
         super.init(nibName: nil, bundle: nil)
         
@@ -71,12 +83,19 @@ public final class SearchViewController: BaseHeaderViewController {
     private func bind() {
         setVisibilityKeywordLabel()
         
-        viewModel.reloadCollectionViewPublisher()
-            .sink { [weak self] _ in
+        viewModel.reloadRecentKeywordData
+            .sink { [weak self] in
                 guard let self else { return }
                 
                 self.setVisibilityKeywordLabel()
                 self.recentKeywordCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.reloadSearchData
+            .sink { [weak self] in
+                self?.resultTableView.isHidden = false
+                self?.resultTableView.reloadData()
             }
             .store(in: &cancelBag)
     }
@@ -120,7 +139,8 @@ public final class SearchViewController: BaseHeaderViewController {
             lineView,
             recentKeywordTitleLabel,
             recentKeywordResetButton,
-            recentKeywordCollectionView
+            recentKeywordCollectionView,
+            resultTableView
         ])
     }
     
@@ -163,6 +183,11 @@ public final class SearchViewController: BaseHeaderViewController {
             $0.trailing.equalTo(searchResetButton)
             $0.bottom.equalToSuperview()
         }
+        
+        resultTableView.snp.makeConstraints {
+            $0.top.equalTo(lineView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
     }
 }
 
@@ -179,7 +204,11 @@ extension SearchViewController: UITextFieldDelegate {
         }
         
         recentKeywordCollectionView.reloadData()
+        recentKeywordCollectionView.isHidden = true
+        
         setVisibilityKeywordLabel()
+        
+        viewModel.search(text: searchText)
         
         return true
     }
@@ -208,4 +237,40 @@ extension SearchViewController {
     @objc private func didTabsearchResetButton() {
         searchTextField.text = ""
     }
+}
+
+extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
+    public func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.searchSectionModel.count
+    }
+    
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.searchSectionModel[section].searchModel.count
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultCell.id,
+                                                       for: indexPath) as? SearchResultCell else { return UITableViewCell() }
+        
+        cell.selectionStyle = .none
+        cell.bind(viewModel.searchSectionModel[indexPath.section].searchModel[indexPath.row])
+        
+        cell.onTapped { [weak self] in
+            
+        }
+                
+        return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return moderateScale(number: 90)
+    }
+    
+//    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+//        return moderateScale(number: 78)
+//    }
+//    
+//    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return moderateScale(number: 48)
+//    }
 }
