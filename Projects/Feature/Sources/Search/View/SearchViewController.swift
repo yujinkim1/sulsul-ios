@@ -54,13 +54,12 @@ public final class SearchViewController: BaseHeaderViewController {
     private lazy var resultTableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.register(SearchFeedCell.self, forCellReuseIdentifier: SearchFeedCell.id)
-//        $0.register(SnackSortHeaderView.self, forHeaderFooterViewReuseIdentifier: SnackSortHeaderView.id)
-//        $0.register(SnackFooterLineView.self, forHeaderFooterViewReuseIdentifier: SnackFooterLineView.id)
         $0.delegate = self
         $0.dataSource = self
         $0.separatorStyle = .none
         $0.sectionFooterHeight = 0
         $0.isHidden = true
+        
     }
     
     private lazy var emptyLabel = UILabel().then {
@@ -69,6 +68,11 @@ public final class SearchViewController: BaseHeaderViewController {
         $0.isHidden = true
         $0.numberOfLines = 2
         $0.textAlignment = .center
+    }
+    
+    private lazy var feedCountLabel = UILabel().then {
+        $0.font = Font.bold(size: 18)
+        $0.textColor = DesignSystemAsset.gray900.color
     }
     
     public init() {
@@ -91,12 +95,6 @@ public final class SearchViewController: BaseHeaderViewController {
     private func bind() {
         setVisibilityKeywordLabel()
         
-        viewModel.reloadSearchData
-            .sink { [weak self] isEmpty in
-                self?.resultTableView.reloadData()
-            }
-            .store(in: &cancelBag)
-        
         viewModel.reloadRecentKeywordData
             .sink { [weak self] in
                 guard let self else { return }
@@ -108,8 +106,20 @@ public final class SearchViewController: BaseHeaderViewController {
         
         viewModel.reloadSearchResults
             .sink { [weak self] isEmpty in
+                guard let selfRef = self else { return }
+                
+                self?.recentKeywordTitleLabel.isHidden = true
+                self?.recentKeywordResetButton.isHidden = true
+                
                 self?.resultTableView.isHidden = false
                 self?.resultTableView.reloadData()
+                
+                if !isEmpty {
+                    self?.feedCountLabel.isHidden = false
+                    self?.feedCountLabel.text = "피드 \(selfRef.viewModel.feedSearchResults.count)"
+                    self?.feedCountLabel.asColor(targetString: "\(selfRef.viewModel.feedSearchResults.count)",
+                                                 color: DesignSystemAsset.main.color)
+                }
                 
                 self?.emptyLabel.isHidden = !isEmpty
                 
@@ -163,7 +173,8 @@ public final class SearchViewController: BaseHeaderViewController {
             recentKeywordResetButton,
             recentKeywordCollectionView,
             resultTableView,
-            emptyLabel
+            emptyLabel,
+            feedCountLabel
         ])
     }
     
@@ -208,13 +219,18 @@ public final class SearchViewController: BaseHeaderViewController {
         }
         
         resultTableView.snp.makeConstraints {
-            $0.top.equalTo(lineView.snp.bottom)
+            $0.top.equalTo(feedCountLabel.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
         emptyLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(moderateScale(number: 385))
+        }
+        
+        feedCountLabel.snp.makeConstraints {
+            $0.top.equalTo(lineView.snp.bottom).offset(moderateScale(number: 24))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
     }
 }
@@ -236,9 +252,6 @@ extension SearchViewController: UITextFieldDelegate {
         recentKeywordTitleLabel.isHidden = true
         recentKeywordResetButton.isHidden = true
         
-        
-        setVisibilityKeywordLabel()
-        
         viewModel.search(text: searchText)
         
         return true
@@ -256,6 +269,11 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         
         cell.bind(viewModel.searchKeyword(indexPath.row))
         
+        cell.onTapped { [weak self] in
+            self?.searchTextField.text = self?.viewModel.searchKeyword(indexPath.row)
+            self?.viewModel.search(text: self?.searchTextField.text)
+        }
+        
         cell.deleteButton.onTapped {
             self.viewModel.removeSelectedKeyword(indexPath)
         }
@@ -269,11 +287,14 @@ extension SearchViewController {
         searchTextField.text = ""
         
         emptyLabel.isHidden = true
+        feedCountLabel.isHidden = true
         resultTableView.isHidden = true
         
         recentKeywordTitleLabel.isHidden = false
         recentKeywordResetButton.isHidden = false
         recentKeywordCollectionView.isHidden = false
+        
+        setVisibilityKeywordLabel()
     }
 }
 
