@@ -176,7 +176,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                     
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112)))
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112+12)))
                 
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
                     layoutSize: headerSize,
@@ -260,7 +260,8 @@ extension MainPageViewController: UICollectionViewDataSource {
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
                 likeHeaderView.updateView(title: "색다른 조합",
-                                          subTitle: "맨날 먹던거만 먹으면 질리니까!!\n새로 만나는 우리, 제법 잘...어울릴지도??")
+                                          subTitle: "맨날 먹던거만 먹으면 질리니까!!\n새로 만나는 우리, 제법 잘...어울릴지도??",
+                                          separator: true)
                 return likeHeaderView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }

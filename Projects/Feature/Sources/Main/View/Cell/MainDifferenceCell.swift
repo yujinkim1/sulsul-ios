@@ -12,7 +12,6 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = .black
-        $0.layer.cornerRadius = 12
     })
     
     private lazy var feedImageView = UIImageView().then({

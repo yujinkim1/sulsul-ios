@@ -12,7 +12,6 @@ final class MainLikeCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = .black
-        $0.layer.cornerRadius = 12
     })
     
     private lazy var titleLabel = UILabel().then({
@@ -20,14 +19,6 @@ final class MainLikeCell: UICollectionViewCell {
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 20)
     })
-    
-//    private lazy var titleFirstImageView = UIImageView().then({
-//        $0.backgroundColor = .yellow
-//    })
-//    
-//    private lazy var titleSecondImageView = UIImageView().then({
-//        $0.backgroundColor = .yellow
-//    })
     
     private lazy var arrowImageView = UIImageView().then({
         $0.image = UIImage(named: "common_rightArrow")
