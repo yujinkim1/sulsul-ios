@@ -11,7 +11,7 @@ import DesignSystem
 final class MainPreferenceDetailCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
-        $0.backgroundColor = .black
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = 12
     })
     
@@ -115,5 +115,11 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
             $0.top.equalTo(foodLabel.snp.bottom).offset(moderateScale(number: 8))
             $0.bottom.equalToSuperview().offset(moderateScale(number: 16))
         }
+    }
+    
+    func bind(_ model: AlcoholFeed.Feed) {
+        feedImageView.kf.setImage(with: model.representImage)
+        nickNameLabel.text = model.writerNickname
+        contentLabel.text = model.title
     }
 }

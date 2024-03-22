@@ -20,8 +20,7 @@ public final class AuthViewController: BaseViewController {
     }
 
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(40)
-        $0.font = Font.bold(size: 32)
+        $0.setLineHeight(40, font: Font.bold(size: 32))
         $0.numberOfLines = 2
         $0.text = "만나서\n반가워요! :)"
         $0.textColor = DesignSystemAsset.gray900.color

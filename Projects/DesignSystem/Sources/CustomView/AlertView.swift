@@ -51,10 +51,9 @@ final class AlertView: UIView {
     
     private lazy var descriptionLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.font = Font.regular(size: 16)
         $0.textAlignment = .left
         $0.numberOfLines = 0
-        $0.setLineHeight(moderateScale(number: 24))
+        $0.setLineHeight(moderateScale(number: 24), font: Font.regular(size: 16))
     }
     
     private let alertType: AlertType

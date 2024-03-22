@@ -12,7 +12,6 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = .black
-        $0.layer.cornerRadius = 12
     })
     
     private lazy var feedImageView = UIImageView().then({
@@ -155,6 +154,26 @@ final class MainDifferenceCell: UICollectionViewCell {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))
             $0.top.equalTo(contentLabel.snp.bottom).offset(moderateScale(number: 6))
             $0.bottom.equalToSuperview().offset(moderateScale(number: -16))
+        }
+    }
+    
+    func bind(_ feed: PopularFeed) {
+//        for index in 0..<feed.feeds.count {
+//            if let url = URL(string: feed.feeds[index].representImage ?? "") {
+//                
+//            } else {
+//                print("사진 없어")
+//            }
+//        }
+        for feed in feed.feeds {
+            contentLabel.text = feed.title
+            detailContentLabel.text = feed.content
+            nickNameLabel.text = feed.userNickname
+            if let url = URL(string: feed.representImage) {
+                feedImageView.kf.setImage(with: url)
+            } else {
+                print("사진 읎어")
+            }
         }
     }
 }

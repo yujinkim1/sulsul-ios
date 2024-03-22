@@ -27,10 +27,9 @@ public final class CompleteViewController: BaseViewController {
     }
     
     private lazy var subtitleLabel = UILabel().then {
-        $0.font = Font.medium(size: 18)
         $0.text = "\(username)님이 선택해주신 취향으로\n추천해드릴게요!"
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.medium(size: 18))
         $0.numberOfLines = 2
     }
     
