@@ -62,7 +62,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     public override func viewDidLoad() {
         super.viewDidLoad()
 //        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
-        view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
         bind()
@@ -102,7 +101,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         }
         mainCollectionView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
     }
@@ -122,8 +121,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 var itemHeight: CGFloat = 0
                 
                 itemHeight = 323
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 12)))
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24)))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24 + 12)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
@@ -217,7 +216,7 @@ extension MainPageViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch indexPath.section {
         case 0:
-            if nopreferenceTemp == 0 {
+            if viewModel.getSelectedAlcoholFeedsValue().count == 0 {
                 guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
                 return cell
             } else {

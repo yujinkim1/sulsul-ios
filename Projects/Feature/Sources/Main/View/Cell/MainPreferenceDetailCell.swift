@@ -11,7 +11,7 @@ import DesignSystem
 final class MainPreferenceDetailCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
-        $0.backgroundColor = .black
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = 12
     })
     

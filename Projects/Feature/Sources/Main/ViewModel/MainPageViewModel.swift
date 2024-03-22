@@ -43,9 +43,7 @@ struct MainPageViewModel {
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
                     alcoholFeeds.send(mappedAlcoholFeedList.feeds)
                     kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
-                    
-                    print(">>>>>dkdkdkd")
-                    print(mappedAlcoholFeedList.feeds)
+                    sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
                 } else {
                     print("디코딩 에러")
                 }
