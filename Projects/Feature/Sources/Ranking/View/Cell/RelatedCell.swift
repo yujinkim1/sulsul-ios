@@ -11,58 +11,44 @@ import DesignSystem
 final class RelatedCell: UICollectionViewCell {
     static let reuseIdentifier = "RelatedCell"
     
-    private lazy var containerView = UIView().then {
-        $0.layer.borderWidth = 0
-        $0.layer.borderColor = UIColor.clear.cgColor
+    private lazy var imageView = UIImageView().then {
+        $0.frame = .zero
+        $0.backgroundColor = DesignSystemAsset.gray400.color
+        $0.layer.cornerRadius = CGFloat(8)
+        $0.layer.masksToBounds = true
     }
     
-    private lazy var backgroundImageView = UIImageView().then {
-        $0.backgroundColor = .clear
+    private lazy var likeTouchableImageView = TouchableImageView(frame: .zero).then {
+        $0.image = UIImage(named: "like")
     }
     
-    private lazy var profileImageView = UIImageView().then {
-        $0.backgroundColor = .clear
-    }
-    
-    private lazy var heartImageView = UIImageView().then {
-        $0.backgroundColor = .clear
-    }
-    
-    private lazy var usernameLabel = UILabel().then {
-        $0.setLineHeight(36)
-        $0.textAlignment = .center
-        $0.font = Font.bold(size: 24)
-        $0.textColor = DesignSystemAsset.gray900.color
+    private lazy var drinkLabel = UILabel().then {
+        $0.setLineHeight(16)
+        $0.numberOfLines = 1
+        $0.font = Font.regular(size: 10)
+        $0.text = "잭 다니엘스"
+        $0.textColor = DesignSystemAsset.white.color
     }
     
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(36)
-        $0.textAlignment = .center
-        $0.font = Font.bold(size: 24)
-        $0.textColor = DesignSystemAsset.gray900.color
-        $0.text = "나초"
-    }
-    
-    private lazy var scoreStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.distribution = .fillEqually
-        $0.spacing = CGFloat(0)
-    }
-    
-    private lazy var scoreImageView = UIImageView().then {
-        $0.image = UIImage(named: "hand_clapping")
+        $0.setLineHeight(24)
+        $0.numberOfLines = 1
+        $0.font = Font.bold(size: 18)
+        $0.text = "맛있고 건간한 채식 요리와 함께 마시는 잭 다니엘스"
+        $0.textColor = DesignSystemAsset.white.color
     }
     
     private lazy var scoreLabel = UILabel().then {
-        $0.setLineHeight(18)
-        $0.textAlignment = .center
-        $0.font = Font.bold(size: 12)
+        $0.setLineHeight(16)
+        $0.font = Font.bold(size: 10.67)
+        $0.text = "4.8/5"
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.text = "0.0/5"
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        self.backgroundColor = .clear
         
         addViews()
         makeConstraints()
@@ -73,84 +59,30 @@ final class RelatedCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//
-//        rankLabel.text = nil
-//        snackNameLabel.text = nil
-//        firstSnackImageView.image = nil
-//        secondSnackImageView.image = nil
-//        thirdSnackImageView.image = nil
-//    }
-    
-    override func bind(_ model: RankingItem) {
-        super.bind(model)
-        
-        configure(model)
-    }
-    
-    // MARK: - Custom Method
-    
     private func addViews() {
-        containerView.addSubviews([
-            profileImageView,
-            usernameLabel,
-            titleLabel,
-            scoreImageView,
-            scoreLabel,
-        ])
+        self.addSubview(imageView)
         
-        addSubview(containerView)
+        self.contentView.addSubviews([
+            titleLabel,
+            drinkLabel,
+            scoreLabel
+        ])
     }
     
     private func makeConstraints() {
-        containerView.snp.makeConstraints {
+        imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        usernameLabel.snp.makeConstraints {
-            $0.leading.equalTo(containerView.snp.leading).offset(moderateScale(number: 10))
-            $0.top.equalToSuperview().offset(moderateScale(number: 16))
-        }
         titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(usernameLabel.snp.trailing).offset(moderateScale(number: 8))
-            $0.top.equalTo(usernameLabel)
+            $0.leading.trailing.bottom.equalToSuperview().inset(moderateScale(number: 8))
+        }
+        drinkLabel.snp.makeConstraints {
+            $0.leading.trailing.equalTo(titleLabel)
+            $0.bottom.equalTo(titleLabel.snp.top)
         }
         scoreLabel.snp.makeConstraints {
-            $0.trailing.equalTo(containerView.snp.trailing).offset(moderateScale(number: -10))
-            $0.top.equalToSuperview().offset(moderateScale(number: 25))
+            $0.leading.trailing.equalTo(titleLabel)
+            $0.bottom.equalTo(drinkLabel.snp.top)
         }
-        scoreImageView.snp.makeConstraints {
-            $0.trailing.equalTo(scoreLabel.snp.leading).offset(moderateScale(number: -4))
-            $0.top.equalToSuperview().offset(moderateScale(number: 25))
-            $0.size.equalTo(moderateScale(number: 16))
-        }
-    }
-    
-    private func configure(_ model: RankingItem) {
-//        if let rank = model.rank {
-//            rankLabel.text = String(rank)
-//        } else {
-//            print("Rank value is not available.")
-//        }
-//
-//        if let imageURLString = model.drink?.image,
-//           let imageURL = URL(string: imageURLString) {
-//            drinkImageView.loadImage(imageURL)
-//        } else {
-//            print("Image URL is not available.")
-//            drinkImageView.image = UIImage()
-//        }
-//
-//        if let subtype = model.drink?.subtype {
-//            subtypeLabel.text = String(subtype)
-//        } else {
-//            print("Subtype value is not available.")
-//        }
-//
-//        if let drinkName = model.drink?.name {
-//            drinkNameLabel.text = drinkName
-//        } else {
-//            print("Drink name is not available.")
-//        }
     }
 }
