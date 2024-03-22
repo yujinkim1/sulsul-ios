@@ -41,7 +41,10 @@ final class RankingCoordinator: NSObject, RankingBaseCoordinator {
         case .main:
             rootNavigationController?.popToRootViewController(animated: true)
         case .search: return
-        case .alarm: return
+        case .alarm:
+            let viewModel = DetailFeedViewModel(feedID: 1)
+            let viewController = DetailFeedViewController(viewModel: viewModel)
+            currentNavigationViewController?.pushViewController(viewController, animated: true)
         case .detailDrink: return
 //            let detailDrinkVC = DetailDrinkViewController()
 //            detailDrinkVC.coordinator = self
