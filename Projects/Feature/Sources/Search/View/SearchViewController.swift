@@ -320,4 +320,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return moderateScale(number: 102)
     }
+    
+    @objc private func didTapBackButton() {
+        self.navigationController?.popViewController(animated: true)
+    }
 }

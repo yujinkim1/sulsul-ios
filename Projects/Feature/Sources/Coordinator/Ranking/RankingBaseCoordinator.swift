@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol RankingBaseCoordinator: Coordinator {}
+public protocol RankingBaseCoordinator: Coordinator, CurrentCoordinated {}
 
 protocol RankingBaseCoordinated {
     var coordinator: RankingBaseCoordinator? { get }

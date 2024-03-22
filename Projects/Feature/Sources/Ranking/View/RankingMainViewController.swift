@@ -1,5 +1,5 @@
 //
-//  RankingViewController.swift
+//  RankingMainViewController.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-01-05.
@@ -9,18 +9,32 @@ import Combine
 import UIKit
 import DesignSystem
 
-public final class RankingViewController: BaseViewController {
+public final class RankingMainViewController: BaseViewController {
     var coordinator: RankingBaseCoordinator?
-    var viewModel: RankingViewModel?
+    var viewModel: RankingMainViewModel
     
-    private var viewControllers: [UIViewController] = []
     private var cancelBag = Set<AnyCancellable>()
+    private var viewControllers: [UIViewController] = []
     
     private lazy var rankingDrinkViewController = RankingDrinkViewController()
     private lazy var rankingCombinationViewController = RankingCombinationViewController()
     private lazy var pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal).then {
         $0.dataSource = self
         $0.delegate = self
+    }
+    
+    private lazy var topHeaderView = UIView().then {
+        $0.frame = .zero
+    }
+    
+    private lazy var searchTouchableImageView = TouchableImageView(frame: .zero).then {
+        $0.image = UIImage(named: "common_search")
+        $0.tintColor = DesignSystemAsset.gray900.color
+    }
+    
+    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then {
+        $0.image = UIImage(named: "common_alarm")
+        $0.tintColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var titleLabel = UILabel().then {
@@ -51,32 +65,68 @@ public final class RankingViewController: BaseViewController {
         $0.register(PageTabBarCell.self, forCellWithReuseIdentifier: PageTabBarCell.reuseIdentifier)
     }
     
-    public override func viewDidLoad() {
-        view.backgroundColor = DesignSystemAsset.black.color
-        overrideUserInterfaceStyle = .dark
+    init(viewModel: RankingMainViewModel) {
+        self.viewModel = viewModel
         
-        viewModel = RankingViewModel()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
         
         bind()
         addViews()
         makeConstraints()
-        configurePageViewController()
+        preparePageViewController()
     }
     
     public override func addViews() {
         pageTabBarContainerView.addSubview(pageTabBarView)
-        view.addSubviews([titleLabel, weekendLabel, pageTabBarContainerView, pageViewController.view])
+        
+        topHeaderView.addSubviews([
+            searchTouchableImageView,
+            alarmTouchableImageView
+        ])
+        
+        view.addSubviews([
+            topHeaderView,
+            titleLabel,
+            weekendLabel,
+            pageTabBarContainerView,
+            pageViewController.view
+        ])
+        
         addChild(pageViewController)
     }
     
     public override func makeConstraints() {
+        topHeaderView.snp.makeConstraints {
+            $0.height.equalTo(moderateScale(number: 52))
+            $0.width.centerX.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        searchTouchableImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalTo(alarmTouchableImageView.snp.leading).offset(moderateScale(number: -12))
+            $0.size.equalTo(moderateScale(number: 24))
+        }
+        alarmTouchableImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.size.equalTo(moderateScale(number: 24))
+        }
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.top.equalToSuperview().offset(moderateScale(number: 52))
+            $0.top.equalTo(topHeaderView.snp.bottom)
         }
         weekendLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(moderateScale(number: 8))
-            $0.top.bottom.equalTo(titleLabel)
+            $0.bottom.equalTo(titleLabel)
         }
         pageTabBarContainerView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
@@ -93,24 +143,34 @@ public final class RankingViewController: BaseViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
-}
-
-// MARK: - Custom Method
-
-extension RankingViewController {
+    
+    public override func setupIfNeeded() {
+        searchTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.search), userData: nil)
+        }
+        alarmTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.alarm), userData: nil)
+        }
+    }
+    
+    // MARK: - Custom Method
+    
     private func bind() {
-        viewModel?
-            .rankingBasePublisher
-            .sink { [weak self] data in
-                guard let self = self,
-                      let startDate = data.first?.startDate,
-                      let endDate = data.first?.endDate else { return }
-                self.weekendLabel.text = "\(startDate) ~ \(endDate)"
+        viewModel.requestRankingDate()
+        
+        viewModel
+            .rankingDatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.weekendLabel.text = "\(value.startDate) ~ \(value.endDate)"
             }
             .store(in: &cancelBag)
     }
     
-    private func configurePageViewController() {
+    private func preparePageViewController() {
         viewControllers = [rankingDrinkViewController, rankingCombinationViewController]
         
         pageViewController.didMove(toParent: self)
@@ -120,7 +180,7 @@ extension RankingViewController {
 
 // MARK: - PageTabBar CollectionView DataSource
 
-extension RankingViewController: UICollectionViewDataSource {
+extension RankingMainViewController: UICollectionViewDataSource {
     public func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -148,7 +208,7 @@ extension RankingViewController: UICollectionViewDataSource {
 
 // MARK: - PageTabBar CollectionView Delegate
 
-extension RankingViewController: UICollectionViewDelegate {
+extension RankingMainViewController: UICollectionViewDelegate {
     public func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
@@ -174,7 +234,7 @@ extension RankingViewController: UICollectionViewDelegate {
 
 // MARK: - 페이지 탭바 CollectionViewFlowLayout 델리게이트
 
-extension RankingViewController: UICollectionViewDelegateFlowLayout {
+extension RankingMainViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -205,7 +265,7 @@ extension RankingViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - UIPageViewController DataSource
 
-extension RankingViewController: UIPageViewControllerDataSource {
+extension RankingMainViewController: UIPageViewControllerDataSource {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
@@ -233,7 +293,7 @@ extension RankingViewController: UIPageViewControllerDataSource {
 
 // MARK: - UIPageViewController Delegate
 
-extension RankingViewController: UIPageViewControllerDelegate {
+extension RankingMainViewController: UIPageViewControllerDelegate {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,

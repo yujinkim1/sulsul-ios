@@ -7,14 +7,20 @@
 
 import Foundation
 
-struct FeedModel {
+struct FeedModel: Codable {
     let nextCursorId: Int
     let size: Int
     let isLast: Bool
     let content: [Feed]
 }
 
-struct Feed {
+struct FeedImages: Codable {
+    let title: String
+    let content: String
+    let images: [String]
+}
+
+struct Feed: Codable {
     let feedId: Int
     let writerInfo: WriterInfo
     let title: String
@@ -32,8 +38,8 @@ struct Feed {
     let updatedAt: String
 }
 
-struct WriterInfo {
+struct WriterInfo: Codable {
     let userId: Int
     let nickname: String
-    let image: String
+    let image: String?
 }
