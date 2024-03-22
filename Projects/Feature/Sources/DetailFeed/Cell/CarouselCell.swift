@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-final class CarouselCell: BaseCollectionViewCell<Feed> {
+final class CarouselCell: UICollectionViewCell {
     static let reuseIdentifier = "CarouselCell"
     
     private lazy var imageView = UIImageView().then {
@@ -18,10 +18,7 @@ final class CarouselCell: BaseCollectionViewCell<Feed> {
     
     private lazy var opaqueView = UIView().then {
         $0.frame = .zero
-        $0.layer.shadowColor = DesignSystemAsset.black.color.cgColor
-        $0.layer.shadowOpacity = Float(0.2)
-        $0.layer.shadowOffset = .zero
-        $0.layer.masksToBounds = true
+        $0.layer.backgroundColor = DesignSystemAsset.black.color.cgColor.copy(alpha: 0.2)
     }
     
     override init(frame: CGRect) {
@@ -38,10 +35,13 @@ final class CarouselCell: BaseCollectionViewCell<Feed> {
         makeConstraints()
     }
     
-    // MARK: - Custom Method
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    func configure(_ image: String) {
-        if let imageURL = URL(string: image) {
+    func configure(_ item: String) {
+        if let imageURL = URL(string: item) {
             imageView.loadImage(imageURL)
         } else {
             print("Image URL is not available.")
@@ -50,19 +50,16 @@ final class CarouselCell: BaseCollectionViewCell<Feed> {
     }
     
     private func addViews() {
-        contentView.addSubviews([
-            imageView,
-            opaqueView
-        ])
-        contentView.sendSubviewToBack(imageView)
+        self.addSubview(imageView)
+        self.contentView.addSubview(opaqueView)
     }
     
     private func makeConstraints() {
-        imageView.snp.makeConstraints {
+        opaqueView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        opaqueView.snp.makeConstraints {
-            $0.edges.equalTo(imageView)
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
 }
