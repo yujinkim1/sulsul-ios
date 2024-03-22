@@ -12,7 +12,7 @@ final class CommentFooterView: UICollectionReusableView {
     static let reuseIdentifier: String = "CommentFooterView"
     
     private lazy var touchableLabel = TouchableLabel().then {
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.text = "댓글 더보기"
         $0.textColor = DesignSystemAsset.gray500.color

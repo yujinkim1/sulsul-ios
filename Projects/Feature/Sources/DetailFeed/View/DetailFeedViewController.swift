@@ -34,7 +34,7 @@ public final class DetailFeedViewController: BaseViewController {
     }
     
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.textAlignment = .center
         $0.text = "피드 상세보기"
@@ -163,6 +163,10 @@ public final class DetailFeedViewController: BaseViewController {
                         
                     }
             }
+        }
+        
+        baseTopView.backTouchableView.onTapped { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
     }
     

@@ -18,7 +18,7 @@ final class CommentTextFieldView: UIView {
     }
     
     private lazy var touchableLabel = TouchableLabel().then {
-        $0.setLineHeight(24)
+        $0.setLineHeight(24, font: Font.semiBold(size: 16))
         $0.frame = .zero
         $0.font = Font.semiBold(size: 16)
         $0.text = "등록"

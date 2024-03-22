@@ -17,7 +17,7 @@ final class RecommendSnackCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var rankLabel = UILabel().then {
-        $0.setLineHeight(36)
+        $0.setLineHeight(36, font: Font.bold(size: 24))
         $0.textAlignment = .center
         $0.font = Font.bold(size: 24)
         $0.textColor = DesignSystemAsset.gray900.color
@@ -25,7 +25,7 @@ final class RecommendSnackCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var snackNameLabel = UILabel().then {
-        $0.setLineHeight(36)
+        $0.setLineHeight(36, font: Font.bold(size: 24))
         $0.textAlignment = .center
         $0.font = Font.bold(size: 24)
         $0.textColor = DesignSystemAsset.gray900.color
@@ -43,7 +43,7 @@ final class RecommendSnackCell: BaseCollectionViewCell<RankingItem> {
     }
     
     private lazy var scoreLabel = UILabel().then {
-        $0.setLineHeight(18)
+        $0.setLineHeight(18, font: Font.bold(size: 12))
         $0.textAlignment = .center
         $0.font = Font.bold(size: 12)
         $0.textColor = DesignSystemAsset.gray900.color

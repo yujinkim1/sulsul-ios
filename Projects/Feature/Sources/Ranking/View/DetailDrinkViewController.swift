@@ -31,14 +31,14 @@ final class DetailDrinkViewController: BaseViewController {
     }
     
     private lazy var rightBarButton = TouchableLabel().then {
-        $0.setLineHeight(22)
+        $0.setLineHeight(22, font: Font.semiBold(size: 14))
         $0.font = Font.semiBold(size: 14)
         $0.text = "취향에 추가"
         $0.textColor = DesignSystemAsset.main.color
     }
     
     private lazy var parentTitleLabel = UILabel().then {
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.text = "이번주 랭킹"
         $0.textColor = DesignSystemAsset.gray900.color
@@ -77,7 +77,7 @@ final class DetailDrinkViewController: BaseViewController {
     }
     
     private lazy var drinkNameLabel = UILabel().then {
-        $0.setLineHeight(16)
+        $0.setLineHeight(16, font: Font.bold(size: 28))
         $0.font = Font.bold(size: 28)
         $0.text = "참이슬 후레쉬"
         $0.textColor = DesignSystemAsset.gray900.color
@@ -202,7 +202,7 @@ final class DetailDrinkViewController: BaseViewController {
     
     private func createDescriptionLabel(_ value: String) -> UILabel {
         let label = UILabel().then {
-            $0.setLineHeight(22)
+            $0.setLineHeight(22, font: Font.semiBold(size: 14))
             $0.font = Font.semiBold(size: 14)
             $0.textColor = DesignSystemAsset.gray500.color
             $0.text = value
@@ -213,7 +213,7 @@ final class DetailDrinkViewController: BaseViewController {
     
     private func createDescriptionValueLabel(_ value: String) -> UILabel {
         let label = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
-            $0.setLineHeight(16)
+            $0.setLineHeight(16, font: Font.regular(size: 10))
             $0.font = Font.regular(size: 10)
             $0.textColor = DesignSystemAsset.gray900.color
             $0.backgroundColor = DesignSystemAsset.gray200.color
