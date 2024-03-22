@@ -63,6 +63,14 @@ public final class SearchViewController: BaseHeaderViewController {
         $0.isHidden = true
     }
     
+    private lazy var emptyLabel = UILabel().then {
+        $0.textColor = DesignSystemAsset.gray600.color
+        $0.font = Font.semiBold(size: 15)
+        $0.isHidden = true
+        $0.numberOfLines = 2
+        $0.textAlignment = .center
+    }
+    
     public init() {
         super.init(nibName: nil, bundle: nil)
         
@@ -83,6 +91,12 @@ public final class SearchViewController: BaseHeaderViewController {
     private func bind() {
         setVisibilityKeywordLabel()
         
+        viewModel.reloadSearchData
+            .sink { [weak self] isEmpty in
+                self?.resultTableView.reloadData()
+            }
+            .store(in: &cancelBag)
+        
         viewModel.reloadRecentKeywordData
             .sink { [weak self] in
                 guard let self else { return }
@@ -92,10 +106,18 @@ public final class SearchViewController: BaseHeaderViewController {
             }
             .store(in: &cancelBag)
         
-        viewModel.reloadSearchData
-            .sink { [weak self] in
+        viewModel.reloadSearchResults
+            .sink { [weak self] isEmpty in
                 self?.resultTableView.isHidden = false
                 self?.resultTableView.reloadData()
+                
+                self?.emptyLabel.isHidden = !isEmpty
+                
+                if isEmpty {
+                    self?.emptyLabel.text = "\"\(self?.searchTextField.text ?? "")\"의 \n검색결과가 없어요"
+                    self?.emptyLabel.asColor(targetString: "\"\(self?.searchTextField.text ?? "")\"",
+                                             color: DesignSystemAsset.main.color)
+                }
             }
             .store(in: &cancelBag)
     }
@@ -140,7 +162,8 @@ public final class SearchViewController: BaseHeaderViewController {
             recentKeywordTitleLabel,
             recentKeywordResetButton,
             recentKeywordCollectionView,
-            resultTableView
+            resultTableView,
+            emptyLabel
         ])
     }
     
@@ -188,6 +211,11 @@ public final class SearchViewController: BaseHeaderViewController {
             $0.top.equalTo(lineView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+        
+        emptyLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(moderateScale(number: 385))
+        }
     }
 }
 
@@ -205,6 +233,9 @@ extension SearchViewController: UITextFieldDelegate {
         
         recentKeywordCollectionView.reloadData()
         recentKeywordCollectionView.isHidden = true
+        recentKeywordTitleLabel.isHidden = true
+        recentKeywordResetButton.isHidden = true
+        
         
         setVisibilityKeywordLabel()
         
@@ -236,18 +267,19 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
 extension SearchViewController {
     @objc private func didTabsearchResetButton() {
         searchTextField.text = ""
+        
+        emptyLabel.isHidden = true
+        resultTableView.isHidden = true
+        
+        recentKeywordTitleLabel.isHidden = false
+        recentKeywordResetButton.isHidden = false
+        recentKeywordCollectionView.isHidden = false
     }
 }
 
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
-    public func numberOfSections(in tableView: UITableView) -> Int {
-//        return viewModel.searchSectionModel.count
-        return 1
-    }
-    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // return viewModel.searchSectionModel[section].searchModel.count
-        return 5
+        return viewModel.feedSearchResults.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -255,10 +287,10 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
                                                        for: indexPath) as? SearchFeedCell else { return UITableViewCell() }
         
         cell.selectionStyle = .none
-        cell.bind()
+        cell.bind(viewModel.feedSearchResults[indexPath.row])
         
         cell.onTapped { [weak self] in
-            
+            // TODO: 피드 상세로 이동 처리
         }
                 
         return cell
@@ -267,12 +299,4 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return moderateScale(number: 102)
     }
-    
-//    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-//        return moderateScale(number: 78)
-//    }
-//    
-//    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return moderateScale(number: 48)
-//    }
 }

@@ -22,6 +22,8 @@ final class SearchViewModel {
     private lazy var jsonDecoder = JSONDecoder()
     private lazy var mapper = PairingModelMapper()
     
+    private lazy var cancelBag = Set<AnyCancellable>()
+    
     private lazy var drinkList: [Pairing] = []
     private lazy var snackList: [Pairing] = []  
     private lazy var resultDrinkList: [Pairing] = []
@@ -30,22 +32,40 @@ final class SearchViewModel {
     // MARK: Datasource
     private lazy var searchKeywordList: [String] = []
     lazy var searchSectionModel: [SearchSectionModel] = []
+    lazy var feedSearchResults: [SearchResult] = []
+    
+    // MARK: Trigger
+    lazy var loadFeedSearchResults = PassthroughSubject<String, Never>()
     
     // MARK: output
+    lazy var reloadSearchResults = PassthroughSubject<Bool, Never>()
     lazy var reloadRecentKeywordData = PassthroughSubject<Void, Never>()
     lazy var reloadSearchData = PassthroughSubject<Void, Never>()
     
     init() {
         getPairings()
+        
+        loadFeedSearchResults
+            .flatMap(getFeedSearchResults(_:))
+            .sink { [weak self] searchResults in
+                self?.feedSearchResults = searchResults
+                self?.reloadSearchResults.send(searchResults.isEmpty)
+            }
+            .store(in: &cancelBag)
     }
     
     func search(text: String?) -> () {
+        // TODO: 술, 안주 검색 추가될 시 사용
+//        if let searchText = text {
+//            resultDrinkList = drinkList.filter({ $0.subtype?.contains(searchText) == true })
+//            resultSnackList = snackList.filter({ $0.subtype?.contains(searchText) == true })
+//            
+//            setSearchSectionModels()
+//            reloadSearchData.send(())
+//        }
+        
         if let searchText = text {
-            resultDrinkList = drinkList.filter({ $0.subtype?.contains(searchText) == true })
-            resultSnackList = snackList.filter({ $0.subtype?.contains(searchText) == true })
-            
-            setSearchSectionModels()
-            reloadSearchData.send(())
+            loadFeedSearchResults.send(searchText)
         }
     }
     
@@ -96,8 +116,24 @@ extension SearchViewModel {
         }
     }
     
-    private func getFeeds() {
-        
+    private func getFeedSearchResults(_ searchText: String) -> AnyPublisher<[SearchResult], Never> {
+        return Future<[SearchResult], Never> { promise in
+            NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/search?keyword=\(searchText)") { [weak self] result in
+                guard let selfRef = self else { return }
+                
+                switch result {
+                case .success(let responseData):
+                    if let searchData = try? selfRef.jsonDecoder.decode(SearchModel.self, from: responseData) {
+                        return promise(.success(searchData.results))
+                    } else {
+                        print("[/feeds/search] Fail Decode")
+                    }
+                case .failure(let error):
+                    print("[/feeds/search] Fail : \(error)")
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
     
     private func setSearchSectionModels() {

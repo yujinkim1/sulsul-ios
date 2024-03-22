@@ -15,6 +15,7 @@ final class SearchFeedCell: UITableViewCell {
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = moderateScale(number: 8.55)
         $0.backgroundColor = .brown
+        $0.clipsToBounds = true
     }
     
     private lazy var firstTagLabel = PaddingLabel().then {
@@ -57,15 +58,17 @@ final class SearchFeedCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind() {
-//        if let url = URL(string: model.image ?? "") {
-//            feedImageView.kf.setImage(with: url)
-//        }
+    func bind(_ feed: SearchResult) {
+        if let url = URL(string: feed.represent_image) {
+            feedImageView.kf.setImage(with: url)
+        }
         
-        firstTagLabel.setText("소주")
-        secondTagLabel.setText("피자")
+        if feed.tags.count >= 2 {
+            firstTagLabel.setText(feed.tags[0])
+            secondTagLabel.setText(feed.tags[1])
+        }
         
-        titleLabel.setLineHeight(28, text: "제목 데이터", font: Font.bold(size: 18))
+        titleLabel.setLineHeight(28, text: feed.title, font: Font.bold(size: 18))
     }
 }
 
@@ -104,12 +107,13 @@ extension SearchFeedCell {
         }
         
         titleLabel.snp.makeConstraints {
-            $0.bottom.equalTo(feedImageView).offset(moderateScale(number: -3))
+            $0.top.equalTo(firstTagLabel.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.equalTo(firstTagLabel)
             $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         
         lineView.snp.makeConstraints {
+            $0.top.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: 8))
             $0.bottom.equalToSuperview().inset(moderateScale(number: 8))
             $0.leading.equalTo(feedImageView)
             $0.trailing.equalTo(titleLabel)
