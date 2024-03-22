@@ -8,8 +8,8 @@
 import UIKit
 import DesignSystem
 
-final class RelatedFeedCell: BaseCollectionViewCell<RankingItem> {
-    static let reuseIdentifier = "RecommendSnackCell"
+final class RelatedCell: UICollectionViewCell {
+    static let reuseIdentifier = "RelatedCell"
     
     private lazy var containerView = UIView().then {
         $0.layer.borderWidth = 0
