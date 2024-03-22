@@ -116,4 +116,10 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
             $0.bottom.equalToSuperview().offset(moderateScale(number: 16))
         }
     }
+    
+    func bind(_ model: AlcoholFeed.Feed) {
+        feedImageView.kf.setImage(with: model.representImage)
+        nickNameLabel.text = model.writerNickname
+        contentLabel.text = model.title
+    }
 }

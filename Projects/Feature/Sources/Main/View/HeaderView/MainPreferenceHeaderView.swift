@@ -102,7 +102,9 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
         cell.bind(alcohol)
         
         cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-            cell.updateView()
+//            cell.updateView()
+            guard let self = self else { return }
+            viewModel?.sendSelectedAlcoholFeed(alcohol)
         }
         
         return cell

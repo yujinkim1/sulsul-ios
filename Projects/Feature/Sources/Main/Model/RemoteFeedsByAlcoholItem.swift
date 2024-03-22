@@ -8,17 +8,17 @@
 import Foundation
 
 struct RemoteFeedsByAlcoholItem: Decodable {
-    let subtypes: [String]
-    let feeds: [Feed]
+    let subtypes: [String]?
+    let feeds: [Feed]?
     
     struct Feed: Decodable {
-        let subtype: String
-        let feedId: Int
-        let title: String
-        let representImage: URL
-        let foods: [String]
-        let score: Int
-        let writerNickname: String
+        let subtype: String?
+        let feedId: Int?
+        let title: String?
+        let representImage: URL?
+        let foods: [String]?
+        let score: Int?
+        let writerNickname: String?
         
         enum CodingKeys: String, CodingKey {
             case subtype

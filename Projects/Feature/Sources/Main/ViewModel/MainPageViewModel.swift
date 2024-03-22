@@ -19,6 +19,8 @@ struct MainPageViewModel {
 //    private let byAlcoholFeeds = CurrentValueSubject<[ByAlcoholFeed], Never> ([])
     // MARK: - (비로그인) 술 종류
     private let kindOfAlcohol = CurrentValueSubject<[String], Never> ([])
+    private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
+    private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     
     init() {
         getPopularFeeds()
@@ -38,12 +40,12 @@ struct MainPageViewModel {
             switch result {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
-//                    let mappedPopularFeeds = self.mainPageMapper.popularFeeds(from: popularFeedList)
-//                    print(">>>>>>3")
-//                    print(popularFeedList)
-                    kindOfAlcohol.send(alcoholFeedList.subtypes)
-                    print(">>>>>@#!@>>>")
-                    print(alcoholFeedList.subtypes)
+                    let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
+                    alcoholFeeds.send(mappedAlcoholFeedList.feeds)
+                    kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
+                    
+                    print(">>>>>dkdkdkd")
+                    print(mappedAlcoholFeedList.feeds)
                 } else {
                     print("디코딩 에러")
                 }
@@ -124,6 +126,29 @@ struct MainPageViewModel {
     
     func getDifferenceFeedsValue() -> [PopularFeed] {
         return differenceFeeds.value
+    }
+    
+//    func alcoholFeedsPublisher() -> AnyPublisher<[AlcoholFeed.Feed], Never> {
+//        return alcoholFeeds.eraseToAnyPublisher()
+//    }
+//    
+//    func getAlcoholFeedsValue() -> [AlcoholFeed.Feed] {
+//        return alcoholFeeds.value
+//    }
+    
+    func selectedAlcoholFeedPublisher() -> AnyPublisher<[AlcoholFeed.Feed], Never> {
+        return selectedAlcoholFeeds.eraseToAnyPublisher()
+    }
+    
+    func sendSelectedAlcoholFeed(_ alcohol: String) {
+        let allAlcoholFeeds = alcoholFeeds.value
+        let selectedFeeds = allAlcoholFeeds.filter { $0.subtype == alcohol }
+        
+        selectedAlcoholFeeds.send(selectedFeeds)
+    }
+    
+    func getSelectedAlcoholFeedsValue() -> [AlcoholFeed.Feed] {
+        return selectedAlcoholFeeds.value
     }
     
     func getKindOfAlcoholValue() -> [String] {

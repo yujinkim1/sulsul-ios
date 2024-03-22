@@ -65,6 +65,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
+        bind()
         
         searchTouchableIamgeView.onTapped { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
@@ -104,6 +105,14 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.bottom.equalToSuperview()
         }
+    }
+    
+    private func bind() {
+        viewModel.selectedAlcoholFeedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.mainCollectionView.reloadData()
+            }.store(in: &cancelBag)
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
@@ -213,6 +222,7 @@ extension MainPageViewController: UICollectionViewDataSource {
                 return cell
             } else {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                cell.alcoholBind(viewModel.getSelectedAlcoholFeedsValue())
                 return cell
             }
         case 1: // MARK: - 좋아요 많은 조합
