@@ -23,7 +23,7 @@ final class RelatedCell: UICollectionViewCell {
     }
     
     private lazy var drinkLabel = UILabel().then {
-        $0.setLineHeight(16)
+        $0.setLineHeight(16, font: Font.regular(size: 10))
         $0.numberOfLines = 1
         $0.font = Font.regular(size: 10)
         $0.text = "잭 다니엘스"
@@ -31,7 +31,7 @@ final class RelatedCell: UICollectionViewCell {
     }
     
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(24)
+        $0.setLineHeight(24, font: Font.bold(size: 18))
         $0.numberOfLines = 1
         $0.font = Font.bold(size: 18)
         $0.text = "맛있고 건간한 채식 요리와 함께 마시는 잭 다니엘스"
@@ -39,7 +39,7 @@ final class RelatedCell: UICollectionViewCell {
     }
     
     private lazy var scoreLabel = UILabel().then {
-        $0.setLineHeight(16)
+        $0.setLineHeight(16, font: Font.bold(size: 10.67))
         $0.font = Font.bold(size: 10.67)
         $0.text = "4.8/5"
         $0.textColor = DesignSystemAsset.gray900.color

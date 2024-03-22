@@ -16,7 +16,7 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
     }
     
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.text = "연관 피드"
         $0.textColor = DesignSystemAsset.gray900.color

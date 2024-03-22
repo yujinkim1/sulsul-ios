@@ -40,12 +40,14 @@ public final class RankingMainViewController: BaseViewController {
     private lazy var titleLabel = UILabel().then {
         $0.text = "이번주 랭킹"
         $0.setLineHeight(38, font: Font.bold(size: 28))
+        $0.font = Font.bold(size: 28)
         $0.textColor = DesignSystemAsset.white.color
     }
     
     private lazy var weekendLabel = UILabel().then {
         $0.text = "MM/dd ~ MM/dd"
         $0.setLineHeight(22, font: Font.regular(size: 14))
+        $0.font = Font.regular(size: 14)
         $0.textColor = DesignSystemAsset.gray600.color
     }
     
@@ -78,6 +80,8 @@ public final class RankingMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tabBarController?.setTabBarHidden(false)
         
         bind()
         addViews()

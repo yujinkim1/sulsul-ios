@@ -38,7 +38,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var indexLabel = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
-        $0.setLineHeight(18)
+        $0.setLineHeight(18, font: Font.regular(size: 12))
         $0.font = Font.regular(size: 12)
         $0.text = "\(carouselCurrentIndex)/\(imageOfList.count)"
         $0.textColor = DesignSystemAsset.gray900.color
@@ -48,7 +48,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(36)
+        $0.setLineHeight(36, font: Font.bold(size: 24))
         $0.font = Font.bold(size: 24)
         $0.text = "썸네일이 위스키인 피드글에 최적의 소맥 비율을 묻다"
         $0.textColor = DesignSystemAsset.white.color
@@ -68,21 +68,21 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var usernameLabel = UILabel().then {
-        $0.setLineHeight(28)
+        $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.text = "알 수 없음"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var createdAtLabel = UILabel().then {
-        $0.setLineHeight(16)
+        $0.setLineHeight(16, font: Font.regular(size: 10))
         $0.font = Font.regular(size: 10)
         $0.text = "24.03.14"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var scoreLabel = UILabel().then {
-        $0.setLineHeight(16)
+        $0.setLineHeight(16, font: Font.bold(size: 10.67))
         $0.font = Font.bold(size: 10.67)
         $0.text = "0점"
         $0.textColor = DesignSystemAsset.gray900.color
@@ -93,14 +93,14 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var drinkLabel = PaddableLabel(edgeInsets: 1, 4, 1, 4).then {
-        $0.setLineHeight(18)
+        $0.setLineHeight(18, font: Font.semiBold(size: 12))
         $0.font = Font.semiBold(size: 12)
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.textColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var snackLabel = PaddableLabel(edgeInsets: 1, 4, 1, 4).then {
-        $0.setLineHeight(18)
+        $0.setLineHeight(18, font: Font.semiBold(size: 12))
         $0.font = Font.semiBold(size: 12)
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.textColor = DesignSystemAsset.gray400.color
@@ -129,21 +129,21 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var feedViewsLabel = UILabel().then {
-        $0.setLineHeight(22)
+        $0.setLineHeight(22, font: Font.medium(size: 14))
         $0.font = Font.medium(size: 14)
         $0.text = "0"
         $0.textColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var feedCommentsLabel = UILabel().then {
-        $0.setLineHeight(22)
+        $0.setLineHeight(22, font: Font.medium(size: 14))
         $0.font = Font.medium(size: 14)
         $0.text = "0"
         $0.textColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var feedLikesLabel = UILabel().then {
-        $0.setLineHeight(22)
+        $0.setLineHeight(22, font: Font.medium(size: 14))
         $0.font = Font.medium(size: 14)
         $0.text = "0"
         $0.textColor = DesignSystemAsset.gray400.color
