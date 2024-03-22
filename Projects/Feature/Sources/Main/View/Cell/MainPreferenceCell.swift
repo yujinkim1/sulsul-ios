@@ -10,6 +10,8 @@ import DesignSystem
 
 final class MainPreferenceCell: UICollectionViewCell {
     
+    private var alcoholFeed: [AlcoholFeed.Feed] = []
+    
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
         $0.registerCell(MainPreferenceDetailCell.self)
         $0.showsVerticalScrollIndicator = false
@@ -49,15 +51,21 @@ final class MainPreferenceCell: UICollectionViewCell {
             return section
         }
     }
+    
+    func alcoholBind(_ model: [AlcoholFeed.Feed]) {
+        alcoholFeed = model
+        collectionView.reloadData()
+    }
 }
 
 extension MainPreferenceCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return alcoholFeed.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainPreferenceDetailCell.self, indexPath: indexPath) else { return .init() }
+        cell.bind(alcoholFeed[indexPath.item])
         return cell
     }
 }

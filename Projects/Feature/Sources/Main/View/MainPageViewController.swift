@@ -62,9 +62,9 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     public override func viewDidLoad() {
         super.viewDidLoad()
 //        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
-        view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
+        bind()
         
         searchTouchableIamgeView.onTapped { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
@@ -101,9 +101,17 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         }
         mainCollectionView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
+    }
+    
+    private func bind() {
+        viewModel.selectedAlcoholFeedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.mainCollectionView.reloadData()
+            }.store(in: &cancelBag)
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
@@ -113,8 +121,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 var itemHeight: CGFloat = 0
                 
                 itemHeight = 323
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight)))
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 12)))
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24)))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24 + 12)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
@@ -168,7 +176,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                     
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112)))
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112+12)))
                 
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
                     layoutSize: headerSize,
@@ -198,28 +206,31 @@ extension MainPageViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
             return 1
-        } else if section == 1 {
-            return 5
+        } else if section == 1 { // MARK: - 좋아요 많은 조합
+            return viewModel.getPopularFeedsValue().count
         } else {
-            return 3
+            return viewModel.getDifferenceFeedsValue().count
         }
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch indexPath.section {
         case 0:
-            if nopreferenceTemp == 0 {
+            if viewModel.getSelectedAlcoholFeedsValue().count == 0 {
                 guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
                 return cell
             } else {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                cell.alcoholBind(viewModel.getSelectedAlcoholFeedsValue())
                 return cell
             }
-        case 1:
+        case 1: // MARK: - 좋아요 많은 조합
             guard let cell = collectionView.dequeueReusableCell(MainLikeCell.self, indexPath: indexPath) else { return .init() }
+            cell.bind(viewModel.getPopularFeedsValue()[indexPath.item])
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
+            cell.bind(viewModel.getDifferenceFeedsValue()[indexPath.item])
             return cell
         default:
             return UICollectionViewCell()
@@ -231,7 +242,10 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            preferenceHeaderView.updateUI(temp)
+            preferenceHeaderView.updateUI(temp) // MARK: - 비로그인, 로그인 때 업뎃
+            if preferenceHeaderView.viewModel == nil {
+                preferenceHeaderView.viewModel = self.viewModel
+            }
             return preferenceHeaderView
         } else if indexPath.section == 1 {
             if kind == UICollectionView.elementKindSectionHeader {
@@ -246,7 +260,8 @@ extension MainPageViewController: UICollectionViewDataSource {
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
                 likeHeaderView.updateView(title: "색다른 조합",
-                                          subTitle: "맨날 먹던거만 먹으면 질리니까!!\n새로 만나는 우리, 제법 잘...어울릴지도??")
+                                          subTitle: "맨날 먹던거만 먹으면 질리니까!!\n새로 만나는 우리, 제법 잘...어울릴지도??",
+                                          separator: true)
                 return likeHeaderView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }

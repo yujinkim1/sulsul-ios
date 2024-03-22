@@ -9,6 +9,9 @@ import UIKit
 import DesignSystem
 
 final class MainPreferenceHeaderView: UICollectionReusableView {
+    
+    var viewModel: MainPageViewModel?
+    
     private lazy var containerView = UIView()
     
     private lazy var titleLabel = UILabel().then({
@@ -88,14 +91,22 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
 
 extension MainPreferenceHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel?.getKindOfAlcoholValue().count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainPreferenceHeaderViewCell.self, indexPath: indexPath) else { return .init() }
+        var alcohol = viewModel?.getKindOfAlcoholValue()[indexPath.item]
+        guard let alcohol = alcohol else { return cell }
+        
+        cell.bind(alcohol)
+        
         cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-            cell.updateView()
+//            cell.updateView()
+            guard let self = self else { return }
+            viewModel?.sendSelectedAlcoholFeed(alcohol)
         }
+        
         return cell
     }
 }

@@ -9,6 +9,10 @@ import UIKit
 import DesignSystem
 
 final class MainLikeHeaderView: UICollectionReusableView {
+    private lazy var separatorView = UIView().then({
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.isHidden = false
+    })
     private lazy var titleLabel = UILabel().then({
         $0.text = "좋아요 많은 조합"
         $0.font = Font.bold(size: 28)
@@ -37,13 +41,19 @@ final class MainLikeHeaderView: UICollectionReusableView {
     }
     
     private func addViews() {
-        addSubviews([titleLabel,
+        addSubviews([separatorView,
+                     titleLabel,
                      subTitleLabel])
     }
     
     private func makeConstraints() {
-        titleLabel.snp.makeConstraints {
+        separatorView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 16))
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 0))
+        }
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(separatorView.snp.bottom)
             $0.leading.equalToSuperview()
         }
         subTitleLabel.snp.makeConstraints {
@@ -52,7 +62,16 @@ final class MainLikeHeaderView: UICollectionReusableView {
         }
     }
     
-    func updateView(title: String, subTitle: String) {
+    func updateView(title: String, subTitle: String, separator: Bool = false) {
+        if separator {
+            separatorView.snp.updateConstraints {
+                $0.height.equalTo(moderateScale(number: 12))
+            }
+        } else {
+            separatorView.snp.updateConstraints {
+                $0.height.equalTo(moderateScale(number: 0))
+            }
+        }
         titleLabel.text = title
         subTitleLabel.text = subTitle
     }
