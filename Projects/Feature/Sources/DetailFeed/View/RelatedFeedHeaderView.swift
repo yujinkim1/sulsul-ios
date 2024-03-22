@@ -11,11 +11,11 @@ import DesignSystem
 final class RelatedFeedHeaderView: UICollectionReusableView {
     static let reuseIdentifier: String = "RelatedFeedHeaderView"
     
-    private lazy var parentImageView = UIImageView().then {
+    private lazy var imageView = UIImageView().then {
         $0.image = UIImage(named: "feeds")
     }
     
-    private lazy var parentTitleLabel = UILabel().then {
+    private lazy var titleLabel = UILabel().then {
         $0.setLineHeight(28)
         $0.font = Font.bold(size: 18)
         $0.text = "연관 피드"
@@ -24,6 +24,8 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        self.backgroundColor = .clear
         
         addViews()
         makeConstraints()
@@ -34,23 +36,22 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Custom Method
-    
     private func addViews() {
-        addSubviews([
-            parentImageView,
-            parentTitleLabel
+        self.addSubviews([
+            imageView,
+            titleLabel
         ])
     }
     
     private func makeConstraints() {
-        parentImageView.snp.makeConstraints {
+        imageView.snp.makeConstraints {
             $0.leading.equalToSuperview()
-            $0.top.equalToSuperview().offset(moderateScale(number: 24))
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(moderateScale(number: 24))
         }
-        parentTitleLabel.snp.makeConstraints {
-            $0.leading.equalTo(parentImageView.snp.trailing).offset(moderateScale(number: 8))
-            $0.top.equalTo(parentImageView)
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalTo(imageView.snp.trailing).offset(moderateScale(number: 8))
+            $0.centerY.equalTo(imageView)
         }
     }
 }
