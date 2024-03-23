@@ -10,6 +10,11 @@ import Combine
 import Service
 import Alamofire
 
+enum PairingType: String {
+    case drink = "술"
+    case snack = "안주"
+}
+
 final class SelectDrinkViewModel {
     
     private let userId = UserDefaultsUtil.shared.getInstallationId()
@@ -35,7 +40,7 @@ final class SelectDrinkViewModel {
     func bind() {
         getUserInfo()
         
-        sendPairingsValue()
+        sendPairingsValue(PairingType.drink)
         
         setUserDrinkPreference
             .sink { [weak self] _ in
@@ -63,8 +68,8 @@ final class SelectDrinkViewModel {
             }.store(in: &cancelBag)
     }
     // 술 목록 가져오기
-    func sendPairingsValue() {
-        if let encodedURL = "/pairings?type=술".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+    func sendPairingsValue(_ pairingType: PairingType) {
+        if let encodedURL = "/pairings?type=\(pairingType)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { result in
                 switch result {
                 case .success(let responseData):
