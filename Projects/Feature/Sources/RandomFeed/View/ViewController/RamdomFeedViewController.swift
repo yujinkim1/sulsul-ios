@@ -51,7 +51,10 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
         super.viewDidLoad()
         
         bind()
-        
+        setTabEvents()
+    }
+    
+    private func setTabEvents() {
         seeMyPostLabel.onTapped { [weak self] in
             self?.coordinator?.moveTo(appFlow: AppFlow.tabBar(.more(.main)), userData: nil)
         }
@@ -121,7 +124,6 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         }
         
         cell.spamView.onTapped { [weak self] in
-            // TODO: 신고 이동
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: nil)
         }
         
