@@ -14,11 +14,21 @@ import KakaoSDKUser
 import Service
 import Combine
 
+enum UserSettingType {
+    case initSettingUser
+    case nickNameSettingUser
+    case drinkSettingUser
+    case allSettingUSer
+}
+
 final class AuthViewModel: NSObject {
     
     private lazy var jsonDecoder = JSONDecoder()
+    private let userMapper = UserMapper()
+//    private var userSettingType: UserSettingType = .initSettingUser
     
     private let errorSubject = CurrentValueSubject<String, Never>("")
+    private let userSettingType = PassthroughSubject<UserSettingType, Never>()
     
     override public init() {
         super.init()
@@ -36,8 +46,42 @@ final class AuthViewModel: NSObject {
         signin(type: .google, id: id, item: item)
     }
     
+    func getUserInfo(userId: Int) {
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                    let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
+                    
+                    print(">>>>>12")
+                    print(mappedUserInfo)
+                    if mappedUserInfo.nickname.isEmpty {
+                        userSettingType.send(.initSettingUser)
+                    } else if mappedUserInfo.preference.alcohols == [0] {
+                        userSettingType.send(.nickNameSettingUser)
+                    } else if mappedUserInfo.preference.foods == [0] {
+                        userSettingType.send(.drinkSettingUser)
+                    } else {
+                        userSettingType.send(.allSettingUSer)
+                    }
+                    print(">>>>설정 상태 >>>>>")
+                    print(userSettingType)
+                } else {
+                    print("디코딩 에러")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     func getErrorSubject() -> AnyPublisher<String, Never> {
         return errorSubject.eraseToAnyPublisher()
+    }
+    
+    func userSettingTypePublisher() -> AnyPublisher<UserSettingType, Never> {
+        return userSettingType.eraseToAnyPublisher()
     }
 }
 
@@ -125,9 +169,12 @@ extension AuthViewModel {
                                 let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
+                                print(">>>>카카오 아이디")
+                                print(id)
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                                StaticValues.isLoggedIn.send(true)
+                                self.getUserInfo(userId: id)
+//                                StaticValues.isLoggedIn.send(true)
                             } else {
                                 print("디코딩 모델 에러2")
                             }
@@ -155,7 +202,10 @@ extension AuthViewModel {
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                                StaticValues.isLoggedIn.send(true)
+                                print(">>>>카카오 아이디")
+                                print(id)
+//                                StaticValues.isLoggedIn.send(true)
+                                self.getUserInfo(userId: id)
                             } else {
                                 print("디코딩 모델 에러3")
                             }

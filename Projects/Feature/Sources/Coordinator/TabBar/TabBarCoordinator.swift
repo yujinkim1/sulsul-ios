@@ -171,11 +171,7 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
         }
         
         switch tabType {
-//<<<<<<< HEAD
         case .home, .ranking, .transferHistory, .more:
-//=======
-//        case .home, .benefit, .transferHistory, .more:
-//>>>>>>> feature/1.0.0
             return true
 
         case .transfer:

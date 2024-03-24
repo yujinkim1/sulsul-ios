@@ -140,6 +140,7 @@ public final class ProfileSettingViewController: BaseViewController {
                                 submitCompletion: {
                 KeychainStore.shared.delete(label: "accessToken")
                 UserDefaultsUtil.shared.remove(.userId)
+                StaticValues.isLoggedIn.send(false)
             },
                                 cancelCompletion: nil)
         }

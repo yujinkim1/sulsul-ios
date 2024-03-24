@@ -10,7 +10,7 @@ import Combine
 import Alamofire
 import Service
 
-struct MainPageViewModel {
+final class MainPageViewModel {
     private var cancelBag = Set<AnyCancellable>()
     private let jsonDecoder = JSONDecoder()
     private let mainPageMapper = MainPageMapper()
@@ -22,10 +22,19 @@ struct MainPageViewModel {
     private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     
+    private let completeAllFeed = PassthroughSubject<Void, Never>()
+    
     init() {
-        getPopularFeeds()
-        getDifferenceFeeds()
-        getFeedsByAlcohol() // TODO: - 비로그인시에만 call
+        bind()
+    }
+    
+    private func bind() {
+        popularFeeds
+            .combineLatest(differenceFeeds, alcoholFeeds)
+            .sink { [weak self] _, _, _ in
+                guard let self = self else { return }
+                completeAllFeed.send(())
+            }.store(in: &cancelBag)
     }
     
     func getFeedsByAlcohol() {
@@ -41,9 +50,9 @@ struct MainPageViewModel {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
-                    alcoholFeeds.send(mappedAlcoholFeedList.feeds)
-                    kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
-                    sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
+                    self.alcoholFeeds.send(mappedAlcoholFeedList.feeds)
+                    self.kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
+                    self.sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
                 } else {
                     print("디코딩 에러")
                 }
@@ -67,9 +76,7 @@ struct MainPageViewModel {
             case .success(let response):
                 if let popularFeedList = try? self.jsonDecoder.decode([RemotePopularFeedsItem].self, from: response) {
                     let mappedPopularFeeds = self.mainPageMapper.popularFeeds(from: popularFeedList)
-                    popularFeeds.send(mappedPopularFeeds)
-                    print(">>>>>1")
-                    print(mappedPopularFeeds)
+                    self.popularFeeds.send(mappedPopularFeeds)
                 } else {
                     print("디코딩 에러")
                 }
@@ -93,10 +100,8 @@ struct MainPageViewModel {
             case .success(let response):
                 if let differenceFeedList = try? self.jsonDecoder.decode([RemotePopularFeedsItem].self, from: response) {
                     let mappedDifferenceFeeds = self.mainPageMapper.popularFeeds(from: differenceFeedList)
-                    differenceFeeds.send(mappedDifferenceFeeds)
-                    
-                    print(">>>>>>2")
-                    print(mappedDifferenceFeeds)
+                    self.differenceFeeds.send(mappedDifferenceFeeds)
+
                 } else {
                     print("디코딩 에러")
                 }
@@ -151,5 +156,9 @@ struct MainPageViewModel {
     
     func getKindOfAlcoholValue() -> [String] {
         return kindOfAlcohol.value
+    }
+    
+    func completeAllFeedPublisher() -> AnyPublisher<Void, Never> {
+        return completeAllFeed.eraseToAnyPublisher()
     }
 }

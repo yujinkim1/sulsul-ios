@@ -15,7 +15,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     var coordinator: HomeBaseCoordinator?
     
-    private let temp = 0 // 0이면 취향 등록 안한 사람, 그외는 한사람
     private let nopreferenceTemp = 1 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel: MainPageViewModel = MainPageViewModel() // 수정
@@ -107,11 +106,31 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     }
     
     private func bind() {
+        StaticValues.isLoggedInPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                viewModel.getPopularFeeds()
+                viewModel.getDifferenceFeeds()
+                viewModel.getFeedsByAlcohol()
+                mainCollectionView.reloadData()
+            }.store(in: &cancelBag)
+        
         viewModel.selectedAlcoholFeedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.mainCollectionView.reloadData()
             }.store(in: &cancelBag)
+        
+        viewModel.completeAllFeedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.mainCollectionView.reloadData()
+            }.store(in: &cancelBag)
+        
+        viewModel.getPopularFeeds()
+        viewModel.getDifferenceFeeds()
+        viewModel.getFeedsByAlcohol() // TODO: - 비로그인시에만 call
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
@@ -128,10 +147,11 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 let section = NSCollectionLayoutSection(group: group)
                     
                 var headerSize: NSCollectionLayoutSize
-                if self?.temp == 0 {
-                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118)))
+
+                if StaticValues.isLoggedIn.value {
+                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 80)))
                 } else {
-                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118-42)))
+                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118)))
                 }
                 
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
@@ -242,7 +262,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            preferenceHeaderView.updateUI(temp) // MARK: - 비로그인, 로그인 때 업뎃
+            preferenceHeaderView.updateUI() // MARK: - 비로그인, 로그인 때 업뎃
             if preferenceHeaderView.viewModel == nil {
                 preferenceHeaderView.viewModel = self.viewModel
             }

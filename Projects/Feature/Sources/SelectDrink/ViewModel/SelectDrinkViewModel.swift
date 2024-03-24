@@ -38,6 +38,8 @@ final class SelectDrinkViewModel {
     }
     
     func bind() {
+        print(">.>>>>>>>>술 쪽 아이디")
+        print(userId)
         getUserInfo()
         
         sendPairingsValue(PairingType.drink)
@@ -57,6 +59,8 @@ final class SelectDrinkViewModel {
                     switch result {
                     case .success(let response):
                         if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                            print(">>>>>1")
+                            print(userData)
                             self?.completeDrinkPreference.send(())
                         } else {
                             print("Decoding failed.")

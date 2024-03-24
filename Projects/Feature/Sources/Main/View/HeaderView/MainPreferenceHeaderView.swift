@@ -80,11 +80,11 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
          }
     }
     
-    func updateUI(_ temp: Int) {
-        if temp == 0 {
-            preferecneCollectionView.isHidden = false
-        } else {
+    func updateUI() {
+        if StaticValues.isLoggedIn.value {
             preferecneCollectionView.isHidden = true
+        } else {
+            preferecneCollectionView.isHidden = false
         }
     }
 }
