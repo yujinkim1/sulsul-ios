@@ -90,6 +90,8 @@ public final class SearchViewController: BaseHeaderViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.tabBarController?.setTabBarHidden(true)
     }
     
     private func bind() {
