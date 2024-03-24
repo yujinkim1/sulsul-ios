@@ -43,9 +43,9 @@ public final class SplashViewController: BaseViewController {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 if KeychainStore.shared.read(label: "accessToken") != nil {
-                    print("로그인되어 있음")
+                    StaticValues.isLoggedIn.send(true)
                 } else {
-                    print("로그인 안되어있음")
+                    StaticValues.isLoggedIn.send(false)
                 }
                 coordinator?.moveTo(appFlow: AppFlow.tabBar(.home(.main)), userData: nil)
             }.store(in: &cancelBag)

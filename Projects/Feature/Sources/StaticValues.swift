@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import Combine
 
 struct StaticValues {
+    static var isLoggedIn = CurrentValueSubject<Bool, Never>(false)
     static var drinkPairings: [SnackModel] = []
     static var snackPairings: [SnackModel] = []
     
@@ -17,5 +19,9 @@ struct StaticValues {
     
     static func getSnackPairingById(_ id: Int) -> SnackModel? {
         return snackPairings.first { $0.id == id }
+    }
+    
+    static func isLoggedInPublisher() -> AnyPublisher<Bool, Never> {
+        return isLoggedIn.eraseToAnyPublisher()
     }
 }

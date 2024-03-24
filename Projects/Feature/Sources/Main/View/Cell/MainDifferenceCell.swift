@@ -158,13 +158,6 @@ final class MainDifferenceCell: UICollectionViewCell {
     }
     
     func bind(_ feed: PopularFeed) {
-//        for index in 0..<feed.feeds.count {
-//            if let url = URL(string: feed.feeds[index].representImage ?? "") {
-//                
-//            } else {
-//                print("사진 없어")
-//            }
-//        }
         for feed in feed.feeds {
             contentLabel.text = feed.title
             detailContentLabel.text = feed.content
@@ -174,6 +167,8 @@ final class MainDifferenceCell: UICollectionViewCell {
             } else {
                 print("사진 읎어")
             }
+            drinkLabel.text = StaticValues.getDrinkPairingById(feed.pairingIds.first ?? 0)?.name
+            foodLabel.text = StaticValues.getSnackPairingById(feed.pairingIds.last ?? 0)?.name
         }
     }
 }

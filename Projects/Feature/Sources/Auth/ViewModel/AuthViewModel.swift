@@ -17,7 +17,6 @@ import Combine
 final class AuthViewModel: NSObject {
     
     private lazy var jsonDecoder = JSONDecoder()
-    private lazy var loginSuccess = PassthroughSubject<Bool, Never>()
     
     private let errorSubject = CurrentValueSubject<String, Never>("")
     
@@ -35,10 +34,6 @@ final class AuthViewModel: NSObject {
 
     public func continueWithGoogle(id: String, item: String) {
         signin(type: .google, id: id, item: item)
-    }
-    
-    func loginSuccessPublisher() -> AnyPublisher<Bool, Never> {
-        return loginSuccess.eraseToAnyPublisher()
     }
     
     func getErrorSubject() -> AnyPublisher<String, Never> {
@@ -132,7 +127,7 @@ extension AuthViewModel {
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                                self.loginSuccess.send(true)
+                                StaticValues.isLoggedIn.send(true)
                             } else {
                                 print("디코딩 모델 에러2")
                             }
@@ -142,30 +137,31 @@ extension AuthViewModel {
                     }
                 }
             }
-        }
-        UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-            guard error == nil else { return }
-            
-            if let accessToken = oauthToken?.accessToken {
-                let url = SignInType.kakao.endpoint()
-                let parameters: Parameters = ["access_token": accessToken]
-                NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
-                    switch result {
-                    case .success(let responseData):
-                        if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
-                            let accessToken = data.accessToken
-                            let tokenType = data.tokenType
-                            let expiresIn = data.expiresIn
-                            let id = data.userID
-                            
-                            UserDefaultsUtil.shared.setUserId(id)
-                            KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                            self.loginSuccess.send(true)
-                        } else {
-                            print("디코딩 모델 에러3")
+        } else {
+            UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
+                guard error == nil else { return }
+                
+                if let accessToken = oauthToken?.accessToken {
+                    let url = SignInType.kakao.endpoint()
+                    let parameters: Parameters = ["access_token": accessToken]
+                    NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
+                        switch result {
+                        case .success(let responseData):
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                                let accessToken = data.accessToken
+                                let tokenType = data.tokenType
+                                let expiresIn = data.expiresIn
+                                let id = data.userID
+                                
+                                UserDefaultsUtil.shared.setUserId(id)
+                                KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                                StaticValues.isLoggedIn.send(true)
+                            } else {
+                                print("디코딩 모델 에러3")
+                            }
+                        case .failure(let error):
+                            print(error)
                         }
-                    case .failure(let error):
-                        print(error)
                     }
                 }
             }

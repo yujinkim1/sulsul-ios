@@ -27,6 +27,7 @@ final class SplashViewModel {
             .combineLatest(snackPairings)
             .sink { [weak self] _, _ in
                 guard let self = self else { return }
+                
                 splashIsCompleted.send(())
             }.store(in: &cancelBag)
         
@@ -35,18 +36,18 @@ final class SplashViewModel {
     }
     
     private func sendPairingsValue(_ pairingType: PairingType) {
-        if let encodedURL = "/pairings?type=\(pairingType)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+        if let encodedURL = "/pairings?type=\(pairingType.rawValue)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { result in
                 switch result {
                 case .success(let responseData):
-                    print(">>>>>>")
-                    print(pairingType)
                     if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
                         let mappedData = self.mapper.snackModel(from: pairingsData.pairings ?? [])
                         if pairingType == .drink {
                             StaticValues.drinkPairings = mappedData
+                            self.drinkPairings.send(())
                         } else {
                             StaticValues.snackPairings = mappedData
+                            self.snackPairings.send(())
                         }
                     } else {
                         print("디코딩 모델 에러8")

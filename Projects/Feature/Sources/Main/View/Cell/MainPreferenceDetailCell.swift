@@ -121,5 +121,6 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
         feedImageView.kf.setImage(with: model.representImage)
         nickNameLabel.text = model.writerNickname
         contentLabel.text = model.title
+        foodLabel.text = model.foods.first
     }
 }

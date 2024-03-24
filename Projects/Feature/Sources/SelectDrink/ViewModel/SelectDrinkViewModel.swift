@@ -69,7 +69,7 @@ final class SelectDrinkViewModel {
     }
     // 술 목록 가져오기
     func sendPairingsValue(_ pairingType: PairingType) {
-        if let encodedURL = "/pairings?type=\(pairingType)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+        if let encodedURL = "/pairings?type=\(pairingType.rawValue)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { result in
                 switch result {
                 case .success(let responseData):
