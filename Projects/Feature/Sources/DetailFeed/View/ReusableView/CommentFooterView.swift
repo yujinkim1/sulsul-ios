@@ -11,7 +11,7 @@ import DesignSystem
 final class CommentFooterView: UICollectionReusableView {
     static let reuseIdentifier: String = "CommentFooterView"
     
-    private lazy var touchableLabel = TouchableLabel().then {
+    lazy var touchableLabel = TouchableLabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
         $0.text = "댓글 더보기"
@@ -39,12 +39,6 @@ final class CommentFooterView: UICollectionReusableView {
     private func makeConstraints() {
         touchableLabel.snp.makeConstraints {
             $0.centerX.centerY.equalToSuperview()
-        }
-    }
-    
-    override func setNeedsLayout() {
-        touchableLabel.setOpaqueTapGestureRecognizer {
-            debugPrint("touchableLabel is tapped.")
         }
     }
 }
