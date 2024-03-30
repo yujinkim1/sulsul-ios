@@ -136,6 +136,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
+    private lazy var editViewController = RecognizedEditViewController().then {
+        $0.view.isHidden = true
+    }
+    
     open override func viewWillAppear(_ animated: Bool) {
         if let thumnailImage = images.first {
             viewModel.uploadImage(thumnailImage)
@@ -189,8 +193,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                                         submitText: "정보를 직접 입력할게요",
                                         isSubmitColorYellow: true,
                                         submitCompletion: {
-//                        self?.infoEditView.bind(recognized)
-//                        self?.infoEditView.isHidden = false
+
+                        self?.editViewController.bind(recognized)
+                        self?.editViewController.view.isHidden = false
                         
                     }, cancelCompletion: {
                         if let galleryVC = self?.coordinator?.currentNavigationViewController?.viewControllers[1] {
@@ -290,8 +295,8 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             lineView,
             contentStackView,
             placeholderLabel,
-            iconContainerView
-//            infoEditView
+            iconContainerView,
+            editViewController.view
         ])
         
         drinkSnackStackView.addArrangedSubviews([
@@ -328,9 +333,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     open override func makeConstraints() {
         super.makeConstraints()
         
-//        infoEditView.snp.makeConstraints {
-//            $0.edges.equalToSuperview()
-//        }
+        editViewController.view.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         imageScrollView.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom)
