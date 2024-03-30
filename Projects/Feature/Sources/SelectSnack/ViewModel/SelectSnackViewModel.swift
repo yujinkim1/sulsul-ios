@@ -67,7 +67,7 @@ final class SelectSnackViewModel {
                 }
             }.store(in: &cancelBag)
     }
-    취향등록 정보에 안들어가는 이슈 수정 중
+    
     private func getUserInfo() {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
             switch result {

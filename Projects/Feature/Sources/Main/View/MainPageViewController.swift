@@ -14,7 +14,6 @@ import Kingfisher
 public final class MainPageViewController: BaseViewController, HomeBaseCoordinated {
     
     var coordinator: HomeBaseCoordinator?
-    
     private let nopreferenceTemp = 1 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel: MainPageViewModel = MainPageViewModel() // 수정
@@ -110,10 +109,25 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                viewModel.getPopularFeeds()
-                viewModel.getDifferenceFeeds()
-                viewModel.getFeedsByAlcohol()
-                mainCollectionView.reloadData()
+                viewModel.getUserInfo()
+            }.store(in: &cancelBag)
+//        여기 하고 잇읍니다
+        
+        viewModel.userInfoPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
+                    viewModel.getPopularFeeds()
+                    viewModel.getDifferenceFeeds()
+                    viewModel.getFeedsByAlcohol()
+                } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
+                    // MARK: - 밴된 유저
+                } else { // MARK: - 로그인한 유저
+                    viewModel.getPreferenceFeeds()
+                    viewModel.getPopularFeeds()
+                    viewModel.getDifferenceFeeds()
+                }
             }.store(in: &cancelBag)
         
         viewModel.selectedAlcoholFeedPublisher()
@@ -128,9 +142,10 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 self?.mainCollectionView.reloadData()
             }.store(in: &cancelBag)
         
-        viewModel.getPopularFeeds()
-        viewModel.getDifferenceFeeds()
-        viewModel.getFeedsByAlcohol() // TODO: - 비로그인시에만 call
+        viewModel.getUserInfo()
+//        viewModel.getPopularFeeds()
+//        viewModel.getDifferenceFeeds()
+//        viewModel.getFeedsByAlcohol() // TODO: - 비로그인시에만 call
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {

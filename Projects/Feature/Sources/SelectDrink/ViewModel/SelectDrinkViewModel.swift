@@ -34,12 +34,12 @@ final class SelectDrinkViewModel {
     private var completeDrinkPreference = PassthroughSubject<Void, Never>()
     
     init() {
+        print(">.>>>>>>>>술 쪽 아이디")
+        print(userId)
         bind()
     }
     
     func bind() {
-        print(">.>>>>>>>>술 쪽 아이디")
-        print(userId)
         getUserInfo()
         
         sendPairingsValue(PairingType.drink)
@@ -54,13 +54,14 @@ final class SelectDrinkViewModel {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + accessToken!
                 ]
-                
+                print(">>>> 술 등록 토큰 값: \(accessToken)")
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
                     case .success(let response):
                         if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
-                            print(">>>>>1")
+                            print("셋팅 성공")
                             print(userData)
+                            self?.getUserInfo()
                             self?.completeDrinkPreference.send(())
                         } else {
                             print("Decoding failed.")
@@ -90,13 +91,14 @@ final class SelectDrinkViewModel {
             }
         }
     }
-    
+//    NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak
     private func getUserInfo() {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak self] result in
             switch result {
             case .success(let response):
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self?.userMapper.userInfoModel(from: userData)
+                    print(">>>술 설정하고 내 정보 : \(mappedUserInfo)")
                     self?.userInfo = mappedUserInfo
                 } else {
                     print("디코딩 모델 에러 9")

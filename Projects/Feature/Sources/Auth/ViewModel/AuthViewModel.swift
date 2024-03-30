@@ -29,6 +29,7 @@ final class AuthViewModel: NSObject {
     
     private let errorSubject = CurrentValueSubject<String, Never>("")
     private let userSettingType = PassthroughSubject<UserSettingType, Never>()
+    private let loginSuccess = PassthroughSubject<Void, Never>()
     
     override public init() {
         super.init()
@@ -46,16 +47,15 @@ final class AuthViewModel: NSObject {
         signin(type: .google, id: id, item: item)
     }
     
+// TODO: 로그인하고 response 값으로 status에 banned이면 영구정지 사용자임 앱 못들어가게 막아야됨
     func getUserInfo(userId: Int) {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let response):
                 if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
-                    
-                    print(">>>>>12")
-                    print(mappedUserInfo)
+                    print("내정보: \(mappedUserInfo)")
                     if mappedUserInfo.nickname.isEmpty {
                         userSettingType.send(.initSettingUser)
                     } else if mappedUserInfo.preference.alcohols == [0] {
@@ -65,13 +65,11 @@ final class AuthViewModel: NSObject {
                     } else {
                         userSettingType.send(.allSettingUSer)
                     }
-                    print(">>>>설정 상태 >>>>>")
-                    print(userSettingType)
                 } else {
                     print("디코딩 에러")
                 }
             case .failure(let error):
-                print(error)
+                errorSubject.send(error.localizedDescription)
             }
         }
     }
@@ -140,7 +138,12 @@ extension AuthViewModel {
                     let accessToken = data.accessToken
                     let tokenType = data.tokenType
                     let expiresIn = data.expiresIn
+                    let id = data.userID
+                    
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                    print("로그인된 구글 아이디: \(id)")
+                    UserDefaultsUtil.shared.setUserId(id)
+                    self.getUserInfo(userId: id)
                 } else {
                     print("디코딩 모델 에러1")
                 }
@@ -174,7 +177,6 @@ extension AuthViewModel {
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.getUserInfo(userId: id)
-//                                StaticValues.isLoggedIn.send(true)
                             } else {
                                 print("디코딩 모델 에러2")
                             }
@@ -237,8 +239,12 @@ extension AuthViewModel: ASAuthorizationControllerDelegate {
                     let accessToken = data.accessToken
                     let tokenType = data.tokenType
                     let expiresIn = data.expiresIn
+                    let id = data.userID
                     
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
+                    print("로그인된 애플 아이디: \(id)")
+                    UserDefaultsUtil.shared.setUserId(id)
+                    self.getUserInfo(userId: id)
                 }
             case .failure(let error):
                 print(error)

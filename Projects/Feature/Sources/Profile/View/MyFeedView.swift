@@ -73,6 +73,7 @@ class MyFeedView: UIView {
     
     func updateState(_ myFeedState: MyFeedState) {
         self.myFeedState = myFeedState
+        collectionView.reloadData()
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {

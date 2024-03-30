@@ -94,43 +94,35 @@ public final class AuthViewController: BaseViewController {
     private func bind() {
         guard let viewModel = viewModel else { return }
         
-        // TODO: - 이미 사용자 입력을 마친 사용자라면 해당 플로우 건너뛰고 바로 홈으로 이동하도록 수정해야됨
-//        StaticValues.isLoggedInPublisher()
-//            .sink { [weak self] state in
-//                if state {
-//                    // MARK: 취향등록 유저
-//                    self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
-//                    // MARK: 취향 미등록 유저
-//                    self?.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
-//                }
-//            }.store(in: &cancelBag)
-        
         viewModel.userSettingTypePublisher()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
                 switch state {
                 case .initSettingUser:
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
                 case .nickNameSettingUser:
+                    StaticValues.isLoggedIn.send(true)
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectDrink)), userData: nil)
                 case .drinkSettingUser:
+                    StaticValues.isLoggedIn.send(true)
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
                 case .allSettingUSer:
-                    coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
+                    StaticValues.isLoggedIn.send(true)
+                    self.navigationController?.popViewController(animated: true)
                 }
-                StaticValues.isLoggedIn.send(true)
             }.store(in: &cancelBag)
+        
         
         viewModel.getErrorSubject()
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-//                self?.showAlertView(withType: .oneButton,
-//                                    title: error,
-//                                    description: error,
-//                                    submitCompletion: nil,
-//                                    cancelCompletion: nil)
-                print(error)
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
             }.store(in: &cancelBag)
     }
 

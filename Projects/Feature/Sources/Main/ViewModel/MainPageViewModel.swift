@@ -13,6 +13,7 @@ import Service
 final class MainPageViewModel {
     private var cancelBag = Set<AnyCancellable>()
     private let jsonDecoder = JSONDecoder()
+    private let userMapper = UserMapper()
     private let mainPageMapper = MainPageMapper()
     private let popularFeeds = CurrentValueSubject<[PopularFeed], Never> ([])
     private let differenceFeeds = CurrentValueSubject<[PopularFeed], Never> ([])
@@ -20,7 +21,16 @@ final class MainPageViewModel {
     // MARK: - (비로그인) 술 종류
     private let kindOfAlcohol = CurrentValueSubject<[String], Never> ([])
     private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
+    private let preferenceFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
+    private let selectedAlcohol = CurrentValueSubject<String, Never>("")
+    
+    private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
+                                                                           uid: "",
+                                                                           nickname: "",
+                                                                           image: "",
+                                                                           preference: .init(alcohols: [0], foods: [0]),
+                                                                           status: ""))
     
     private let completeAllFeed = PassthroughSubject<Void, Never>()
     
@@ -38,14 +48,14 @@ final class MainPageViewModel {
     }
     
     func getFeedsByAlcohol() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+//        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+//        
+//        var headers: HTTPHeaders = [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer " + accessToken,
+//        ]
         
-        var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken,
-        ]
-        
-        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-alcohols", header: headers) { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-alcohols") { result in
             switch result {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
@@ -53,6 +63,7 @@ final class MainPageViewModel {
                     self.alcoholFeeds.send(mappedAlcoholFeedList.feeds)
                     self.kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
                     self.sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
+                    self.selectedAlcohol.send(mappedAlcoholFeedList.subtypes.first ?? "")
                 } else {
                     print("디코딩 에러")
                 }
@@ -111,9 +122,59 @@ final class MainPageViewModel {
         }
     }
     
-//    func getFeedsByAlcoholName(_ name: String) -> {
-//        
-//    }
+    func getPreferenceFeeds() {
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
+        ]
+        
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-preferences", header: headers) { result in
+            switch result {
+            case .success(let response):
+                if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
+                    let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
+                    print("성공 \(mappedAlcoholFeedList)")
+                    self.selectedAlcoholFeeds.send(mappedAlcoholFeedList.feeds)
+                } else {
+                    print("디코딩 에러")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    func getUserInfo() {
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else {
+            userInfo.send(UserInfoModel(id: 0,
+                                        uid: "",
+                                        nickname: "",
+                                        image: "",
+                                        preference: .init(alcohols: [0],
+                                                          foods: [0]),
+                                        status: UserInfoStatus.notLogin.rawValue))
+            return
+        }
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
+        ]
+        
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())", header: headers) { result in
+            switch result {
+            case .success(let response):
+                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                    let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
+                    self.userInfo.send(mappedUserInfo)
+                } else {
+                    print("디코딩 모델 에러5")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
     func popularFeedsPublisher() -> AnyPublisher<[PopularFeed] , Never> {
         return popularFeeds.eraseToAnyPublisher()
@@ -131,6 +192,13 @@ final class MainPageViewModel {
         return differenceFeeds.value
     }
     
+    func userInfoPublisher() -> AnyPublisher<UserInfoModel, Never> {
+        return userInfo.eraseToAnyPublisher()
+    }
+    
+    func getUserInfoValue() -> UserInfoModel {
+        return userInfo.value
+    }
 //    func alcoholFeedsPublisher() -> AnyPublisher<[AlcoholFeed.Feed], Never> {
 //        return alcoholFeeds.eraseToAnyPublisher()
 //    }
@@ -146,8 +214,12 @@ final class MainPageViewModel {
     func sendSelectedAlcoholFeed(_ alcohol: String) {
         let allAlcoholFeeds = alcoholFeeds.value
         let selectedFeeds = allAlcoholFeeds.filter { $0.subtype == alcohol }
-        
+        selectedAlcohol.send(alcohol)
         selectedAlcoholFeeds.send(selectedFeeds)
+    }
+    
+    func getSelectedAlcoholValue() -> String {
+        return selectedAlcohol.value
     }
     
     func getSelectedAlcoholFeedsValue() -> [AlcoholFeed.Feed] {

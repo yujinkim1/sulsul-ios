@@ -10,6 +10,12 @@ import Combine
 import Service
 import Alamofire
 
+enum UserInfoStatus: String {
+    case notLogin = "notLogin"
+    case banned = "banned"
+    case active = "active"
+}
+
 struct ProfileMainViewModel {
 
     private let userId = UserDefaultsUtil.shared.getInstallationId()
@@ -33,7 +39,16 @@ struct ProfileMainViewModel {
     }
     
     func getUserInfo() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else {
+            userInfo.send(UserInfoModel(id: 0,
+                                        uid: "",
+                                        nickname: "",
+                                        image: "",
+                                        preference: .init(alcohols: [0],
+                                                          foods: [0]),
+                                        status: UserInfoStatus.notLogin.rawValue))
+            return
+        }
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken

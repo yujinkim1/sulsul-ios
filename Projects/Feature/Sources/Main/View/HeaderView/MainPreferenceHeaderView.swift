@@ -83,9 +83,14 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
     func updateUI() {
         if StaticValues.isLoggedIn.value {
             preferecneCollectionView.isHidden = true
+            guard let nickname = viewModel?.getUserInfoValue().nickname else { return }
+            titleLabel.text = nickname + "님이 선택한\n취향으로 골라봤어요."
         } else {
             preferecneCollectionView.isHidden = false
+            guard let title = viewModel?.getSelectedAlcoholValue() else { return }
+            titleLabel.text = title + "랑 어울리는\n안주로 골라봤어요!"
         }
+        preferecneCollectionView.reloadData()
     }
 }
 
