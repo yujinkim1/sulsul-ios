@@ -10,7 +10,9 @@ import Combine
 import DesignSystem
 import Service
 
-public final class SearchViewController: BaseHeaderViewController {
+public final class SearchViewController: BaseHeaderViewController, CommonBaseCoordinated {
+    var coordinator: CommonBaseCoordinator?
+    
     private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = SearchViewModel()
     
@@ -313,7 +315,10 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         cell.bind(viewModel.feedSearchResults[indexPath.row])
         
         cell.onTapped { [weak self] in
-            // TODO: 피드 상세로 이동 처리
+            if let feedId = self?.viewModel.feedSearchResults[indexPath.row].feed_id {
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.feedDetail),
+                                          userData: ["feedId": feedId])
+            }
         }
                 
         return cell
