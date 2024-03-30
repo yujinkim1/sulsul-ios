@@ -137,9 +137,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
-    private lazy var editViewController = RecognizedEditViewController().then {
-        $0.view.isHidden = true
-    }
+    private lazy var editViewController = RecognizedEditViewController()
     
     open override func viewWillAppear(_ animated: Bool) {
         if let thumnailImage = images.first {
@@ -184,6 +182,8 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         
         viewModel.completeRecognizeAI
             .sink { [weak self] recognized in
+                guard let selfRef = self else { return }
+                
                 if let firstSnack = recognized.foods.first,
                    let firstDrink = recognized.alcohols.first {
                     self?.recognizedContentLabel.isHidden = true
@@ -206,8 +206,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                                         isSubmitColorYellow: true,
                                         submitCompletion: {
 
+                        self?.navigationController?.pushViewController(selfRef.editViewController,
+                                                                       animated: true)
                         self?.editViewController.bind(recognized)
-                        self?.editViewController.view.isHidden = false
                         
                     }, cancelCompletion: {
                         if let galleryVC = self?.coordinator?.currentNavigationViewController?.viewControllers[1] {
@@ -269,7 +270,8 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             guard let selfRef = self else { return }
             
             if selfRef.recognizedContentLabel.text != "AI가 열심히 찾고있어요!" {
-                // self?.infoEditView.isHidden = false
+                self?.navigationController?.pushViewController(selfRef.editViewController,
+                                                               animated: true)
             }
         }
     }
@@ -307,8 +309,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             lineView,
             contentStackView,
             placeholderLabel,
-            iconContainerView,
-            editViewController.view
+            iconContainerView
         ])
         
         drinkSnackStackView.addArrangedSubviews([
@@ -344,10 +345,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     open override func makeConstraints() {
         super.makeConstraints()
-        
-        editViewController.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
         
         imageScrollView.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom)

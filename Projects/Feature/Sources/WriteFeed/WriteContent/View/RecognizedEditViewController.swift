@@ -16,7 +16,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     }
     
     private lazy var drinkLabel = UILabel().then {
-        $0.text = "인식된 술, 안주 정보를 수정할 수 있어요."
+        $0.text = "술"
         $0.font = Font.medium(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
     }
@@ -29,7 +29,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     private lazy var placeholderLabel = UILabel().then {
         $0.text = "술 종류를 선택해주세요"
         $0.font = Font.semiBold(size: 16)
-        $0.backgroundColor = DesignSystemAsset.gray400.color
+        $0.textColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var drinkArrowImageView = UIImageView().then {
@@ -37,7 +37,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     }
     
     private lazy var snackLabel = UILabel().then {
-        $0.text = "인식된 술, 안주 정보를 수정할 수 있어요."
+        $0.text = "안주"
         $0.font = Font.medium(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
     }
@@ -55,13 +55,17 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     private lazy var snackPlaceholderLabel = UILabel().then {
         $0.text = "안주이름을 검색해보세요"
         $0.font = Font.semiBold(size: 16)
-        $0.backgroundColor = DesignSystemAsset.gray400.color
+        $0.textColor = DesignSystemAsset.gray400.color
     }
     
     private lazy var saveButton = UILabel().then {
         $0.text = "변경 내용 저장"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray300.color
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.textAlignment = .center
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.clipsToBounds = true
     }
     
     override func viewDidLoad() {
@@ -109,7 +113,8 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         
         drinkArrowImageView.snp.makeConstraints {
             $0.size.equalTo(moderateScale(number: 32))
-            $0.trailing.centerY.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 12))
         }
         
         snackLabel.snp.makeConstraints {
@@ -121,6 +126,18 @@ final class RecognizedEditViewController: BaseHeaderViewController {
             $0.size.equalTo(drinkBackView)
             $0.centerX.equalToSuperview()
             $0.top.equalTo(snackLabel.snp.bottom).offset(moderateScale(number: 8))
+        }
+        
+        searchImageView.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 24))
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 12))
+        }
+        
+        snackPlaceholderLabel.snp.makeConstraints {
+            $0.leading.equalTo(searchImageView.snp.trailing).offset(moderateScale(number: 8))
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 12))
+            $0.centerY.equalToSuperview()
         }
         
         saveButton.snp.makeConstraints {
