@@ -46,7 +46,17 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToSearch()
         case .comment:
             moveToComment()
+        case .feedDetail:
+            moveToFeedDetail(userData)
         }
+    }
+    
+    private func moveToFeedDetail(_ userData: [String: Any]?) {
+        guard let feedId = userData?["feedId"] as? Int else { return }
+        
+        let viewModel = DetailFeedViewModel(feedID: feedId)
+        let viewController = DetailFeedViewController(viewModel: viewModel)
+        currentNavigationViewController?.pushViewController(viewController, animated: true)
     }
     
     private func moveToComment() {

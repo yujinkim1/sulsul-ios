@@ -42,7 +42,9 @@ final class RankingCoordinator: NSObject, RankingBaseCoordinator {
             rootNavigationController?.popToRootViewController(animated: true)
         case .search: return
         case .alarm:
-            let viewModel = DetailFeedViewModel(feedID: 1)
+            guard let feedId = userData?["feedId"] as? Int else { return }
+            
+            let viewModel = DetailFeedViewModel(feedID: feedId)
             let viewController = DetailFeedViewController(viewModel: viewModel)
             currentNavigationViewController?.pushViewController(viewController, animated: true)
         case .detailDrink: return
