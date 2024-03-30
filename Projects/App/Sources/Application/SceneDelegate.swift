@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         currentScene = scene
         mainCoordinator = MainCoordinator()
         setRootViewController(mainCoordinator!.start())
-//        let vc = WriteContentViewController()
+//        let vc = CommentViewController()
 //        setRootViewController(vc)
     }
     

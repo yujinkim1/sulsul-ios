@@ -34,6 +34,14 @@ open class BaseViewController: UIViewController {
                                                name: UIResponder.keyboardDidHideNotification,
                                                object: nil)
         
+        // MARK: 하단 탭 바 색상이 간헐적으로 흰색으로 변경되는 현상이 있어 검은색으로 고정
+        if #available(iOS 15.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = DesignSystemAsset.black.color
+            navigationController?.tabBarController?.tabBar.standardAppearance = appearance
+            navigationController?.tabBarController?.tabBar.scrollEdgeAppearance = navigationController?.tabBarController?.tabBar.standardAppearance
+        }
     }
     
     deinit {
@@ -97,10 +105,14 @@ open class BaseViewController: UIViewController {
         
         view.addSubview(toastView)
         view.bringSubviewToFront(toastView)
+        
         toastView.snp.makeConstraints {
+            let inset: CGFloat = keyboardHeight == 0 ? 100 : 15
+            
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: 15))
+            $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: inset))
         }
+        
         UIView.animate(withDuration: 1, delay: 0.5, options: .curveEaseOut, animations: { [weak self] in
             toastView.alpha = 0.0
         }, completion: { [weak self] _ in

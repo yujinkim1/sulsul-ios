@@ -40,7 +40,34 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToWritePostText(userData)
         case .writeContent:
             moveToWriteContent(userData)
+        case .reportContent:
+            moveToReportContent(userData)
+        case .search:
+            moveToSearch()
+        case .comment:
+            moveToComment()
+        case .feedDetail:
+            moveToFeedDetail(userData)
         }
+    }
+    
+    private func moveToFeedDetail(_ userData: [String: Any]?) {
+        guard let feedId = userData?["feedId"] as? Int else { return }
+        
+        let viewModel = DetailFeedViewModel(feedID: feedId)
+        let viewController = DetailFeedViewController(viewModel: viewModel)
+        currentNavigationViewController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func moveToComment() {
+        let vc = CommentViewController()
+        currentNavigationViewController?.pushViewController(vc, animated: true)
+    }
+    
+    private func moveToSearch() {
+        let vc = SearchViewController()
+        vc.coordinator = self
+        currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToWriteContent(_ userData: [String: Any]?) {
@@ -65,6 +92,13 @@ final class CommonCoordinator: CommonBaseCoordinator {
     
     private func moveToSelectPhoto() {
         let vc = SelectPhotoViewController()
+        vc.coordinator = self
+        
+        currentNavigationViewController?.pushViewController(vc, animated: true)
+    }
+    
+    private func moveToReportContent(_ userData: [String: Any]?) {
+        let vc = ReportViewController()
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)

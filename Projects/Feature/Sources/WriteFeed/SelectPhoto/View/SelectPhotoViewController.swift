@@ -8,6 +8,7 @@
 import UIKit
 import Photos
 import Combine
+import Service
 import DesignSystem
 
 public class SelectPhotoViewController: BaseViewController, CommonBaseCoordinated {
@@ -85,6 +86,11 @@ public class SelectPhotoViewController: BaseViewController, CommonBaseCoordinate
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        UserDefaultsUtil.shared.remove(.feedContent)
+        UserDefaultsUtil.shared.remove(.feedTitle)
     }
     
     public override func viewWillLayoutSubviews() {
