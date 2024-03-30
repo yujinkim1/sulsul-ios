@@ -120,9 +120,9 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         cell.bind(viewModel.randomFeeds[indexPath.row])
         
         cell.seeAllLabel.onTapped { [weak self] in
-            if let userId = self?.viewModel.randomFeeds[indexPath.row].feed_id {
+            if let feedId = self?.viewModel.randomFeeds[indexPath.row].feed_id {
                 self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.feedDetail),
-                                          userData: ["feedId": userId])                
+                                          userData: ["feedId": feedId])                
             }
         }
         

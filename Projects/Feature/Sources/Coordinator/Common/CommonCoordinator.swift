@@ -66,6 +66,7 @@ final class CommonCoordinator: CommonBaseCoordinator {
     
     private func moveToSearch() {
         let vc = SearchViewController()
+        vc.coordinator = self
         currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
