@@ -11,8 +11,9 @@ import DesignSystem
 final class DetailFeedMainCell: UICollectionViewCell {
     static let reuseIdentifier: String = "DetailFeedMainCell"
     
-    private var drinkName: String = ""
-    private var snackName: String = ""
+    var drinkName: String = ""
+    var snackName: String = ""
+    
     private var carouselCurrentIndex: Int = 1
     private var imageOfList: [String] = []
     
@@ -56,7 +57,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var indicatorView = UIView().then {
-        $0.frame = .zero
+        $0.layer.cornerRadius = CGFloat(2)
         $0.backgroundColor = DesignSystemAsset.main.color
     }
     
@@ -82,15 +83,12 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private lazy var scoreLabel = UILabel().then {
-        $0.setLineHeight(16, font: Font.bold(size: 10.67))
-        $0.font = Font.bold(size: 10.67)
-        $0.text = "0점"
-        $0.textColor = DesignSystemAsset.gray900.color
+        $0.setLineHeight(16, font: Font.bold(size: 10.7))
+        $0.font = Font.bold(size: 10.7)
+        $0.textColor = DesignSystemAsset.main.color
     }
     
-    private lazy var scoreLevelImageView = UIImageView().then {
-        $0.image = UIImage(named: "score_level_0")
-    }
+    private lazy var scoreLevelImageView = UIImageView()
     
     private lazy var drinkLabel = PaddableLabel(edgeInsets: 1, 4, 1, 4).then {
         $0.setLineHeight(18, font: Font.semiBold(size: 12))
@@ -114,6 +112,12 @@ final class DetailFeedMainCell: UICollectionViewCell {
         $0.backgroundColor = .clear
         $0.textColor = DesignSystemAsset.gray800.color
         $0.text = "작성된 내용이 없습니다."
+    }
+    
+    private lazy var userTagStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = CGFloat(8)
+        $0.distribution = .fillProportionally
     }
     
     private lazy var feedViewsImageView = UIImageView().then {
@@ -172,6 +176,10 @@ final class DetailFeedMainCell: UICollectionViewCell {
     
     private lazy var pairingStackView = PairingStackView()
     
+    private lazy var separatorView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -187,20 +195,11 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private func addViews() {
-        containerView.addSubviews([
-            carouselCollectionView,
-            indicatorView,
-            profileImageView,
-            usernameLabel,
-            createdAtLabel,
-            textView,
-            scoreLabel,
-            scoreLevelImageView,
-            feedViewsStackView,
-            feedCommentsStackView,
-            feedLikesStackView,
-            pairingStackView
-        ])
+        containerView.addSubviews([carouselCollectionView, indicatorView, profileImageView,
+                                   usernameLabel, createdAtLabel, textView,
+                                   scoreLabel, scoreLevelImageView, feedViewsStackView,
+                                   feedCommentsStackView, feedLikesStackView, pairingStackView, 
+                                   userTagStackView, separatorView])
         
         self.addSubviews([
             containerView,
@@ -217,7 +216,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
             $0.edges.equalToSuperview()
         }
         carouselCollectionView.snp.makeConstraints {
-            $0.leading.trailing.top.equalToSuperview()
+            $0.leading.trailing.top.equalToSuperview().inset(moderateScale(number: 20))
             $0.size.equalTo(moderateScale(number: 353))
         }
         indexLabel.snp.makeConstraints {
@@ -231,7 +230,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
             $0.height.equalTo(moderateScale(number: 72))
         }
         profileImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview()
+            $0.leading.equalTo(carouselCollectionView)
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 26))
             $0.size.equalTo(moderateScale(number: 40))
         }
@@ -244,25 +243,29 @@ final class DetailFeedMainCell: UICollectionViewCell {
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 27))
         }
         scoreLevelImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview()
+            $0.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(scoreLabel)
         }
         pairingStackView.snp.makeConstraints {
+            $0.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(scoreLabel.snp.bottom).offset(moderateScale(number: 2))
-            $0.trailing.equalToSuperview()
         }
         createdAtLabel.snp.makeConstraints {
             $0.leading.equalTo(usernameLabel)
             $0.top.equalTo(usernameLabel.snp.bottom).offset(moderateScale(number: 8))
         }
         textView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(profileImageView.snp.bottom).offset(moderateScale(number: 18))
             $0.height.equalTo(moderateScale(number: 144))
         }
+        userTagStackView.snp.makeConstraints {
+            $0.leading.trailing.equalTo(carouselCollectionView)
+            $0.top.equalTo(textView.snp.bottom).offset(moderateScale(number: 4))
+        }
         feedViewsStackView.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.bottom.equalTo(containerView.snp.bottom).inset(moderateScale(number: 22))
+            $0.leading.equalTo(carouselCollectionView)
+            $0.bottom.equalTo(separatorView.snp.top).offset(moderateScale(number: -22))
         }
         feedCommentsStackView.snp.makeConstraints {
             $0.leading.equalTo(feedViewsStackView.snp.trailing).offset(moderateScale(number: 16))
@@ -272,25 +275,30 @@ final class DetailFeedMainCell: UICollectionViewCell {
             $0.leading.equalTo(feedCommentsStackView.snp.trailing).offset(moderateScale(number: 16))
             $0.bottom.equalTo(feedViewsStackView)
         }
+        separatorView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 10))
+        }
     }
     
     func bind(_ model: DetailFeed.Feed) {
         imageOfList = model.images
-        updateIndicatorViewWidth()
-        updateIndex(to: carouselCurrentIndex)
-        updateScore(to: model.score)
         carouselCollectionView.reloadData()
         
+        updateIndex(to: carouselCurrentIndex)
+        updateScore(to: model.score)
+        updateUserTags(to: model.userTags ?? [])
+        updateIndicatorViewWidth()
+        
         textView.text = model.content
-        updateTextViewHeightDimension(textView)
+        updateTextViewHeight(textView)
         
         titleLabel.text = model.title
-        
         feedViewsLabel.text = String(model.viewCount)
-        
         feedCommentsLabel.text = String(model.commentCount)
-        
         feedLikesLabel.text = String(model.likeCount)
+        
+        pairingStackView.bind(withPairing: self.drinkName, self.snackName)
         
         if let username = model.writerInfo?.nickname {
             usernameLabel.text = username
@@ -322,32 +330,41 @@ final class DetailFeedMainCell: UICollectionViewCell {
         switch score {
         case 5: 
             scoreLabel.text = "5점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_5")
         case 4: 
             scoreLabel.text = "4점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_4")
         case 3: 
             scoreLabel.text = "3점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_3")
         case 2: 
             scoreLabel.text = "2점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_2")
         case 1: 
             scoreLabel.text = "1점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_1")
         default: 
             scoreLabel.text = "0점"
-            scoreLabel.textColor = DesignSystemAsset.main.color
             scoreLevelImageView.image = UIImage(named: "score_level_0")
         }
     }
     
-    private func updateTextViewHeightDimension(_ textView: UITextView) {
+    private func updateUserTags(to tags: [String]) {
+        if !tags.isEmpty {
+            tags.forEach { tag in
+                let label = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
+                    $0.textColor = DesignSystemAsset.gray300.color
+                    $0.setLineHeight(18, font: Font.regular(size: 12))
+                    $0.font = Font.regular(size: 12)
+                    $0.layer.cornerRadius = CGFloat(8)
+                    $0.backgroundColor = DesignSystemAsset.gray050.color
+                }
+                userTagStackView.addArrangedSubview(label)
+            }
+        }
+    }
+    
+    private func updateTextViewHeight(_ textView: UITextView) {
         let contentSize = textView.sizeThatFits(CGSize(width: textView.frame.width, height: CGFloat.greatestFiniteMagnitude))
         
         textView.snp.updateConstraints {
@@ -361,13 +378,13 @@ final class DetailFeedMainCell: UICollectionViewCell {
     }
     
     private func updateIndicatorViewWidth() {
-        let divided = imageOfList.count
+        let count = imageOfList.count
         
         indicatorView.snp.makeConstraints {
-            $0.leading.equalToSuperview()
+            $0.leading.equalTo(carouselCollectionView)
             $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
             $0.height.equalTo(moderateScale(number: 2))
-            $0.width.equalToSuperview().dividedBy(imageOfList.count)
+            $0.width.equalToSuperview().dividedBy(count)
         }
     }
 }
@@ -384,7 +401,8 @@ extension DetailFeedMainCell: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.reuseIdentifier, for: indexPath) as? CarouselCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.reuseIdentifier, for: indexPath) as? CarouselCell 
+        else { return .init() }
         
         let item = imageOfList[indexPath.item]
         
@@ -404,7 +422,7 @@ extension DetailFeedMainCell: UICollectionViewDelegate {
 
         if carouselCurrentIndex != imageOfList.count {
             indicatorView.snp.remakeConstraints {
-                $0.leading.equalToSuperview()
+                $0.leading.equalTo(carouselCollectionView)
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
                 $0.width.equalToSuperview().dividedBy(imageOfList.count)
@@ -414,10 +432,10 @@ extension DetailFeedMainCell: UICollectionViewDelegate {
             }
         } else if carouselCurrentIndex == imageOfList.count {
             indicatorView.snp.remakeConstraints {
-                $0.leading.equalToSuperview()
+                $0.leading.equalTo(carouselCollectionView)
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
-                $0.width.equalToSuperview()
+                $0.width.equalToSuperview().inset(moderateScale(number: 20))
             }
             UIView.animate(withDuration: 0.3) {
                 self.layoutIfNeeded()

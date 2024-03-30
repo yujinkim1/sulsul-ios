@@ -11,6 +11,10 @@ import DesignSystem
 final class RelatedFeedHeaderView: UICollectionReusableView {
     static let reuseIdentifier: String = "RelatedFeedHeaderView"
     
+    private lazy var separatorView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+    }
+    
     private lazy var imageView = UIImageView().then {
         $0.image = UIImage(named: "feeds")
     }
@@ -38,19 +42,26 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
     
     private func addViews() {
         self.addSubviews([
+            separatorView,
             imageView,
             titleLabel
         ])
     }
     
     private func makeConstraints() {
+        separatorView.snp.makeConstraints {
+            $0.leading.trailing.top.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 10))
+        }
         imageView.snp.makeConstraints {
-            $0.leading.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.equalTo(separatorView.snp.bottom).offset(moderateScale(number: 24))
             $0.centerY.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 24))
         }
         titleLabel.snp.makeConstraints {
             $0.leading.equalTo(imageView.snp.trailing).offset(moderateScale(number: 8))
+            $0.top.equalTo(separatorView.snp.bottom).offset(moderateScale(number: 24))
             $0.centerY.equalTo(imageView)
         }
     }

@@ -16,7 +16,7 @@ struct DetailFeed {
         let images: [String]
         let alcoholPairingIDs: [Int]
         let snackPairingIDs: [Int]
-//        let userTags: [String]?
+        let userTags: [String]?
         let isLiked: Bool
         let viewCount: Int
         let likeCount: Int
@@ -32,7 +32,7 @@ struct DetailFeed {
             case images
             case alcoholPairingIDs = "alcohol_pairing_ids"
             case snackPairingIDs = "food_pairing_ids"
-//            case userTags = "user_tags"
+            case userTags = "user_tags"
             case isLiked = "is_liked"
             case viewCount = "view_count"
             case likeCount = "likes_count"
@@ -50,7 +50,7 @@ struct DetailFeed {
             self.images = try container.decode([String].self, forKey: DetailFeed.Feed.CodingKeys.images)
             self.alcoholPairingIDs = try container.decode([Int].self, forKey: DetailFeed.Feed.CodingKeys.alcoholPairingIDs)
             self.snackPairingIDs = try container.decode([Int].self, forKey: DetailFeed.Feed.CodingKeys.snackPairingIDs)
-//            self.userTags = try container.decode([String].self, forKey: DetailFeed.Feed.CodingKeys.userTags)
+            self.userTags = try? container.decode([String].self, forKey: DetailFeed.Feed.CodingKeys.userTags)
             self.isLiked = try container.decode(Bool.self, forKey: DetailFeed.Feed.CodingKeys.isLiked)
             self.viewCount = try container.decode(Int.self, forKey: DetailFeed.Feed.CodingKeys.viewCount)
             self.likeCount = try container.decode(Int.self, forKey: DetailFeed.Feed.CodingKeys.likeCount)
@@ -77,10 +77,5 @@ struct DetailFeed {
             self.nickname = try container.decode(String.self, forKey: DetailFeed.WriterInfo.CodingKeys.nickname)
             self.image = try? container.decode(String.self, forKey: DetailFeed.WriterInfo.CodingKeys.image)
         }
-    }
-    
-    struct PairingStack: Decodable {
-        let alcohol: Pairings
-        let snack: Pairings
     }
 }

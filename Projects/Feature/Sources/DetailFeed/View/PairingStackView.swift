@@ -70,8 +70,10 @@ final class PairingStackView: UIView {
         }
     }
     
-    private func bind(_ model: DetailFeed.PairingStack) {
-        drinkLabel.text = model.alcohol.name
-        snackLabel.text = model.snack.name
+    func bind(withPairing drinkName: String, _ snackName: String) {
+        drinkLabel.text = drinkName
+        snackLabel.text = snackName
+        print("스택뷰: \(drinkName)")
+        print("스택뷰: \(snackName)")
     }
 }

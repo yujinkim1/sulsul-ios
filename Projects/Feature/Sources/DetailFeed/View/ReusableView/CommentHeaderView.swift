@@ -25,7 +25,7 @@ final class CommentHeaderView: UICollectionReusableView {
     private lazy var countLabel = UILabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
-        $0.text = "13"
+        $0.text = "0"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
@@ -65,5 +65,9 @@ final class CommentHeaderView: UICollectionReusableView {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(moderateScale(number: 8))
             $0.centerY.equalTo(imageView)
         }
+    }
+    
+    func bind(toComment count: Int) {
+        countLabel.text = String(count)
     }
 }
