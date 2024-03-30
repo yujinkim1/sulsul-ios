@@ -237,6 +237,10 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
             $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
     }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension SearchViewController: UITextFieldDelegate {
