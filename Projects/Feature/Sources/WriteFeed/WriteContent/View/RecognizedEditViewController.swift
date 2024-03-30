@@ -72,6 +72,13 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         super.viewDidLoad()
         
         titleLabel.text = "술&안주 정보 수정"
+        
+        drinkBackView.onTapped { [weak self] in
+            let vc = SelectDrinkBottomSheetViewController()
+            vc.delegate = self
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: false)
+        }
     }
     
     func bind(_ recognized: WriteContentModel.Recognized) {
@@ -169,5 +176,14 @@ final class RecognizedEditViewController: BaseHeaderViewController {
             snackPlaceholderLabel,
             searchImageView
         ])
+    }
+}
+
+extension RecognizedEditViewController: OnSelectedValue {
+    func selectedValue(_ value: [String : Any]) {
+        if let selectedDrink = value["selectedDrink"] as? String {
+            placeholderLabel.text = selectedDrink
+            placeholderLabel.textColor = DesignSystemAsset.gray900.color
+        }
     }
 }

@@ -10,7 +10,7 @@ import DesignSystem
 import Combine
 import Service
 
-protocol OnSelectedValue {
+protocol OnSelectedValue: AnyObject {
     func selectedValue(_ value: [String: Any])
 }
 
