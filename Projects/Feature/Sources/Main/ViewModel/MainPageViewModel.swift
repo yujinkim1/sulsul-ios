@@ -21,7 +21,6 @@ final class MainPageViewModel {
     // MARK: - (비로그인) 술 종류
     private let kindOfAlcohol = CurrentValueSubject<[String], Never> ([])
     private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
-    private let preferenceFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcohol = CurrentValueSubject<String, Never>("")
     

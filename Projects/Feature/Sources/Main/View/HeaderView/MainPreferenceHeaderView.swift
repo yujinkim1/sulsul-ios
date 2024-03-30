@@ -15,7 +15,6 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
     private lazy var containerView = UIView()
     
     private lazy var titleLabel = UILabel().then({
-        $0.text = "소주랑 어울리는\n안주로 골라봤어요"
         $0.font = Font.bold(size: 28)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.numberOfLines = 0
@@ -84,11 +83,17 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
         if StaticValues.isLoggedIn.value {
             preferecneCollectionView.isHidden = true
             guard let nickname = viewModel?.getUserInfoValue().nickname else { return }
-            titleLabel.text = nickname + "님이 선택한\n취향으로 골라봤어요."
+            let attributedString = NSMutableAttributedString(string: nickname + "님이 선택한\n취향으로 골라봤어요.")
+            attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: nickname.count)) // 닉네임의 색상 변경
+            titleLabel.attributedText = attributedString
         } else {
             preferecneCollectionView.isHidden = false
             guard let title = viewModel?.getSelectedAlcoholValue() else { return }
-            titleLabel.text = title + "랑 어울리는\n안주로 골라봤어요!"
+            
+            let attributedString = NSMutableAttributedString(string: title + "랑 어울리는\n안주로 골라봤어요!")
+            attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: title.count)) // 타이틀의 색상 변경
+            titleLabel.attributedText = attributedString
+            
         }
         preferecneCollectionView.reloadData()
     }
