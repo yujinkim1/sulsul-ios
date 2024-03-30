@@ -120,11 +120,19 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         cell.bind(viewModel.randomFeeds[indexPath.row])
         
         cell.seeAllLabel.onTapped { [weak self] in
-            // TODO: 피드 상세 이동
+            if let userId = self?.viewModel.randomFeeds[indexPath.row].feed_id {
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.feedDetail),
+                                          userData: ["feedId": userId])                
+            }
         }
         
         cell.spamView.onTapped { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: nil)
+            if UserDefaultsUtil.shared.isLogin() {
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: nil)
+
+            } else {
+                self?.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")
+            }
         }
         
         cell.heartView.onTapped { [weak self] in

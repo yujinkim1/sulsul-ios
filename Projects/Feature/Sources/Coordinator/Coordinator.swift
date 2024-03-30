@@ -64,6 +64,7 @@ enum CommonScene {
     case reportContent
     case search
     case comment
+    case feedDetail
 }
 
 enum LoginScene {
