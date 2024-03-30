@@ -84,8 +84,6 @@ public final class ProfileMainViewController: BaseViewController {
         addViews()
         makeConstraints()
         bind()
-        viewModel.getFeedsByMe()
-        viewModel.getFeedsLikeByMe()
     }
     
     private func bind() {
@@ -93,20 +91,22 @@ public final class ProfileMainViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
-                if result.id == 0 {
+                if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     self.profileLabel.text = "로그인 해주세요!"
                     self.profileEditTouchableLabel.isHidden = true
                     self.myFeedView.updateState(.notLogin)
-                } else {
+                } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
+                    // MARK: - 밴된 유저
+                } else { // MARK: - 로그인한 유저
                     self.profileLabel.text = result.nickname
                     self.profileEditTouchableLabel.isHidden = false
                     if let imageURL = URL(string: result.image ?? "") {
                         self.profileTouchableImageView.kf.setImage(with: imageURL)
                     }
+                    viewModel.getFeedsByMe()
+                    viewModel.getFeedsLikeByMe()
                 }
             }.store(in: &cancelBag)
-        
-        viewModel.getUserInfo()
         
         viewModel.loginButtonIsTappedPublisher()
               .receive(on: DispatchQueue.main)
@@ -119,6 +119,15 @@ public final class ProfileMainViewController: BaseViewController {
               .sink { [weak self] _ in
                   self?.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
               }.store(in: &cancelBag)
+        
+        StaticValues.isLoggedInPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] loginStatus in
+                guard let self = self else { return }
+                viewModel.getUserInfo()
+            }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func addViews() {
