@@ -9,7 +9,7 @@ import Combine
 import UIKit
 import DesignSystem
 
-public final class RankingMainViewController: BaseViewController {
+public final class RankingMainViewController: BaseViewController, RankingBaseCoordinated {
     var coordinator: RankingBaseCoordinator?
     var viewModel: RankingMainViewModel
     
@@ -32,20 +32,20 @@ public final class RankingMainViewController: BaseViewController {
         $0.tintColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then {
-        $0.image = UIImage(named: "common_alarm")
-        $0.tintColor = DesignSystemAsset.gray900.color
-    }
+//    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then {
+//        $0.image = UIImage(named: "common_alarm")
+//        $0.tintColor = DesignSystemAsset.gray900.color
+//    }
     
     private lazy var titleLabel = UILabel().then {
-        $0.text = "이번주 랭킹"
+        $0.text = "이번 주 랭킹"
         $0.setLineHeight(38, font: Font.bold(size: 28))
         $0.font = Font.bold(size: 28)
         $0.textColor = DesignSystemAsset.white.color
     }
     
     private lazy var weekendLabel = UILabel().then {
-        $0.text = "MM/dd ~ MM/dd"
+        $0.text = "기간 집계 중 오류가 발생했습니다."
         $0.setLineHeight(22, font: Font.regular(size: 14))
         $0.font = Font.regular(size: 14)
         $0.textColor = DesignSystemAsset.gray600.color
@@ -81,20 +81,18 @@ public final class RankingMainViewController: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        tabBarController?.setTabBarHidden(false)
-        
-        bind()
         addViews()
         makeConstraints()
         preparePageViewController()
+        bind()
     }
     
     public override func addViews() {
         pageTabBarContainerView.addSubview(pageTabBarView)
         
         topHeaderView.addSubviews([
-            searchTouchableImageView,
-            alarmTouchableImageView
+            searchTouchableImageView
+//            alarmTouchableImageView
         ])
         
         view.addSubviews([
@@ -116,14 +114,14 @@ public final class RankingMainViewController: BaseViewController {
         }
         searchTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(alarmTouchableImageView.snp.leading).offset(moderateScale(number: -12))
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.size.equalTo(moderateScale(number: 24))
         }
-        alarmTouchableImageView.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
-            $0.size.equalTo(moderateScale(number: 24))
-        }
+//        alarmTouchableImageView.snp.makeConstraints {
+//            $0.centerY.equalToSuperview()
+//            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+//            $0.size.equalTo(moderateScale(number: 24))
+//        }
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 20))
             $0.top.equalTo(topHeaderView.snp.bottom)
@@ -150,12 +148,7 @@ public final class RankingMainViewController: BaseViewController {
     
     public override func setupIfNeeded() {
         searchTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.search), userData: nil)
-        }
-        alarmTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.alarm), userData: nil)
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
         }
     }
     
@@ -312,10 +305,5 @@ extension RankingMainViewController: UIPageViewControllerDelegate {
         
         pageTabBarView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
         collectionView(pageTabBarView, didSelectItemAt: indexPath)
-    }
-    
-    private func updateTabIndex() {
-        guard let currentViewController = pageViewController.viewControllers?.first,
-              let currentIndex = viewControllers.firstIndex(of: currentViewController) else { return }
     }
 }
