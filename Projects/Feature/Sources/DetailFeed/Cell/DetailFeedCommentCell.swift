@@ -32,10 +32,10 @@ final class DetailFeedCommentCell: UICollectionViewCell {
         super.init(frame: frame)
         
         self.backgroundColor = .clear
+        self.isUserInteractionEnabled = true
         
         addViews()
         makeConstraints()
-        bind()
     }
     
     @available(*, unavailable)

@@ -9,7 +9,7 @@ import UIKit
 import DesignSystem
 
 final class CommentTextFieldView: UIView {
-    private lazy var textField = PaddableTextField(to: 12).then {
+    lazy var textField = PaddableTextField(to: 12).then {
         $0.autocorrectionType = .no
         $0.spellCheckingType = .no
         $0.autocapitalizationType = .none
@@ -17,7 +17,7 @@ final class CommentTextFieldView: UIView {
         $0.delegate = self
     }
     
-    private lazy var touchableLabel = TouchableLabel().then {
+    lazy var touchableLabel = TouchableLabel().then {
         $0.setLineHeight(24, font: Font.semiBold(size: 16))
         $0.frame = .zero
         $0.font = Font.semiBold(size: 16)
@@ -44,7 +44,7 @@ final class CommentTextFieldView: UIView {
     }
     
     private func addViews() {
-        self.addSubviews([textField, touchableLabel])
+        addSubviews([textField, touchableLabel])
     }
     
     private func makeConstraints() {
@@ -63,7 +63,7 @@ final class CommentTextFieldView: UIView {
 }
 
 extension CommentTextFieldView: UITextFieldDelegate {
-    public func textField(
+    func textField(
         _ textField: UITextField,
         shouldChangeCharactersIn range: NSRange,
         replacementString string: String
@@ -71,7 +71,7 @@ extension CommentTextFieldView: UITextFieldDelegate {
         return true
     }
     
-    public func textFieldShouldReturn(
+    func textFieldShouldReturn(
         _ textField: UITextField
     ) -> Bool {
         return false

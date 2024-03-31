@@ -92,7 +92,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         case .home:
             startHomeFlow(tabBarFlow, userData: userData)
         case .ranking:
-            startBenefitFlow(tabBarFlow, userData: userData)
+            startRankingFlow(tabBarFlow, userData: userData)
         case .transfer:
             startCommonFlow(tabBarFlow, userData: userData)
         case .transferHistory:
@@ -112,7 +112,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         homeCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
-    private func startBenefitFlow(_ flow: Flow, userData: [String: Any]?) {
+    private func startRankingFlow(_ flow: Flow, userData: [String: Any]?) {
         currentFlowManager?.currentCoordinator = rankingCoordinator
         (rootViewController as? UITabBarController)?.selectedIndex = TabType.ranking.rawValue
         rankingCoordinator.moveTo(appFlow: flow, userData: userData)

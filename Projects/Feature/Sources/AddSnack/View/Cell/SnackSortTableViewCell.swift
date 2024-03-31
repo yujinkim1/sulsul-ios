@@ -35,6 +35,12 @@ final class SnackSortTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func bind(_ snackSortModel: SnackModel) {
+        snackSortLabel.text = snackSortModel.name
+        cellBackButton.backgroundColor = snackSortModel.isSelect ? DesignSystemAsset.gray200.color : DesignSystemAsset.gray100.color
+        checkImageView.isHidden = !snackSortModel.isSelect
+    }
+    
     func bind(_ snackSortModel: SnackSortModel) {
         snackSortLabel.text = snackSortModel.name
         cellBackButton.backgroundColor = snackSortModel.isSelect ? DesignSystemAsset.gray200.color : DesignSystemAsset.gray100.color
