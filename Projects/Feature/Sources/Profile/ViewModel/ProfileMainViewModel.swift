@@ -18,7 +18,6 @@ enum UserInfoStatus: String {
 
 struct ProfileMainViewModel {
 
-    private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private let userMapper = UserMapper()
@@ -54,7 +53,8 @@ struct ProfileMainViewModel {
             "Authorization": "Bearer " + accessToken
         ]
         
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)", header: headers) { result in
+        
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())", header: headers) { result in
             switch result {
             case .success(let response):
                 if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {

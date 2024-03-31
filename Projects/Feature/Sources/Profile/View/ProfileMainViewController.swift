@@ -88,8 +88,10 @@ public final class ProfileMainViewController: BaseViewController {
     
     private func bind() {
         viewModel.userInfoPublisher()
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
+                print("뭐지 : \(result)")
                 guard let self = self else { return }
                 if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     self.profileLabel.text = "로그인 해주세요!"
@@ -124,6 +126,7 @@ public final class ProfileMainViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] loginStatus in
                 guard let self = self else { return }
+                print("userinfo는 호출됨")
                 viewModel.getUserInfo()
             }.store(in: &cancelBag)
         

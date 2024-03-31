@@ -141,6 +141,7 @@ public final class ProfileSettingViewController: BaseViewController {
                 KeychainStore.shared.delete(label: "accessToken")
                 UserDefaultsUtil.shared.remove(.userId)
                 StaticValues.isLoggedIn.send(false)
+                self?.navigationController?.popViewController(animated: true)
             },
                                 cancelCompletion: nil)
         }

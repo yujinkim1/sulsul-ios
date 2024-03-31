@@ -73,11 +73,7 @@ final class MainPageViewModel {
     }
     
     func getPopularFeeds() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
-        
         var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken,
             "order_by_popular": "true"
         ]
         
@@ -97,11 +93,7 @@ final class MainPageViewModel {
     }
     
     func getDifferenceFeeds() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
-        
         var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken,
             "order_by_popular": "false"
         ]
         

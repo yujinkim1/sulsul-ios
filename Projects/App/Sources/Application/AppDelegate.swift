@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         KakaoSDK.initSDK(appKey: "3fcd336396b571c494495d0e9b42bccd")
+        removeKeychainAtFirstLaunch()
         return true
     }
 
@@ -51,5 +52,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return true
             }
             return false
+    }
+    
+    private func removeKeychainAtFirstLaunch() {
+        guard UserDefaultsUtil.isFirstLaunch() else {
+            return
+        }
+        KeychainStore.shared.delete(label: "accessToken")
     }
 }
