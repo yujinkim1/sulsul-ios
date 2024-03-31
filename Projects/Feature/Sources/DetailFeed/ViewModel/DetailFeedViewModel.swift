@@ -20,9 +20,8 @@ public final class DetailFeedViewModel {
     private var detailFeedImageSubject = PassthroughSubject<[String], Never>()
     /// 댓글 개수
     private var commentCountSubject = CurrentValueSubject<Int, Never>(0)
-    /// 페어링 주류
+    /// 페어링 주류와 안주
     private var pairingDrinkSubject = CurrentValueSubject<String, Never>("")
-    /// 페어링 안주
     private var pairingSnackSubject = CurrentValueSubject<String, Never>("")
     
     public init(feedID: Int) {
@@ -58,30 +57,7 @@ public final class DetailFeedViewModel {
         }
     }
     
-//    public func requestDetailFeed() {
-//        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/\(feedID)") { result in
-//            switch result {
-//            case .success(let response):
-//                if let data = try? self.jsonDecoder.decode(DetailFeed.Feed.self, from: response) {
-//                    print("DetailFeedViewModel.requestDetailFeed(): \(String(describing: data))")
-//                    
-//                    self.detailFeedSubject.send(data)
-//                    
-//                    guard let alcoholPairingID = data.alcoholPairingIDs.first,
-//                          let snackPairingID = data.snackPairingIDs.first
-//                    else { return }
-//                    
-//                    self.requestParingDrink(alcoholPairingID)
-//                    self.requestParingSnack(snackPairingID)
-//                }
-//            case .failure(let error):
-//                print("DetailFeedViewModel.requestDetailFeed(): \(error)")
-//            }
-//        }
-//    }
-    
-    public func requestParingDrink(_ alcoholPairingID: Int) {
-        
+    private func requestParingDrink(_ alcoholPairingID: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/pairings/\(alcoholPairingID)") { [weak self] result in
             guard let self = self else { return }
             
@@ -89,7 +65,6 @@ public final class DetailFeedViewModel {
             case .success(let response):
                 if let data = try? jsonDecoder.decode(Pairings.self, from: response) {
                     guard let drinkName = data.name else { return }
-                    print("DetailFeedViewModel.requestPairingDrink(): \(drinkName)")
                     self.pairingDrinkSubject.send(drinkName)
                 }
             case .failure(let error):
@@ -98,8 +73,7 @@ public final class DetailFeedViewModel {
         }
     }
     
-    public func requestParingSnack(_ foodPairingID: Int) {
-        
+    private func requestParingSnack(_ foodPairingID: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/pairings/\(foodPairingID)") { [weak self] result in
             guard let self = self else { return }
             
@@ -107,8 +81,7 @@ public final class DetailFeedViewModel {
             case .success(let response):
                 if let data = try? jsonDecoder.decode(Pairings.self, from: response) {
                     guard let snackName = data.name else { return }
-                    print("DetailFeedViewModel.requestPairingSnack(): \(snackName)")
-                    self.pairingDrinkSubject.send(snackName)
+                    self.pairingSnackSubject.send(snackName)
                 }
             case .failure(let error):
                 print("DetailFeedViewModel.requestPairingSnack(): \(error)")
@@ -116,16 +89,22 @@ public final class DetailFeedViewModel {
         }
     }
     
+    public func requestLike(_ feedID: Int) {
+        NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/\(feedID)/like") { result in
+            // TODO: 좋아요 표시, 취소
+        }
+    }
+    
     public func fetchCommentCount() -> Int {
         return commentCountSubject.value
     }
     
-    public func fetchPairingDrink() -> String {
-        return pairingDrinkSubject.value
+    var pairingDrinkPublisher: AnyPublisher<String, Never> {
+        return pairingDrinkSubject.eraseToAnyPublisher()
     }
     
-    public func fetchPairingSnack() -> String {
-        return pairingSnackSubject.value
+    var pairingSnackPublisher: AnyPublisher<String, Never> {
+        return pairingSnackSubject.eraseToAnyPublisher()
     }
     
     var detailFeedPublisher: AnyPublisher<DetailFeed.Feed, Never> {
