@@ -79,6 +79,12 @@ final class RecognizedEditViewController: BaseHeaderViewController {
             vc.modalPresentationStyle = .overFullScreen
             self?.present(vc, animated: false)
         }
+        
+        snackBackView.onTapped { [weak self] in
+            let vc = SelectRecognizdSnackBottomSheet()
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: false)
+        }
     }
     
     func bind(_ recognized: WriteContentModel.Recognized) {
