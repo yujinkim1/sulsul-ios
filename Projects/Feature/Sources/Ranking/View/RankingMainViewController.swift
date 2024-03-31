@@ -150,6 +150,9 @@ public final class RankingMainViewController: BaseViewController, RankingBaseCoo
         searchTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
         }
+//        alarmTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+//            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: nil)
+//        }
     }
     
     // MARK: - Custom Method
