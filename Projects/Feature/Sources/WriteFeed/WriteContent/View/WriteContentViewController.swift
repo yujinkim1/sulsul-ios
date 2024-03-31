@@ -137,10 +137,13 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.image = UIImage(named: "writeFeed_addTag")
     }
     
-    private lazy var editViewController = RecognizedEditViewController()
+    private lazy var editViewController = RecognizedEditViewController().then {
+        $0.delegate = self
+    }
     
     open override func viewWillAppear(_ animated: Bool) {
-        if let thumnailImage = images.first {
+        if let thumnailImage = images.first,
+           editViewController.selectedDrink == nil || editViewController.selectedSnack == nil {
             viewModel.uploadImage(thumnailImage)
             
             recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
@@ -508,11 +511,18 @@ extension WriteContentViewController: UITextViewDelegate {
 
 extension WriteContentViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        guard let writtenText = value["writtenText"] as? [String] else { return }
-        
-        recognizedContentLabel.isHidden = true
-        drinkSnackStackView.isHidden = false
-        recognizedDrinkLabel.text = "\(writtenText[0])"
-        recognizedSnackLabel.text = "\(writtenText[1])"
+        if let writtenText = value["writtenText"] as? [String] {
+            if writtenText.count == 2 {
+                recognizedContentLabel.isHidden = true
+                drinkSnackStackView.isHidden = false
+                recognizedDrinkLabel.text = "\(writtenText[0])"
+                recognizedSnackLabel.text = "\(writtenText[1])"
+            } else {
+                recognizedContentLabel.isHidden = false
+                drinkSnackStackView.isHidden = true
+                recognizedContentLabel.text = "정보 직접 입력하기"
+                recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+            }
+        }
     }
 }

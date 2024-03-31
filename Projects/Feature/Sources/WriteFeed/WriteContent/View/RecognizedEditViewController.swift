@@ -9,6 +9,11 @@ import UIKit
 import DesignSystem
 
 final class RecognizedEditViewController: BaseHeaderViewController {
+    weak var delegate: OnSelectedValue?
+    
+    var selectedDrink: String?
+    var selectedSnack: String?
+    
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "인식된 술, 안주 정보를 수정할 수 있어요."
         $0.font = Font.medium(size: 16)
@@ -85,6 +90,14 @@ final class RecognizedEditViewController: BaseHeaderViewController {
             vc.delegate = self
             vc.modalPresentationStyle = .overFullScreen
             self?.present(vc, animated: false)
+        }
+        
+        saveButton.onTapped { [weak self] in
+            let texts = [self?.selectedDrink ?? "",
+                         self?.selectedSnack ?? ""]
+            
+            self?.delegate?.selectedValue(["writtenText": texts.filter({ $0 != "" })])
+            self?.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -191,11 +204,20 @@ extension RecognizedEditViewController: OnSelectedValue {
         if let selectedDrink = value["selectedDrink"] as? String {
             placeholderLabel.text = selectedDrink
             placeholderLabel.textColor = DesignSystemAsset.gray900.color
+            self.selectedDrink = selectedDrink
         }
         
         if let selectedSnack = value["selectedSnack"] as? String {
             snackPlaceholderLabel.text = selectedSnack
             snackPlaceholderLabel.textColor = DesignSystemAsset.gray900.color
+            self.selectedSnack = selectedSnack
+        }
+        
+        if placeholderLabel.text != "술 종류를 선택해주세요",
+           snackPlaceholderLabel.text != "안주이름을 검색해보세요" {
+            
+            saveButton.textColor = DesignSystemAsset.gray050.color
+            saveButton.backgroundColor = DesignSystemAsset.main.color
         }
     }
 }
