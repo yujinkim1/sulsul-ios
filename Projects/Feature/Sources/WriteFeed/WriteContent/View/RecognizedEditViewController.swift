@@ -82,6 +82,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         
         snackBackView.onTapped { [weak self] in
             let vc = SelectRecognizdSnackBottomSheet()
+            vc.delegate = self
             vc.modalPresentationStyle = .overFullScreen
             self?.present(vc, animated: false)
         }
@@ -190,6 +191,11 @@ extension RecognizedEditViewController: OnSelectedValue {
         if let selectedDrink = value["selectedDrink"] as? String {
             placeholderLabel.text = selectedDrink
             placeholderLabel.textColor = DesignSystemAsset.gray900.color
+        }
+        
+        if let selectedSnack = value["selectedSnack"] as? String {
+            snackPlaceholderLabel.text = selectedSnack
+            snackPlaceholderLabel.textColor = DesignSystemAsset.gray900.color
         }
     }
 }

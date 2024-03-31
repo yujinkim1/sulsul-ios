@@ -15,9 +15,9 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
     
     weak var delegate: OnSelectedValue?
     
-    private lazy var viewModel = SelectDrinkViewModel()
+    private lazy var viewModel = SelectSnackViewModel()
     
-    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 200
+    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 150
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!
     
@@ -38,29 +38,26 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
     
     private lazy var bottomSheetTitleLabel = UILabel().then {
         $0.text = "안주 선택"
-        $0.font = Font.bold(size: 24)
+        $0.font = Font.semiBold(size: 16)
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var snackSortTableView = UITableView().then {
-        $0.backgroundColor = DesignSystemAsset.gray100.color
-        $0.register(SnackSortTableViewCell.self, forCellReuseIdentifier: SnackSortTableViewCell.reuseIdentifier)
-        $0.delegate = self
-        $0.dataSource = self
-        $0.separatorStyle = .none
-        $0.rowHeight = moderateScale(number: 48)
-    }
+    private lazy var selectSnackView = SelectSnackView(delegate: nil,
+                                                       viewModel: viewModel,
+                                                       isEditView: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        selectSnackView.didTabSnack = self
     
         view.backgroundColor = .clear
         
         setupGestureRecognizer()
         
         viewModel.setCompletedSnackDataPublisher()
-            .sink { [weak self] _ in
-                self?.snackSortTableView.reloadData()
+            .sink { [weak self] in
+                self?.selectSnackView.snackTableView.reloadData()
             }
             .store(in: &cancelBag)
     }
@@ -79,7 +76,7 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         bottomSheetView.addSubviews([
             grabView,
             bottomSheetTitleLabel,
-            snackSortTableView
+            selectSnackView
         ])
     }
     
@@ -107,37 +104,14 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         
         bottomSheetTitleLabel.snp.makeConstraints {
             $0.top.equalTo(grabView.snp.bottom).offset(moderateScale(number: 8))
-            $0.leading.equalToSuperview().inset(moderateScale(number: 36))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
         
-        snackSortTableView.snp.makeConstraints {
-            $0.top.equalTo(bottomSheetTitleLabel.snp.bottom).offset(moderateScale(number: 8))
-            $0.leading.trailing.bottom.equalToSuperview().inset(moderateScale(number: 12))
+        selectSnackView.snp.makeConstraints {
+            $0.top.equalTo(bottomSheetTitleLabel.snp.bottom).offset(moderateScale(number: 18))
+            $0.bottom.equalToSuperview().inset(moderateScale(number: 12))
+            $0.leading.trailing.equalToSuperview()
         }
-    }
-}
-
-extension SelectRecognizdSnackBottomSheet: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.dataSourceCount()
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: SnackSortTableViewCell.reuseIdentifier,
-                                                       for: indexPath) as? SnackSortTableViewCell else { return UITableViewCell() }
-        cell.selectionStyle = .none
-        cell.bind(viewModel.getDataSource(indexPath.row))
-        
-        cell.cellBackButton.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let selfRef = self else { return }
-            
-            let selectedDrink = selfRef.viewModel.getDataSource(indexPath.row).name
-            selfRef.delegate?.selectedValue(["selectedDrink": selectedDrink])
-            
-            selfRef.hideBottomSheetAndGoBack()
-        }
-        
-        return cell
     }
 }
 
@@ -198,5 +172,14 @@ extension SelectRecognizdSnackBottomSheet {
                 break
             }
         }
+    }
+}
+
+extension SelectRecognizdSnackBottomSheet: OnSelectedValue {
+    func selectedValue(_ value: [String : Any]) {
+        guard let selectedValue = value["selectedValue"] as? String else { return }
+        
+        delegate?.selectedValue(["selectedSnack": selectedValue])
+        hideBottomSheetAndGoBack()
     }
 }

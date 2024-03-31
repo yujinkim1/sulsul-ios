@@ -13,6 +13,8 @@ final class SelectSnackView: UIView {
     var searchBarView: SearchBarView!
     
     weak var didTabSnack: OnSelectedValue?
+    
+    private lazy var isEditView = false
 
     lazy var snackTableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundColor = DesignSystemAsset.black.color
@@ -30,12 +32,20 @@ final class SelectSnackView: UIView {
         $0.isHidden = true
     }
     
-    convenience init(delegate: SearchSnack,
-                     viewModel: SelectSnackViewModel) {
+    convenience init(delegate: SearchSnack?,
+                     viewModel: SelectSnackViewModel,
+                     isEditView: Bool = false) {
         
         self.init(frame: .zero)
         
+        self.isEditView = isEditView
         self.searchBarView = SearchBarView(delegate: delegate)
+        
+        if isEditView {
+            self.searchBarView.backgroundColor = DesignSystemAsset.gray100.color
+            self.snackTableView.backgroundColor = DesignSystemAsset.gray100.color
+        }
+        
         self.viewModel = viewModel
         
         layout()
@@ -85,6 +95,8 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
         cell.selectionStyle = .none
         cell.bind(snack: viewModel.snackSectionModel(in: indexPath.section).cellModels[indexPath.row])
         
+        cell.backgroundColor = .clear
+        
         return cell
     }
     
@@ -98,7 +110,12 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
             viewModel.changeSelectedState(isSelect: true, indexPath: indexPath)
         }
 
-        didTabSnack?.selectedValue(["shouldSetCount": ()])
+        if isEditView {
+            didTabSnack?.selectedValue(["selectedValue": selectedSnackCellModel.name])
+            
+        } else {
+            didTabSnack?.selectedValue(["shouldSetCount": ()])
+        }
 
         snackTableView.reloadData()
     }

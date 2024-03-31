@@ -85,6 +85,8 @@ public final class SelectSnackViewController: BaseViewController {
         selectSnackView = SelectSnackView(delegate: self,
                                           viewModel: viewModel)
         
+        selectSnackView.didTabSnack = self
+        
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.selectSnackView.snackTableView.reloadData()
         }
