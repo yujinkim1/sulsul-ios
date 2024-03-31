@@ -36,7 +36,6 @@ final class DetailFeedCommentCell: UICollectionViewCell {
         
         addViews()
         makeConstraints()
-        bind()
     }
     
     @available(*, unavailable)

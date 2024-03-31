@@ -10,7 +10,9 @@ import Combine
 import DesignSystem
 import Service
 
-public final class SearchViewController: BaseHeaderViewController {
+public final class SearchViewController: BaseHeaderViewController, CommonBaseCoordinated {
+    var coordinator: CommonBaseCoordinator?
+    
     private var cancelBag = Set<AnyCancellable>()
     private lazy var viewModel = SearchViewModel()
     
@@ -235,6 +237,10 @@ public final class SearchViewController: BaseHeaderViewController {
             $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
     }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension SearchViewController: UITextFieldDelegate {
@@ -313,7 +319,10 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         cell.bind(viewModel.feedSearchResults[indexPath.row])
         
         cell.onTapped { [weak self] in
-            // TODO: 피드 상세로 이동 처리
+            if let feedId = self?.viewModel.feedSearchResults[indexPath.row].feed_id {
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed),
+                                          userData: ["feedId": feedId])
+            }
         }
                 
         return cell
