@@ -17,4 +17,8 @@ struct UserMapper {
                                                                foods: userModel.preference?.foods ?? [0]),
                      status: userModel.status ?? "")
     }
+    
+    func deleteUserModel(from userModel: RemoteDeleteUserItem) -> DeleteUserModel {
+        return .init(result: userModel.result ?? false)
+    }
 }
