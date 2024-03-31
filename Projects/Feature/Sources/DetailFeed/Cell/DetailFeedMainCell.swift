@@ -11,9 +11,6 @@ import DesignSystem
 final class DetailFeedMainCell: UICollectionViewCell {
     static let reuseIdentifier: String = "DetailFeedMainCell"
     
-    var drinkName: String = ""
-    var snackName: String = ""
-    
     private var carouselCurrentIndex: Int = 1
     private var imageOfList: [String] = []
     
@@ -174,7 +171,7 @@ final class DetailFeedMainCell: UICollectionViewCell {
         $0.addArrangedSubviews([feedLikesImageView, feedLikesLabel])
     }
     
-    private lazy var pairingStackView = PairingStackView()
+    lazy var pairingStackView = PairingStackView()
     
     private lazy var separatorView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray100.color
@@ -297,8 +294,6 @@ final class DetailFeedMainCell: UICollectionViewCell {
         feedViewsLabel.text = String(model.viewCount)
         feedCommentsLabel.text = String(model.commentCount)
         feedLikesLabel.text = String(model.likeCount)
-        
-        pairingStackView.bind(withPairing: self.drinkName, self.snackName)
         
         if let username = model.writerInfo?.nickname {
             usernameLabel.text = username
