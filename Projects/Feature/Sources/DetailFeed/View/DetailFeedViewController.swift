@@ -449,10 +449,8 @@ extension DetailFeedViewController: UICollectionViewDataSource {
                 else { return .init() }
                 
                 footerView.touchableLabel.onTapped { [weak self] in
-                    guard let self = self else { return }
-                    
-                    let viewController = CommentViewController()
-                    self.navigationController?.pushViewController(viewController, animated: true)
+                    let commentVC = CommentViewController()
+                    self?.navigationController?.pushViewController(commentVC, animated: true)
                 }
                 
                 return footerView

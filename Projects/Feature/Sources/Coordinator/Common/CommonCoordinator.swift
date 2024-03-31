@@ -46,7 +46,14 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToSearch()
         case .comment:
             moveToComment()
+        case .detailFeed:
+            moveToDetailFeed()
         }
+    }
+    
+    private func moveToDetailFeed() {
+        let vc = DetailFeedViewController() // feedID를 전달하지 않으면 기본 0
+        currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToComment() {
