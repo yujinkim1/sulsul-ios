@@ -61,14 +61,6 @@ public final class ReportViewController: BaseViewController {
         $0.isHidden = true
         $0.delegate = self
     })
-    
-    // MARK: - 임시로 넣어둔거 나중에 기획 변경되면 수정
-    private lazy var textCountLabel = UILabel().then({
-        $0.font = Font.semiBold(size: 16)
-        $0.textColor = DesignSystemAsset.gray900.color
-        $0.isHidden = true
-        $0.text = "0/\(maxTextCount)"
-    })
 
     private lazy var etcReportLabel = UILabel().then({
         $0.font = Font.regular(size: 14)
@@ -86,7 +78,6 @@ public final class ReportViewController: BaseViewController {
         $0.backgroundColor = DesignSystemAsset.main.color
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.clipsToBounds = true
-//        $0.isHidden = true
     }
     
     public override func viewDidLoad() {
@@ -105,7 +96,6 @@ public final class ReportViewController: BaseViewController {
                           reportTableView,
                           etcReportTextView,
                           etcReportLabel,
-                          textCountLabel,
                           submitTouchableLabel])
         topHeaderView.addSubview(backButton)
     }
@@ -140,10 +130,6 @@ public final class ReportViewController: BaseViewController {
             $0.top.equalTo(reportTableView.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
             $0.height.equalTo(moderateScale(number: 120))
-        }
-        textCountLabel.snp.makeConstraints {
-            $0.bottom.equalTo(etcReportTextView.snp.bottom)
-            $0.trailing.equalTo(etcReportTextView.snp.trailing)
         }
         etcReportLabel.snp.makeConstraints {
             $0.top.equalTo(etcReportTextView.snp.bottom)
@@ -198,11 +184,6 @@ public final class ReportViewController: BaseViewController {
     private func keyboardWillHide(_ notification: NSNotification) {
         view.frame.origin.y = 0
     }
-
-    private func updateCountLabel(characterCount: Int) {
-        textCountLabel.text = "\(characterCount)/\(maxTextCount)"
-        textCountLabel.asColor(targetString: "\(characterCount)", color: characterCount == 0 ? .lightGray : .blue)
-    }
 }
 
 extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
@@ -225,11 +206,9 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
                 // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
                 etcReportTextView.isHidden = false
                 etcReportLabel.isHidden = false
-                textCountLabel.isHidden = false
             } else {
                 etcReportTextView.isHidden = true
                 etcReportLabel.isHidden = true
-                textCountLabel.isHidden = true
             }
         }
         
@@ -256,7 +235,6 @@ extension ReportViewController: UITextViewDelegate {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = textViewPlaceHolder
             textView.textColor = DesignSystemAsset.gray400.color
-            updateCountLabel(characterCount: 0)
         }
     }
 
@@ -267,7 +245,6 @@ extension ReportViewController: UITextViewDelegate {
 
         let characterCount = newString.count
         guard characterCount <= maxTextCount else { return false }
-        updateCountLabel(characterCount: characterCount)
 
         return true
     }
