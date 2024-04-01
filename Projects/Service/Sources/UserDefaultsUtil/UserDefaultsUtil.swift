@@ -22,8 +22,8 @@ public struct UserDefaultsUtil {
     }
     
     public func isLogin() -> Bool {
-        let accessToke = KeychainStore.shared.read(label: "accessToken")
-        return getInstallationId() != 0 && accessToke != nil
+        let accessToken = KeychainStore.shared.read(label: "accessToken")
+        return getInstallationId() != 0 && accessToken != nil
     }
     
     public func setRecentKeywordList(_ dataList: [String]) {

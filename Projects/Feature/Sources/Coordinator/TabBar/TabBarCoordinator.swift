@@ -7,6 +7,7 @@
 
 import UIKit
 import DesignSystem
+import Service
 
 enum TabType: Int {
     case home
@@ -175,7 +176,13 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
             return true
 
         case .writeFeed:
-            startCommonFlow(TabBarFlow.common(.selectPhoto), userData: nil)
+            if UserDefaultsUtil.shared.isLogin() {
+                startCommonFlow(TabBarFlow.common(.selectPhoto), userData: nil)
+                
+            } else {
+                startCommonFlow(TabBarFlow.auth(.login), userData: nil)
+            }
+            
             return false
         }
     }
