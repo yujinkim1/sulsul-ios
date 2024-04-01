@@ -25,8 +25,8 @@ open class SelectTasteBaseViewController: BaseViewController {
     
     public lazy var submitTouchableLabel = IndicatorTouchableView().then {
         $0.text = "다음"
-        $0.textColor = DesignSystemAsset.gray200.color
-        $0.backgroundColor = DesignSystemAsset.main.color
+        $0.textColor = DesignSystemAsset.gray300.color
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.clipsToBounds = true
     }

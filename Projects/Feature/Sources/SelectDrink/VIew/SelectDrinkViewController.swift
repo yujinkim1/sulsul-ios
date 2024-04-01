@@ -140,6 +140,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                     self?.countLabel.text = String(result)
                     self?.countLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
                     self?.selectLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
+                    self?.submitTouchableLabel.backgroundColor = result == 0 ? DesignSystemAsset.gray100.color : DesignSystemAsset.main.color
+                    self?.submitTouchableLabel.isUserInteractionEnabled = result == 0 ? false : true
+                    self?.submitTouchableLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.gray050.color
                 }
             }
             .store(in: &cancelBag)
@@ -156,6 +159,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     public override func setupIfNeeded() {
+        selectLimitView.updateView("3개까지 고를 수 있어요!")
         topView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
