@@ -17,10 +17,7 @@ public final class ProfileMainViewController: BaseViewController {
     private let viewModel: ProfileMainViewModel
     
     private lazy var topHeaderView = UIView()
-    private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(named: "common_search")
-        $0.tintColor = DesignSystemAsset.gray900.color
-    })
+    
     private lazy var settingTouchableImageView = TouchableImageView(frame: .zero).then({
         $0.image = UIImage(named: "common_setting")
         $0.tintColor = DesignSystemAsset.gray900.color
@@ -136,8 +133,7 @@ public final class ProfileMainViewController: BaseViewController {
     public override func addViews() {
         view.addSubviews([topHeaderView,
                           containerView])
-        topHeaderView.addSubviews([searchTouchableIamgeView,
-                                   settingTouchableImageView])
+        topHeaderView.addSubviews([settingTouchableImageView])
         containerView.addSubviews([profileView,
                                    selectFeedView,
                                    myFeedView,
@@ -159,11 +155,6 @@ public final class ProfileMainViewController: BaseViewController {
         containerView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
-        }
-        searchTouchableIamgeView.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(settingTouchableImageView.snp.leading).offset(moderateScale(number: -12))
-            $0.size.equalTo(moderateScale(number: 24))
         }
         settingTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
