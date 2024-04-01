@@ -41,7 +41,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
-        $0.setContentCompressionResistancePriority(.init(1000), for: .horizontal)
     }
     
     private lazy var recognizedContentLabel = UILabel().then {
