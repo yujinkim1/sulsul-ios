@@ -28,9 +28,10 @@ public final class SelectSnackViewController: BaseViewController {
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
-    private lazy var noFindSnackButton = UIButton().then {
-        $0.setTitle("찾는 안주가 없어요", for: .normal)
-        $0.titleLabel?.font = Font.semiBold(size: 14)
+    private lazy var noFindSnackButton = TouchableLabel().then {
+        $0.text = "찾는 안주가 없어요"
+        $0.textColor = DesignSystemAsset.main.color
+        $0.font = Font.semiBold(size: 14)
     }
         
     private lazy var questionNumberLabel = UILabel().then {
@@ -113,7 +114,7 @@ public final class SelectSnackViewController: BaseViewController {
         makeConstraints()
         bind()
         
-        noFindSnackButton.onTapped { [weak self] in
+        noFindSnackButton.setOpaqueTapGestureRecognizer { [weak self] in
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
