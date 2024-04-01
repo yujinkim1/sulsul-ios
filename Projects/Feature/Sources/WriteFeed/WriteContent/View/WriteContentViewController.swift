@@ -143,7 +143,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     open override func viewWillAppear(_ animated: Bool) {
         if let thumnailImage = images.first,
-           editViewController.selectedDrink == nil || editViewController.selectedSnack == nil {
+           editViewController.selectedDrink == nil && editViewController.selectedSnack == nil {
             viewModel.uploadImage(thumnailImage)
             
             recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
@@ -517,11 +517,11 @@ extension WriteContentViewController: OnSelectedValue {
                 drinkSnackStackView.isHidden = false
                 recognizedDrinkLabel.text = "\(writtenText[0])"
                 recognizedSnackLabel.text = "\(writtenText[1])"
-            } else {
+                
+            } else if writtenText.count == 1 {
                 recognizedContentLabel.isHidden = false
                 drinkSnackStackView.isHidden = true
-                recognizedContentLabel.text = "정보 직접 입력하기"
-                recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+                recognizedContentLabel.text = "\(writtenText[0])"
             }
         }
     }

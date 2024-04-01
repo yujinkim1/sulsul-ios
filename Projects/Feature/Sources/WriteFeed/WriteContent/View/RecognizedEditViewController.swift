@@ -213,8 +213,7 @@ extension RecognizedEditViewController: OnSelectedValue {
             self.selectedSnack = selectedSnack
         }
         
-        if placeholderLabel.text != "술 종류를 선택해주세요",
-           snackPlaceholderLabel.text != "안주이름을 검색해보세요" {
+        if self.selectedSnack != nil || self.selectedDrink != nil {
             
             saveButton.textColor = DesignSystemAsset.gray050.color
             saveButton.backgroundColor = DesignSystemAsset.main.color
