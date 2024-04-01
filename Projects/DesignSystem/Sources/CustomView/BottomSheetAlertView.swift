@@ -27,7 +27,7 @@ final class BottomSheetAlertView: UIView {
     
     private lazy var submitTouchableLabel = TouchableLabel().then {
         $0.text = "회원탈퇴"
-        $0.textColor = DesignSystemAsset.gray700.color
+        $0.textColor = DesignSystemAsset.white.color
         $0.textAlignment = .center
         $0.font = Font.bold(size: 16)
         $0.backgroundColor = DesignSystemAsset.red050.color
@@ -59,14 +59,14 @@ final class BottomSheetAlertView: UIView {
     
     private lazy var titleLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.font = Font.regular(size: 18)
+        $0.font = Font.bold(size: 24)
         $0.textAlignment = .left
         $0.numberOfLines = 0
     }
     
     private lazy var descriptionLabel = UILabel().then {
         $0.textColor = DesignSystemAsset.gray900.color
-        $0.font = Font.regular(size: 16)
+        $0.font = Font.medium(size: 16)
         $0.textAlignment = .left
         $0.numberOfLines = 0
     }
