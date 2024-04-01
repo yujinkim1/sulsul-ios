@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TransferCoordinator: NSObject, TransferBaseCoordinator {
+final class WriteFeedCoordinator: NSObject, WriteFeedBaseCoordinator {
     var currentFlowManager: CurrentFlowManager?
     
     var parentCoordinator: Coordinator?
@@ -24,7 +24,7 @@ final class TransferCoordinator: NSObject, TransferBaseCoordinator {
         }
         
         switch tabBarFlow {
-        case .transfer(let transferScene):
+        case .writeFeed(let transferScene):
             moveTotransferScene(transferScene, userData: userData)
         default:
             parentCoordinator?.moveTo(appFlow: appFlow, userData: userData)
@@ -40,7 +40,7 @@ final class TransferCoordinator: NSObject, TransferBaseCoordinator {
 }
 
 // MARK: - UINavigationControllerDelegate
-extension TransferCoordinator: UINavigationControllerDelegate {
+extension WriteFeedCoordinator: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         guard viewController is TransferViewController else { return }
         

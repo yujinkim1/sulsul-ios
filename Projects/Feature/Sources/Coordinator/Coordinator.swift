@@ -46,7 +46,7 @@ enum TabBarFlow: Flow {
     case common(CommonScene)
     case home(HomeScene)
     case ranking(RankingScene)
-    case transfer(TransferScene)
+    case writeFeed(TransferScene)
     case transferHistory(TransferHistoryScene)
     case more(ProfileScene)
 }
