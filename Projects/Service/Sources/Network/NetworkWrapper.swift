@@ -20,7 +20,7 @@ struct Detail: Decodable {
 
 public struct NetworkWrapper {
     public static let shared = NetworkWrapper()
-    var apiDomain =  "http://sulsul-env.eba-gvmvk4bq.ap-northeast-2.elasticbeanstalk.com"
+    var apiDomain =  "https://sulsul.link"
     private let jsonDecoder = JSONDecoder()
     
     public func postUploadImage(stringURL: String, image: UIImage, completion: @escaping (Result<Data, Error>) -> Void) {

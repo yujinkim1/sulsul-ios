@@ -11,14 +11,14 @@ import DesignSystem
 import Service
 
 public final class DetailFeedViewController: BaseViewController {
-    var viewModel: DetailFeedViewModel
+    var feedID: Int
     
+    private var detailFeedVM: DetailFeedViewModel
+    private var commentVM: CommentViewModel
     private var cancelBag = Set<AnyCancellable>()
     
-    private lazy var baseTopView = BaseTopView().then {
-        $0.frame = .zero
-    }
-    
+    private lazy var baseTopView = BaseTopView()
+    private lazy var commentTextFieldView = CommentTextFieldView()
     private lazy var bottomView = UIView().then {
         $0.frame = .zero
         $0.backgroundColor = DesignSystemAsset.black.color
@@ -29,10 +29,6 @@ public final class DetailFeedViewController: BaseViewController {
         $0.layer.masksToBounds = false
     }
     
-    private lazy var commentTextFieldView = CommentTextFieldView().then {
-        $0.frame = .zero
-    }
-    
     private lazy var titleLabel = UILabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
@@ -41,9 +37,6 @@ public final class DetailFeedViewController: BaseViewController {
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    // 사용자 로그인이 되어 있으면 heart_filled
-    // 로그인이 안되어 있으면 무조건 common_heart
-    // 탭 이벤트 처리도 UIImage에 따라 다른 이벤트 처리하도록 수정해야 함
     private lazy var likeTouchableImageView = TouchableImageView(frame: .zero).then {
         $0.image = UIImage(named: "common_heart")
     }
@@ -53,19 +46,21 @@ public final class DetailFeedViewController: BaseViewController {
     }
     
     private lazy var detailFeedCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
+        $0.backgroundColor = .clear
+        $0.showsVerticalScrollIndicator = false
+        $0.dataSource = self
         $0.register(DetailFeedMainCell.self, forCellWithReuseIdentifier: DetailFeedMainCell.reuseIdentifier)
         $0.register(DetailFeedCommentCell.self, forCellWithReuseIdentifier: DetailFeedCommentCell.reuseIdentifier)
         $0.register(DetailFeedRelatedCell.self, forCellWithReuseIdentifier: DetailFeedRelatedCell.reuseIdentifier)
         $0.registerSupplimentaryView(CommentHeaderView.self, supplementaryViewOfKind: .header)
         $0.registerSupplimentaryView(RelatedFeedHeaderView.self, supplementaryViewOfKind: .header)
         $0.registerSupplimentaryView(CommentFooterView.self, supplementaryViewOfKind: .footer)
-        $0.backgroundColor = .clear // DesignSystemAsset.gray100.color
-        $0.showsVerticalScrollIndicator = false
-        $0.dataSource = self
     }
     
-    public init(viewModel: DetailFeedViewModel) {
-        self.viewModel = viewModel
+    public init(feedID: Int = 0) {
+        self.feedID = feedID
+        self.detailFeedVM = DetailFeedViewModel(feedID: feedID)
+        self.commentVM = CommentViewModel(feedId: feedID)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -77,6 +72,7 @@ public final class DetailFeedViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
         tabBarController?.setTabBarHidden(true)
         
         NotificationCenter.default.addObserver(
@@ -92,11 +88,21 @@ public final class DetailFeedViewController: BaseViewController {
             object: nil
         )
         
+        verifyLoginUser()
         addGestures()
-        bind()
+        addViews()
+        makeConstraints()
+        
+        if feedID != 0 {
+            bind()
+        } else {
+            showNotFoundView()
+        }
     }
     
     public override func addViews() {
+        super.addViews()
+        
         baseTopView.addSubviews([
             titleLabel,
             likeTouchableImageView,
@@ -114,6 +120,8 @@ public final class DetailFeedViewController: BaseViewController {
     }
     
     public override func makeConstraints() {
+        super.makeConstraints()
+        
         baseTopView.snp.makeConstraints {
             $0.height.equalTo(moderateScale(number: 59))
             $0.width.centerX.equalToSuperview()
@@ -132,41 +140,64 @@ public final class DetailFeedViewController: BaseViewController {
             $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
             $0.size.equalTo(moderateScale(number: 24))
         }
-        detailFeedCollectionView.snp.makeConstraints {
-            $0.top.equalTo(baseTopView.snp.bottom)
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.bottom.equalToSuperview()
-        }
-        bottomView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(moderateScale(number: 76))
-            $0.bottom.equalToSuperview()
-        }
-        commentTextFieldView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))
-            $0.height.equalTo(moderateScale(number: 48))
-            $0.bottom.equalToSuperview().inset(moderateScale(number: 28))
+        
+        if feedID != 0 { // 피드 아이디 조회가 가능한 경우에만 제약조건 설정 수행
+            detailFeedCollectionView.snp.makeConstraints {
+                $0.top.equalTo(baseTopView.snp.bottom)
+                $0.leading.trailing.equalToSuperview()
+                $0.bottom.equalToSuperview()
+            }
+            bottomView.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview()
+                $0.height.equalTo(moderateScale(number: 76))
+                $0.bottom.equalToSuperview()
+            }
+            commentTextFieldView.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))
+                $0.height.equalTo(moderateScale(number: 48))
+                $0.bottom.equalToSuperview().inset(moderateScale(number: 28))
+            }
+        } else if feedID == 0 { // 피드 아이디 조회를 할 수 없는 경우 빈 화면 생성
+            showNotFoundView()
         }
     }
     
     override public func setupIfNeeded() {
+        baseTopView.backTouchableView.onTapped { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+        
         likeTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             
-            if likeTouchableImageView.image == UIImage(named: "heart_filled") {
+            if UserDefaultsUtil.shared.isLogin() {
+                // 좋아요 저장
                 print("로그인 되어 있는 사용자")
-            } else if likeTouchableImageView.image == UIImage(named: "common_heart") {
+            } else if !UserDefaultsUtil.shared.isLogin() {
                 print("로그인 되어있지 않은 사용자")
-                self.showAlertView(withType: .oneButton, title: "로그인이 필요해요", description: "로그인 후 해당 피드에 좋아요를 남길 수 있어요.") {
-                        
-                    } cancelCompletion: {
-                        
-                    }
+                self.showToastMessageView(toastType: .error, title: "로그인해야 좋아요를 남길 수 있어요.")
             }
         }
         
-        baseTopView.backTouchableView.onTapped { [weak self] in
-            self?.navigationController?.popViewController(animated: true)
+        menuTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            
+            // 신고하기 바텀 시트 추가 필요
+            let viewController = SpamBottomSheet()
+            viewController.modalPresentationStyle = .overFullScreen
+            self.present(viewController, animated: false)
+        }
+        
+        commentTextFieldView.touchableLabel.onTapped { [weak self] in
+            guard let self = self else { return }
+            
+            if let text = self.commentTextFieldView.textField.text,
+               text.removeSpace() != "" {
+                let feedID = self.feedID
+                
+                self.commentVM.didTabWriteComment(feedID, content: text, parentId: 0)
+                self.detailFeedCollectionView.reloadData()
+            }
         }
     }
     
@@ -179,18 +210,40 @@ public final class DetailFeedViewController: BaseViewController {
         )
     }
     
-    // MARK: - Custom Method
-    
     private func bind() {
-            viewModel.requestDetailFeed()
+        detailFeedVM.requestDetailFeed()
 
-            viewModel
-                .detailFeedPublisher
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] model in
-                    self?.detailFeedCollectionView.reloadData()
-                }
-                .store(in: &cancelBag)
+        detailFeedVM
+            .detailFeedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.detailFeedCollectionView.reloadData()
+            }
+            .store(in: &cancelBag)
+    }
+    
+    private func showNotFoundView() {
+        lazy var notFoundView = NotFoundDetailFeedView()
+        
+        self.view.addSubview(notFoundView)
+        
+        notFoundView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.top.equalTo(baseTopView.snp.bottom)
+        }
+    }
+    
+    private func verifyLoginUser() {
+        if !UserDefaultsUtil.shared.isLogin() {
+            commentTextFieldView.textField.isEnabled = false
+            commentTextFieldView.onTapped {
+                self.showAlertView(withType: .oneButton,
+                                   title: "알림",
+                                   description: "로그인하면 댓글을 남길 수 있어요.",
+                                   submitCompletion: nil,
+                                   cancelCompletion: nil)
+            }
+        }
     }
     
     private func addGestures() {
@@ -204,11 +257,11 @@ public final class DetailFeedViewController: BaseViewController {
             switch sectionIndex {
             case 0:
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), 
-                                                      heightDimension: .fractionalHeight(1))
+                                                      heightDimension: .estimated(747-140))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                       heightDimension: .fractionalHeight(1))
+                                                       heightDimension: .estimated(747-140))
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 
                 let section = NSCollectionLayoutSection(group: group)
@@ -222,21 +275,25 @@ public final class DetailFeedViewController: BaseViewController {
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), 
-                                                       heightDimension: .estimated(130))
+                                                       heightDimension: .estimated(393))
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 
                 let section = NSCollectionLayoutSection(group: group)
                 section.interGroupSpacing = 0
-                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20)
                 
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), 
-                                                        heightDimension: .absolute(48))
-                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                        heightDimension: .estimated(48))
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                         elementKind: UICollectionView.elementKindSectionHeader,
+                                                                         alignment: .top)
                 
                 let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), 
-                                                        heightDimension: .absolute(48))
+                                                        heightDimension: .estimated(48))
                 
-                let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: footerSize, elementKind: UICollectionView.elementKindSectionFooter, alignment: .bottom)
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: footerSize, 
+                                                                         elementKind: UICollectionView.elementKindSectionFooter,
+                                                                         alignment: .bottom)
                 
                 section.boundarySupplementaryItems = [header, footer]
                 
@@ -246,7 +303,7 @@ public final class DetailFeedViewController: BaseViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), 
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                        heightDimension: .fractionalHeight(1))
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 
@@ -255,8 +312,10 @@ public final class DetailFeedViewController: BaseViewController {
                 section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
                 
                 let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                        heightDimension: .absolute(48))
-                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+                                                        heightDimension: .estimated(48))
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                         elementKind: UICollectionView.elementKindSectionHeader,
+                                                                         alignment: .top)
                 
                 section.boundarySupplementaryItems = [header]
                 
@@ -330,27 +389,39 @@ extension DetailFeedViewController: UICollectionViewDataSource {
         switch indexPath.section {
         // 해당하는 피드의 상세 내용을 보여주는 DetailFeedMainCell
         case 0:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedMainCell.reuseIdentifier, for: indexPath) as? DetailFeedMainCell else { return UICollectionViewCell() }
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedMainCell.reuseIdentifier, for: indexPath) as? DetailFeedMainCell 
+            else { return .init() }
             
-            viewModel
+            detailFeedVM
                 .detailFeedPublisher
-                .sink(receiveValue: { model in
-                    cell.bind(model)
-                })
+                .sink { model in cell.bind(model) }
+                .store(in: &cancelBag)
+            
+            detailFeedVM
+                .pairingDrinkPublisher
+                .sink { value in cell.pairingStackView.drinkLabel.text = value }
+                .store(in: &cancelBag)
+            
+            detailFeedVM
+                .pairingSnackPublisher
+                .sink { value in cell.pairingStackView.snackLabel.text = value }
                 .store(in: &cancelBag)
             
             return cell
         // 해당하는 피드의 댓글을 최대 5개만 보여주는 DetailFeedCommentCell
         case 1:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedCommentCell.reuseIdentifier, for: indexPath) as? DetailFeedCommentCell else { return UICollectionViewCell() }
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedCommentCell.reuseIdentifier, for: indexPath) as? DetailFeedCommentCell 
+            else { return .init() }
             
             return cell
         // 해당하는 피드와 연관된 피드가 있으면 보여주는 DetailFeedRelatedCell
         case 2:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedRelatedCell.reuseIdentifier, for: indexPath) as? DetailFeedRelatedCell else { return UICollectionViewCell() }
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailFeedRelatedCell.reuseIdentifier, for: indexPath) as? DetailFeedRelatedCell 
+            else { return .init() }
             
             return cell
-        default: return UICollectionViewCell()
+        default: 
+            return .init()
         }
     }
     
@@ -369,11 +440,18 @@ extension DetailFeedViewController: UICollectionViewDataSource {
                                                                                supplementaryViewOfKind: .header, indexPath: indexPath)
                 else { return .init() }
                 
+                headerView.bind(toComment: detailFeedVM.fetchCommentCount())
+                
                 return headerView
             } else if kind == footer {
                 guard let footerView = collectionView.dequeueSupplimentaryView(CommentFooterView.self, 
                                                                                supplementaryViewOfKind: .footer, indexPath: indexPath)
                 else { return .init() }
+                
+                footerView.touchableLabel.onTapped { [weak self] in
+                    let commentVC = CommentViewController()
+                    self?.navigationController?.pushViewController(commentVC, animated: true)
+                }
                 
                 return footerView
             }

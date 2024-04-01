@@ -13,7 +13,7 @@ final class DetailFeedRelatedCell: UICollectionViewCell {
     
     private lazy var flowLayout = UICollectionViewFlowLayout().then {
         $0.scrollDirection = .vertical
-        $0.itemSize = CGSize(width: 173, height: 220)
+        $0.itemSize = CGSize(width: 170, height: 220)
         $0.minimumLineSpacing = 10
         $0.minimumInteritemSpacing = 7
     }
@@ -30,6 +30,7 @@ final class DetailFeedRelatedCell: UICollectionViewCell {
         super.init(frame: frame)
         
         self.backgroundColor = .clear
+        self.isUserInteractionEnabled = true
         
         addViews()
         makeConstraints()
@@ -46,7 +47,8 @@ final class DetailFeedRelatedCell: UICollectionViewCell {
     
     private func makeConstraints() {
         relatedCollectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.bottom.equalToSuperview()
         }
     }
 }
@@ -64,7 +66,8 @@ extension DetailFeedRelatedCell: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RelatedCell.reuseIdentifier, for: indexPath) as? RelatedCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RelatedCell.reuseIdentifier, for: indexPath) as? RelatedCell
+        else { return .init() }
         
         return cell
     }

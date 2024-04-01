@@ -1,5 +1,5 @@
 //
-//  RelatedFeedHeaderView.swift
+//  CommentHeaderView.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-03-10.
@@ -8,17 +8,24 @@
 import UIKit
 import DesignSystem
 
-final class RelatedFeedHeaderView: UICollectionReusableView {
-    static let reuseIdentifier: String = "RelatedFeedHeaderView"
+final class CommentHeaderView: UICollectionReusableView {
+    static let reuseIdentifier: String = "CommentHeaderView"
     
     private lazy var imageView = UIImageView().then {
-        $0.image = UIImage(named: "feeds")
+        $0.image = UIImage(named: "comment")
     }
     
     private lazy var titleLabel = UILabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
-        $0.text = "연관 피드"
+        $0.text = "댓글"
+        $0.textColor = DesignSystemAsset.gray900.color
+    }
+    
+    private lazy var countLabel = UILabel().then {
+        $0.setLineHeight(28, font: Font.bold(size: 18))
+        $0.font = Font.bold(size: 18)
+        $0.text = "0"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
@@ -39,7 +46,8 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
     private func addViews() {
         self.addSubviews([
             imageView,
-            titleLabel
+            titleLabel,
+            countLabel
         ])
     }
     
@@ -53,5 +61,13 @@ final class RelatedFeedHeaderView: UICollectionReusableView {
             $0.leading.equalTo(imageView.snp.trailing).offset(moderateScale(number: 8))
             $0.centerY.equalTo(imageView)
         }
+        countLabel.snp.makeConstraints {
+            $0.leading.equalTo(titleLabel.snp.trailing).offset(moderateScale(number: 8))
+            $0.centerY.equalTo(imageView)
+        }
+    }
+    
+    func bind(toComment count: Int) {
+        countLabel.text = String(count)
     }
 }
