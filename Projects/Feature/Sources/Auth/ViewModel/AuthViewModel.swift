@@ -206,9 +206,6 @@ extension AuthViewModel {
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                                print(">>>>카카오 아이디")
-                                print(id)
-//                                StaticValues.isLoggedIn.send(true)
                                 self.getUserInfo(userId: id)
                             } else {
                                 print("디코딩 모델 에러3")
