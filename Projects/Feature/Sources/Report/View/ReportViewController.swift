@@ -11,14 +11,27 @@ import DesignSystem
 
 public final class ReportViewController: BaseViewController {
     
+    private let reportType: ReportType
+    private let targetId: Int
     var coordinator: CommonBaseCoordinator?
     private let viewModel: ReportViewModel = ReportViewModel()
     
     private var buttonBottomConstraint: Constraint?
     private let textViewPlaceHolder = "텍스트를 입력하세요"
     private let maxTextCount: Int = 100
-    
     private lazy var superViewInset = moderateScale(number: 20)
+    
+    init(reportType: ReportType, targetId: Int) {
+        self.reportType = reportType
+        self.targetId = targetId
+        super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private lazy var topHeaderView = UIView()
     
@@ -157,8 +170,8 @@ public final class ReportViewController: BaseViewController {
                                                object: nil)
         
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-    
-            self?.showToastMessageView(toastType: .error, title: "ㅎ이ㅏ멀;ㅐ야러ㅔㅁㄷ")
+            guard let self = self else { return }
+            viewModel.setReports(reason: "", type: reportType, targetId: targetId)
         }
     }
     

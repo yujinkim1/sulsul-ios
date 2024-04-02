@@ -64,7 +64,6 @@ final class AuthViewModel: NSObject {
                         userSettingType.send(.drinkSettingUser)
                     } else {
                         userSettingType.send(.allSettingUSer)
-                        
                         print(">>>>> 키체인 잘저장되나 :\(KeychainStore.shared.read(label: "accessToken"))")
                     }
                 } else {

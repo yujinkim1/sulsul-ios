@@ -34,8 +34,6 @@ final class SelectDrinkViewModel {
     private var completeDrinkPreference = PassthroughSubject<Void, Never>()
     
     init() {
-        print(">.>>>>>>>>술 쪽 아이디")
-        print(userId)
         bind()
     }
     
