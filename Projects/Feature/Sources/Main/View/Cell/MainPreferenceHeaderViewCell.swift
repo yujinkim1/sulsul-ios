@@ -10,7 +10,10 @@ import DesignSystem
 
 final class MainPreferenceHeaderViewCell: UICollectionViewCell {
     
-    lazy var containerView = TouchableView()
+    lazy var containerView = TouchableView().then({
+        $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.backgroundColor = .clear
+    })
     
     private lazy var titleLabel = UILabel().then({
         $0.text = "test"
@@ -42,13 +45,19 @@ final class MainPreferenceHeaderViewCell: UICollectionViewCell {
         }
     }
     
-    func bind(_ title: String) {
-        titleLabel.text = title
+    func bind(_ model: SelectableAlcohol) {
+        titleLabel.text = model.title
+        if model.isSelected {
+            containerView.backgroundColor = DesignSystemAsset.main.color
+            titleLabel.textColor = DesignSystemAsset.gray050.color
+        } else {
+            containerView.backgroundColor = .clear
+            titleLabel.textColor = DesignSystemAsset.gray400.color
+        }
     }
+}
     
-    func updateView() {
-        containerView.layer.cornerRadius = moderateScale(number: 16)
-        containerView.backgroundColor = DesignSystemAsset.main.color
-        titleLabel.textColor = DesignSystemAsset.gray050.color
-    }
+struct SelectableAlcohol {
+    let title: String
+    var isSelected: Bool = false
 }

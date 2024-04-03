@@ -19,7 +19,7 @@ final class MainPageViewModel {
     private let differenceFeeds = CurrentValueSubject<[PopularFeed], Never> ([])
 //    private let byAlcoholFeeds = CurrentValueSubject<[ByAlcoholFeed], Never> ([])
     // MARK: - (비로그인) 술 종류
-    private let kindOfAlcohol = CurrentValueSubject<[String], Never> ([])
+    private let kindOfAlcohol = CurrentValueSubject<[SelectableAlcohol], Never> ([])
     private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcohol = CurrentValueSubject<String, Never>("")
@@ -59,8 +59,12 @@ final class MainPageViewModel {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
+                    var selectableAlcohols: [SelectableAlcohol] = mappedAlcoholFeedList.subtypes.map { SelectableAlcohol(title: $0, isSelected: false) }
+                    if let firstIndex = selectableAlcohols.indices.first {
+                        selectableAlcohols[firstIndex].isSelected = true
+                    }
                     self.alcoholFeeds.send(mappedAlcoholFeedList.feeds)
-                    self.kindOfAlcohol.send(mappedAlcoholFeedList.subtypes)
+                    self.kindOfAlcohol.send(selectableAlcohols)
                     self.sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
                     self.selectedAlcohol.send(mappedAlcoholFeedList.subtypes.first ?? "")
                 } else {
@@ -206,6 +210,13 @@ final class MainPageViewModel {
         let allAlcoholFeeds = alcoholFeeds.value
         let selectedFeeds = allAlcoholFeeds.filter { $0.subtype == alcohol }
         selectedAlcohol.send(alcohol)
+        var kindOfAlcoholValue = kindOfAlcohol.value
+        if let index = kindOfAlcoholValue.firstIndex(where: { $0.title.lowercased() == alcohol }) {
+            for (i, _) in kindOfAlcoholValue.enumerated() {
+                kindOfAlcoholValue[i].isSelected = (i == index)
+            }
+        }
+        kindOfAlcohol.send(kindOfAlcoholValue)
         selectedAlcoholFeeds.send(selectedFeeds)
     }
     
@@ -217,7 +228,7 @@ final class MainPageViewModel {
         return selectedAlcoholFeeds.value
     }
     
-    func getKindOfAlcoholValue() -> [String] {
+    func getKindOfAlcoholValue() -> [SelectableAlcohol] {
         return kindOfAlcohol.value
     }
     

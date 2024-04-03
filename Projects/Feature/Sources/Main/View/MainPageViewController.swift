@@ -14,7 +14,6 @@ import Kingfisher
 public final class MainPageViewController: BaseViewController, HomeBaseCoordinated {
     
     var coordinator: HomeBaseCoordinator?
-    private let nopreferenceTemp = 1 //0이면 소주나 그런거에 피드 하나도 등록 안된 상태, 그외는 등록되있는 상태
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel: MainPageViewModel = MainPageViewModel() // 수정
     
@@ -59,7 +58,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-//        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
         addViews()
         makeConstraints()
         bind()

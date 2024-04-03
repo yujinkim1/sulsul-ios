@@ -182,6 +182,7 @@ extension AuthViewModel {
                                 print("디코딩 모델 에러2")
                             }
                         case .failure(let error):
+                            print(">>>>>> :\(error)")
                             if let networkError = error as? NetworkError {
                                 self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
                             }
@@ -212,6 +213,7 @@ extension AuthViewModel {
                                 print("디코딩 모델 에러3")
                             }
                         case .failure(let error):
+                            print(">>>>>> :\(error)")
                             if let networkError = error as? NetworkError {
                                 self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
                             }

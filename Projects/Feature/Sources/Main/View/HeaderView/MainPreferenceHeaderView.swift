@@ -7,10 +7,12 @@
 
 import UIKit
 import DesignSystem
+import Combine
 
 final class MainPreferenceHeaderView: UICollectionReusableView {
     
     var viewModel: MainPageViewModel?
+    private var cancelBag = Set<AnyCancellable>()
     
     private lazy var containerView = UIView()
     
@@ -112,9 +114,8 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
         cell.bind(alcohol)
         
         cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-//            cell.updateView()
             guard let self = self else { return }
-            viewModel?.sendSelectedAlcoholFeed(alcohol)
+            viewModel?.sendSelectedAlcoholFeed(alcohol.title)
         }
         
         return cell
