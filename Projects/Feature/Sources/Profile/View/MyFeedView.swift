@@ -26,7 +26,7 @@ class MyFeedView: UIView {
         $0.registerCell(NoDataCell.self)
         $0.registerCell(MyFeedCell.self)
         $0.showsVerticalScrollIndicator = false
-        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.backgroundColor = .clear
         $0.dataSource = self
     })
     
@@ -86,9 +86,9 @@ class MyFeedView: UIView {
             case .loginFeedExist:
                 itemHeight = 611
             case .loginFeedNotExist:
-                itemHeight = 213
+                itemHeight = 400
             case .notLogin:
-                itemHeight = 213
+                itemHeight = 400
             case nil:
                 itemHeight = 0
             }
@@ -113,14 +113,6 @@ class MyFeedView: UIView {
 
 extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
-//        if viewModel.getMyFeedsValue().count == 0 {
-//            // MARK: - 빈 셀일때
-//            return 1
-//        } else {
-//            return viewModel.getMyFeedsValue().count
-//        }
-        
         switch myFeedState {
         case .loginFeedExist:
             return viewModel.getMyFeedsValue().count
@@ -134,19 +126,6 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        if viewModel.getMyFeedsValue().count == 0 {
-//            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
-//            cell.updateView(withType: .logInMyFeed)
-//            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
-//                print("로그인하러가기")
-//            }
-//            return cell
-//        } else {
-//            guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
-//            let model = viewModel.getMyFeedsValue()[indexPath.row]
-//            cell.bind(model)
-//            return cell
-//        }
         switch myFeedState {
         case .loginFeedExist:
             guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
