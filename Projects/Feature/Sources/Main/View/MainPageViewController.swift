@@ -141,9 +141,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             }.store(in: &cancelBag)
         
         viewModel.getUserInfo()
-//        viewModel.getPopularFeeds()
-//        viewModel.getDifferenceFeeds()
-//        viewModel.getFeedsByAlcohol() // TODO: - 비로그인시에만 call
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
@@ -215,14 +212,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                     layoutSize: headerSize,
                     elementKind: UICollectionView.elementKindSectionHeader,
                     alignment: .top)
-                
-                let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 52)))
-                let footer = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: footerSize,
-                    elementKind: UICollectionView.elementKindSectionFooter,
-                    alignment: .bottom)
-                
-                section.boundarySupplementaryItems = [header, footer]
+ 
+                section.boundarySupplementaryItems = [header]
                 return section
             default:
                 return nil
@@ -240,7 +231,11 @@ extension MainPageViewController: UICollectionViewDataSource {
         if section == 0 {
             return 1
         } else if section == 1 { // MARK: - 좋아요 많은 조합
-            return viewModel.getPopularFeedsValue().count
+            if viewModel.getPopularFeedsValue().count > 3 {
+                return 3
+            } else {
+                return viewModel.getPopularFeedsValue().count
+            }
         } else {
             return viewModel.getDifferenceFeedsValue().count
         }
@@ -296,9 +291,6 @@ extension MainPageViewController: UICollectionViewDataSource {
                                           subTitle: "맨날 먹던거만 먹으면 질리니까!!\n새로 만나는 우리, 제법 잘...어울릴지도??",
                                           separator: true)
                 return likeHeaderView
-            } else if kind == UICollectionView.elementKindSectionFooter {
-                guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }
-                return likeFooterView
             }
         }
         return UICollectionReusableView()
