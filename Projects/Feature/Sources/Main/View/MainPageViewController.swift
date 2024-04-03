@@ -254,11 +254,20 @@ extension MainPageViewController: UICollectionViewDataSource {
             }
         case 1: // MARK: - 좋아요 많은 조합
             guard let cell = collectionView.dequeueReusableCell(MainLikeCell.self, indexPath: indexPath) else { return .init() }
-            cell.bind(viewModel.getPopularFeedsValue()[indexPath.item])
+            let popularFeed = viewModel.getPopularFeedsValue()[indexPath.item]
+            cell.bind(popularFeed)
+            
+//            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+//                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": popularFeed.)
+//            }
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
-            cell.bind(viewModel.getDifferenceFeedsValue()[indexPath.item])
+            let differenceFeed = viewModel.getDifferenceFeedsValue()[indexPath.item]
+            cell.bind(differenceFeed)
+            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": differenceFeed.feeds[0].feedId]) // MARK: feed가 하나밖에 안내려오긴 함
+            }
             return cell
         default:
             return UICollectionViewCell()
