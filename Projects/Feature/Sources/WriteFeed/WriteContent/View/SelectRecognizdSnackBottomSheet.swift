@@ -42,7 +42,7 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var selectSnackView = SelectSnackView(delegate: nil,
+    private lazy var selectSnackView = SelectSnackView(delegate: self,
                                                        viewModel: viewModel,
                                                        isEditView: true)
     
@@ -181,5 +181,23 @@ extension SelectRecognizdSnackBottomSheet: OnSelectedValue {
         
         delegate?.selectedValue(["selectedSnack": selectedValue])
         hideBottomSheetAndGoBack()
+    }
+}
+
+extension SelectRecognizdSnackBottomSheet: SearchSnack {
+    func searchSnackWith(_ searchText: String) {
+        if searchText == "" {
+            self.selectSnackView.resultEmptyView.isHidden = true
+            self.selectSnackView.snackTableView.isHidden = false
+            
+            viewModel.setWithInitSnackData()
+        } else {
+            viewModel.setWithSearchResult(searchText)
+        }
+
+        UIView.transition(with: selectSnackView.snackTableView,
+                          duration: 0.2,
+                          options: .transitionCrossDissolve,
+                          animations: { self.selectSnackView.snackTableView.reloadData() })
     }
 }
