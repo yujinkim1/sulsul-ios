@@ -8,22 +8,21 @@
 import UIKit
 import SnapKit
 import DesignSystem
+import Combine
 
 public final class ReportViewController: BaseViewController {
     
-    private let reportType: ReportType
-    private let targetId: Int
     var coordinator: CommonBaseCoordinator?
-    private let viewModel: ReportViewModel = ReportViewModel()
+    private let viewModel: ReportViewModel
     
+    private var cancelBag = Set<AnyCancellable>()
     private var buttonBottomConstraint: Constraint?
     private let textViewPlaceHolder = "텍스트를 입력하세요"
     private let maxTextCount: Int = 100
     private lazy var superViewInset = moderateScale(number: 20)
     
-    init(reportType: ReportType, targetId: Int) {
-        self.reportType = reportType
-        self.targetId = targetId
+    init(viewModel: ReportViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
     }
@@ -88,8 +87,7 @@ public final class ReportViewController: BaseViewController {
         $0.text = "다음"
         $0.textColor = DesignSystemAsset.gray200.color
         $0.font = Font.bold(size: 16)
-        $0.backgroundColor = DesignSystemAsset.main.color
-        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.setClickable(false)
         $0.clipsToBounds = true
     }
     
@@ -99,6 +97,7 @@ public final class ReportViewController: BaseViewController {
         self.tabBarController?.setTabBarHidden(true)
         addViews()
         makeConstraints()
+        bind()
     }
     
     public override func addViews() {
@@ -158,6 +157,36 @@ public final class ReportViewController: BaseViewController {
         }
     }
     
+    private func bind() {
+        viewModel.getErrorSubject()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
+            }.store(in: &cancelBag)
+        
+        viewModel.reportSuccessPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }.store(in: &cancelBag)
+        
+        viewModel.currentReportContentPublisher()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] content in
+                if content.isEmpty {
+                    self?.submitTouchableLabel.setClickable(false)
+                } else {
+                    self?.submitTouchableLabel.setClickable(true)
+                }
+            }.store(in: &cancelBag)
+    }
+    
     public override func setupIfNeeded() {
         
         NotificationCenter.default.addObserver(self,
@@ -171,7 +200,10 @@ public final class ReportViewController: BaseViewController {
         
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            viewModel.setReports(reason: "", type: reportType, targetId: targetId)
+            if viewModel.currentReportContentValue() == ReportReason.other.rawValue {
+                viewModel.sendCurrentReportContent(etcReportTextView.text)
+            }
+            viewModel.sendReportContent()
         }
     }
     
@@ -231,8 +263,8 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.hiddenCellComponet()
             }
         }
-        
-        // 선택된 셀 뷰모델에 저장하고 있다가 제출 누르면 서버 전송되도록
+
+        viewModel.sendCurrentReportContent(viewModel.getReportList(indexPath.row))
     }
 }
 

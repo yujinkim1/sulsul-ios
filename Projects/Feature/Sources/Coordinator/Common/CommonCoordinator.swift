@@ -101,7 +101,8 @@ final class CommonCoordinator: CommonBaseCoordinator {
         guard let targetId = userData?["targetId"] as? Int else { return }
         guard let reportType = userData?["reportType"] as? ReportType else { return }
         
-        let vc = ReportViewController(reportType: reportType, targetId: targetId)
+        let viewModel = ReportViewModel(reportType: reportType, targetId: targetId)
+        let vc = ReportViewController(viewModel: viewModel)
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)
