@@ -62,16 +62,20 @@ public final class ProfileSettingViewController: BaseViewController {
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
+        bind()
     }
     
     private func bind() {
         viewModel.deleteUserIsCompletedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-                KeychainStore.shared.delete(label: "accessToken")
-                UserDefaultsUtil.shared.remove(.userId)
-                StaticValues.isLoggedIn.send(false)
-                self?.navigationController?.popViewController(animated: true)
+
+                if result {
+                    KeychainStore.shared.delete(label: "accessToken")
+                    UserDefaultsUtil.shared.remove(.userId)
+                    StaticValues.isLoggedIn.send(false)
+                    self?.navigationController?.popViewController(animated: true)
+                }
             }.store(in: &cancelBag)
     }
     

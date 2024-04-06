@@ -10,7 +10,7 @@ import Combine
 import DesignSystem
 import Service
 
-public final class RamdomFeedViewController: BaseViewController, TransferHistoryBaseCoordinated {
+public final class RandomFeedViewController: BaseViewController, TransferHistoryBaseCoordinated {
     var coordinator: TransferHistoryBaseCoordinator?
     
     private var cancelBag = Set<AnyCancellable>()
@@ -109,7 +109,7 @@ public final class RamdomFeedViewController: BaseViewController, TransferHistory
     }
 }
 
-extension RamdomFeedViewController: UICollectionViewDataSource {
+extension RandomFeedViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.randomFeeds.count
     }
@@ -128,8 +128,8 @@ extension RamdomFeedViewController: UICollectionViewDataSource {
         
         cell.spamView.onTapped { [weak self] in
             if UserDefaultsUtil.shared.isLogin() {
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: nil)
-
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: ["targetId": self?.viewModel.randomFeeds[indexPath.row].feed_id,
+                                                                                                 "reportType": ReportType.feed])
             } else {
                 self?.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")
             }

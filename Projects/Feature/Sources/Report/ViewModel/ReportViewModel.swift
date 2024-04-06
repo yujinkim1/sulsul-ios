@@ -26,31 +26,36 @@ enum ReportReason: String {
 
 final class ReportViewModel {
     
+    private let reportType: ReportType
+    private let targetId: Int
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
-    private let accessToken = KeychainStore.shared.read(label: "accessToken")
     
     private let errorSubject = PassthroughSubject<String, Never>()
     private let reportSuccess = PassthroughSubject<Void, Never>()
+    private let currentReportContent = CurrentValueSubject<String, Never>("")
     
     private let reportReasons: [ReportReason] = [.profanity,
                                                  .conflict,
                                                  .spam,
                                                  .inappropriateNickname,
                                                  .other]
-    init() {
-        
+    init(reportType: ReportType, targetId: Int) {
+        self.reportType = reportType
+        self.targetId = targetId
     }
-    // TODO: - 신고 완료 시 api 호출 -> (피드 아이디 없어서 연동 아직 X)
+    
     func setReports(reason: String, type: ReportType, targetId: Int) {
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        
         let params: [String: Any] = ["reason": reason,
-                                     "type": type,
+                                     "type": type.rawValue,
                                      "target_id": targetId]
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken!
+            "Authorization": "Bearer " + accessToken
         ]
-        NetworkWrapper.shared.postBasicTask(stringURL: "/reports", parameters: params, header: headers) {[weak self] result in
+        NetworkWrapper.shared.postBasicTask(stringURL: "/reports", parameters: params, header: headers) { [weak self] result in
             switch result {
             case .success(let response):
                 self?.reportSuccess.send(())
@@ -59,6 +64,10 @@ final class ReportViewModel {
             }
             
         }
+    }
+    
+    func reportSuccessPublisher() -> AnyPublisher<Void, Never> {
+        return reportSuccess.eraseToAnyPublisher()
     }
     
     func reportListCount() -> Int {
@@ -72,4 +81,21 @@ final class ReportViewModel {
     func getErrorSubject() -> AnyPublisher<String, Never> {
         return errorSubject.eraseToAnyPublisher()
     }
+    
+    func sendCurrentReportContent(_ content: String) {
+        currentReportContent.send(content)
+    }
+    
+    func sendReportContent() {
+        setReports(reason: currentReportContent.value, type: self.reportType, targetId: self.targetId)
+    }
+    
+    func currentReportContentPublisher() -> AnyPublisher<String, Never> {
+        return currentReportContent.eraseToAnyPublisher()
+    }
+    
+    func currentReportContentValue() -> String {
+        return currentReportContent.value
+    }
 }
+
