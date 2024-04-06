@@ -120,11 +120,13 @@ open class BaseViewController: UIViewController {
         })
     }
     
-    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, description: String?, submitCompletion: (() -> Void)?,
+    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, submitLabel: String?, cancelLabel: String?, description: String?, submitCompletion: (() -> Void)?,
                                        cancelCompletion: (() -> Void)?) {
         let bottomSheetAlertView = BottomSheetAlertView(bottomSheetAlertType: bottomSheetAlertType)
         bottomSheetAlertView.bind(title: title,
                                   description: description,
+                                  submitLabel: submitLabel,
+                                  cancelLabel: cancelLabel,
                                   submitCompletion: submitCompletion,
                                   cancelCompletion: cancelCompletion)
         view.addSubview(bottomSheetAlertView)

@@ -119,15 +119,23 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                     viewModel.getDifferenceFeeds()
                     viewModel.getFeedsByAlcohol()
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
-                    // MARK: - 밴된 유저
+                    
                 } else { // MARK: - 로그인한 유저
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
+                    // MARK: - 취향미등록 유저
                     if result.preference.foods == [0] || result.preference.foods == [] || result.preference.alcohols == [0] || result.preference.alcohols == [] {
-                        print("여기 호출")
+                        self.tabBarController?.setTabBarHidden(true, animated: false)
+                        self.showBottomSheetAlertView(bottomSheetAlertType: .verticalTwoButton,
+                                                      title: "취향을 알려주지 않을래?",
+                                                      submitLabel: "취향 등록하기!",
+                                                      cancelLabel: "아직 괜찮아요",
+                                                      description: "아...이게 정말 좋은데... 뭐라 설명할 방법이 없네... 하면 진짜 도움이 많이 될텐데... 쩝.. 하려면 버튼을 눌러줘바",
+                                                      submitCompletion: { self.tabBarController?.setTabBarHidden(false) },
+                                                      cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
                         viewModel.getFeedsByAlcohol()
                     } else {
-                        print("저기 호출")
+                        // MARK: - 취향등록 유저
                         viewModel.getPreferenceFeeds()
                     }
                 }
