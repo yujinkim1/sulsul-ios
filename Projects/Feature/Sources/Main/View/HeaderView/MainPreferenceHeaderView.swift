@@ -80,22 +80,21 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
              return section
          }
     }
-    
-    func updateUI() {
+//    히든이 ture니까 안보이지
+    func updateUI(isHidden: Bool) {
         if StaticValues.isLoggedIn.value {
-            preferecneCollectionView.isHidden = true
+            preferecneCollectionView.isHidden = isHidden
             guard let nickname = viewModel?.getUserInfoValue().nickname else { return }
             let attributedString = NSMutableAttributedString(string: nickname + "님이 선택한\n취향으로 골라봤어요.")
             attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: nickname.count)) // 닉네임의 색상 변경
             titleLabel.attributedText = attributedString
         } else {
-            preferecneCollectionView.isHidden = false
+            preferecneCollectionView.isHidden = isHidden
             guard let title = viewModel?.getSelectedAlcoholValue() else { return }
             
             let attributedString = NSMutableAttributedString(string: title + "랑 어울리는\n안주로 골라봤어요!")
             attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: title.count)) // 타이틀의 색상 변경
             titleLabel.attributedText = attributedString
-            
         }
         preferecneCollectionView.reloadData()
     }
@@ -109,6 +108,9 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainPreferenceHeaderViewCell.self, indexPath: indexPath) else { return .init() }
         var alcohol = viewModel?.getKindOfAlcoholValue()[indexPath.item]
+        
+        print(">>>>>소주없냐")
+        print(alcohol)
         guard let alcohol = alcohol else { return cell }
         
         cell.bind(alcohol)

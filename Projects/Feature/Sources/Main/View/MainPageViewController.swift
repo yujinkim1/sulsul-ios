@@ -109,7 +109,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 guard let self = self else { return }
                 viewModel.getUserInfo()
             }.store(in: &cancelBag)
-//        여기 하고 잇읍니다
         
         viewModel.userInfoPublisher()
             .receive(on: DispatchQueue.main)
@@ -122,9 +121,15 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
                     // MARK: - 밴된 유저
                 } else { // MARK: - 로그인한 유저
-                    viewModel.getPreferenceFeeds()
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
+                    if result.preference.foods == [0] || result.preference.foods == [] || result.preference.alcohols == [0] || result.preference.alcohols == [] {
+                        print("여기 호출")
+                        viewModel.getFeedsByAlcohol()
+                    } else {
+                        print("저기 호출")
+                        viewModel.getPreferenceFeeds()
+                    }
                 }
             }.store(in: &cancelBag)
         
@@ -137,6 +142,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         viewModel.completeAllFeedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+                print("됐냐?")
                 self?.mainCollectionView.reloadData()
             }.store(in: &cancelBag)
         
@@ -159,7 +165,11 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 var headerSize: NSCollectionLayoutSize
 
                 if StaticValues.isLoggedIn.value {
-                    headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 80)))
+                    if self?.viewModel.getUserInfoValue().preference.foods == [0] || self?.viewModel.getUserInfoValue().preference.foods == [] || self?.viewModel.getUserInfoValue().preference.alcohols == [0] || self?.viewModel.getUserInfoValue().preference.alcohols == [] {
+                        headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118)))
+                    } else {
+                        headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 80)))
+                    }
                 } else {
                     headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 118)))
                 }
@@ -266,7 +276,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             let differenceFeed = viewModel.getDifferenceFeedsValue()[indexPath.item]
             cell.bind(differenceFeed)
             cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": differenceFeed.feeds[0].feedId]) // MARK: feed가 하나밖에 안내려오긴 함
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": differenceFeed.feeds[0].feedId])
             }
             return cell
         default:
@@ -279,7 +289,12 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            preferenceHeaderView.updateUI() // MARK: - 비로그인, 로그인 때 업뎃
+            if viewModel.getUserInfoValue().preference.foods == [0] || viewModel.getUserInfoValue().preference.foods == [] || viewModel.getUserInfoValue().preference.alcohols == [0] || viewModel.getUserInfoValue().preference.alcohols == [] {
+                preferenceHeaderView.updateUI(isHidden: false)
+            } else {
+                preferenceHeaderView.updateUI(isHidden: true)
+            }
+            
             if preferenceHeaderView.viewModel == nil {
                 preferenceHeaderView.viewModel = self.viewModel
             }

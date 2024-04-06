@@ -68,12 +68,10 @@ public final class ProfileSettingViewController: BaseViewController {
         viewModel.deleteUserIsCompletedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-                //                if result {
                 KeychainStore.shared.delete(label: "accessToken")
                 UserDefaultsUtil.shared.remove(.userId)
                 StaticValues.isLoggedIn.send(false)
                 self?.navigationController?.popViewController(animated: true)
-                //                }
             }.store(in: &cancelBag)
     }
     
