@@ -48,7 +48,15 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToComment()
         case .detailFeed:
             moveToDetailFeed(userData)
+        case .setting:
+            moveToSetting()
         }
+    }
+    
+    private func moveToSetting() {
+        let profileSettingVC = ProfileSettingViewController()
+        profileSettingVC.coordinator = self
+        currentNavigationViewController?.pushViewController(profileSettingVC, animated: true)
     }
     
     private func moveToDetailFeed(_ userData: [String: Any]?) {

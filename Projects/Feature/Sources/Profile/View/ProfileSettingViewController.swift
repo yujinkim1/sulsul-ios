@@ -12,7 +12,7 @@ import Service
 import Combine
 
 public final class ProfileSettingViewController: BaseViewController {
-    var coordinator: MoreBaseCoordinator?
+    var coordinator: Coordinator?
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel = ProfileSettingViewModel()
     private lazy var topHeaderView = BaseTopView()
@@ -59,7 +59,10 @@ public final class ProfileSettingViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
+        
         addViews()
         makeConstraints()
     }
