@@ -219,6 +219,11 @@ public final class ProfileMainViewController: BaseViewController {
             self.myFeedView.isHidden = true
             self.likeFeedView.isHidden = false
         }
+        
+        searchTouchableIamgeView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
+        }
+        
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
         }
