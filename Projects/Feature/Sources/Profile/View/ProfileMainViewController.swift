@@ -91,7 +91,6 @@ public final class ProfileMainViewController: BaseViewController {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-                print("뭐지 : \(result)")
                 guard let self = self else { return }
                 if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     self.profileLabel.text = "로그인 해주세요!"

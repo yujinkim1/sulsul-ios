@@ -55,7 +55,6 @@ final class AuthViewModel: NSObject {
             case .success(let response):
                 if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
-                    print("내정보: \(mappedUserInfo)")
                     if mappedUserInfo.nickname.isEmpty {
                         userSettingType.send(.initSettingUser)
                     } else if mappedUserInfo.preference.alcohols == [0] {
@@ -64,8 +63,6 @@ final class AuthViewModel: NSObject {
                         userSettingType.send(.drinkSettingUser)
                     } else {
                         userSettingType.send(.allSettingUSer)
-                        
-                        print(">>>>> 키체인 잘저장되나 :\(KeychainStore.shared.read(label: "accessToken"))")
                     }
                 } else {
                     print("디코딩 에러")

@@ -177,7 +177,7 @@ extension SelectRecognizdSnackBottomSheet {
 
 extension SelectRecognizdSnackBottomSheet: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        guard let selectedValue = value["selectedValue"] as? String else { return }
+        guard let selectedValue = value["selectedValue"] as? SnackModel else { return }
         
         delegate?.selectedValue(["selectedSnack": selectedValue])
         hideBottomSheetAndGoBack()

@@ -111,7 +111,7 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
         }
 
         if isEditView {
-            didTabSnack?.selectedValue(["selectedValue": selectedSnackCellModel.name])
+            didTabSnack?.selectedValue(["selectedValue": selectedSnackCellModel])
             
         } else {
             didTabSnack?.selectedValue(["shouldSetCount": ()])

@@ -131,7 +131,7 @@ extension SelectDrinkBottomSheetViewController: UITableViewDelegate, UITableView
         cell.cellBackButton.setOpaqueTapGestureRecognizer { [weak self] in
             guard let selfRef = self else { return }
             
-            let selectedDrink = selfRef.viewModel.getDataSource(indexPath.row).name
+            let selectedDrink = selfRef.viewModel.getDataSource(indexPath.row)
             selfRef.delegate?.selectedValue(["selectedDrink": selectedDrink])
             
             selfRef.hideBottomSheetAndGoBack()
