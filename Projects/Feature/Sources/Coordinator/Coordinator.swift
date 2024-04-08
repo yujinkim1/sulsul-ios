@@ -66,6 +66,8 @@ enum CommonScene {
     case comment
     case detailFeed
     case setting
+    case selectSnack
+    case selectDrink
 }
 
 enum LoginScene {

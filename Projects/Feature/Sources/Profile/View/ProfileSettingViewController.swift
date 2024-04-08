@@ -136,11 +136,11 @@ public final class ProfileSettingViewController: BaseViewController {
         }
         drinkSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectDrink), userData: nil)
         }
         snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectSnack), userData: nil)
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }

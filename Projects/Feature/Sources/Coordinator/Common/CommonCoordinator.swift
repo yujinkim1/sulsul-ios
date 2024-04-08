@@ -50,7 +50,25 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToDetailFeed(userData)
         case .setting:
             moveToSetting()
+        case .selectSnack:
+            moveToSelectSnackScene()
+        case .selectDrink:
+            moveToSelectDrinkScene()
         }
+    }
+    
+    private func moveToSelectDrinkScene() {
+        let viewModel = SelectDrinkViewModel()
+        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+        selectDrinkVC.coordinator = self
+        currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
+    }
+    
+    private func moveToSelectSnackScene() {
+        let viewModel = SelectSnackViewModel()
+        let selectSnackVC = SelectSnackViewController(viewModel: viewModel)
+        selectSnackVC.coordinator = self
+        currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
     }
     
     private func moveToSetting() {
