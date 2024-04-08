@@ -14,7 +14,7 @@ final class AddSnackViewModel {
     private let userMapper = UserMapper()
     
     // MARK: Output
-    private lazy var goNextPage = PassthroughSubject<Void, Never>()
+    private lazy var shouldPop = PassthroughSubject<Void, Never>()
     private lazy var updateSelectedSnackSort = PassthroughSubject<String, Never>()
     private lazy var userNickName = CurrentValueSubject<String, Never>("")
     private lazy var error = CurrentValueSubject<Void, Never>(())
@@ -40,7 +40,7 @@ final class AddSnackViewModel {
     }
     
     func submitAddedSnack(_ name: String, _ sort: String?) {
-        requestPOSTaddSnack(.init(type: "술", subtype: sort ?? "", name: name))
+        requestPOSTaddSnack(.init(type: "안주", subtype: sort ?? "", name: name))
     }
     
     func sendUpdateSelectedSnackSort() {
@@ -57,8 +57,8 @@ final class AddSnackViewModel {
         return snackSortModels[index.row]
     }
     
-    func goNextPagePublisher() -> AnyPublisher<Void, Never> {
-        return goNextPage.eraseToAnyPublisher()
+    func shouldPopVC() -> AnyPublisher<Void, Never> {
+        return shouldPop.eraseToAnyPublisher()
     }
     
     func updateSelectedSnackSortPublisher() -> AnyPublisher<String, Never> {
@@ -84,7 +84,7 @@ extension AddSnackViewModel {
         NetworkWrapper.shared.postBasicTask(stringURL: "/pairings/requests", parameters: parameters) { [weak self] result in
             switch result {
             case .success(let responseData):
-                self?.goNextPage.send(())
+                self?.shouldPop.send(())
             case .failure(_):
                 self?.error.send(())
                 print("[/pairings/requests] Fail")

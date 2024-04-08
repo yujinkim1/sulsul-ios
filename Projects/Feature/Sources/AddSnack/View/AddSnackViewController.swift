@@ -109,13 +109,26 @@ public class AddSnackViewController: BaseViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         
+        submitButton.onTapped { [weak self] in
+            if let snackName = self?.snackWriteTextField.text {
+                let category = self?.selectedCategoryLabel.text
+                self?.viewModel.submitAddedSnack(snackName, category)
+            }
+        }
+        
         bind()
     }
     
     private func bind() {
-        viewModel.goNextPagePublisher()
+        viewModel.shouldPopVC()
             .sink { [weak self] _ in
-                // TODO: 다음 화면으로 화면전환
+                guard let selfRef = self,
+                      let vcCount = selfRef.navigationController?.viewControllers.count else { return }
+                
+                let selectSnackVC = (selfRef.navigationController?.viewControllers[vcCount - 2] as? BaseViewController)
+                selectSnackVC?.showToastMessageView(toastType: .success, title: "소중한 의견 감사합니다!")
+                
+                selfRef.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
         
         viewModel.updateSelectedSnackSortPublisher()
