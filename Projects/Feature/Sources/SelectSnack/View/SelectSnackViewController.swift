@@ -31,6 +31,7 @@ public final class SelectSnackViewController: BaseViewController {
     private lazy var noFindSnackButton = UIButton().then {
         $0.setTitle("찾는 안주가 없어요", for: .normal)
         $0.titleLabel?.font = Font.semiBold(size: 14)
+        $0.setTitleColor(DesignSystemAsset.main.color, for: .normal)
     }
         
     private lazy var questionNumberLabel = UILabel().then {
