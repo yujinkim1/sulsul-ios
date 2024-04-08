@@ -226,7 +226,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         viewModel.completeCreateFeed
             .sink { [weak self] isSuccessed in
                 if isSuccessed {
-                    // TODO: 메인페이지가서 토스트 띄우기
+                    let rootVC = self?.coordinator?.currentNavigationViewController?.viewControllers.first as? BaseViewController
+                    rootVC?.showToastMessageView(toastType: .success, title: "게시글 작성 완료!")
+                    
                     self?.coordinator?.currentNavigationViewController?.popToRootViewController(animated: true)
                 } else {
                     self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
