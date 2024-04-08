@@ -8,10 +8,11 @@
 import UIKit
 import Combine
 import DesignSystem
+import Service
 
 public class AddSnackViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
-    private lazy var viewModel = AddSnackViewModel(userId: 0)
+    private lazy var viewModel = AddSnackViewModel(userId: UserDefaultsUtil.shared.getInstallationId())
     
     private lazy var backButton = UIButton().then {
         $0.setImage(UIImage(named: "common_leftArrow")?.withTintColor(DesignSystemAsset.gray900.color), for: .normal)
@@ -32,8 +33,8 @@ public class AddSnackViewController: BaseViewController {
     
     private lazy var descriptionLabel = UILabel().then {
         $0.numberOfLines = 0
-        $0.text = "안녕하세요 000님!\n서비스 초기여서, 원하시는 안주가 많이 없죠..?\n아래에 원하셨던 안주 정보를 입력해주시면,\n더 다양한 안주를 추가할 수 있도록 술술팀이 열심히 달\n려보겠습니다. 조금만 기다려주세요!!\n\n-2023년이 한달 남은 순간에, 술술팀 드림 🎅🏻"
         $0.textColor = DesignSystemAsset.gray900.color
+        $0.font = Font.medium(size: 16)
         $0.setLineHeight(24, font: Font.medium(size: 16))
     }
     
@@ -127,6 +128,18 @@ public class AddSnackViewController: BaseViewController {
                 self?.selectedCategoryLabel.textColor = isTextPlaceHolder ? DesignSystemAsset.gray400.color : DesignSystemAsset.gray900.color
                 self?.categoryArrowImageView.tintColor = isTextPlaceHolder ? DesignSystemAsset.gray400.color : DesignSystemAsset.gray900.color
             }.store(in: &cancelBag)
+        
+        viewModel.userName()
+            .sink { [weak self] userName in
+                self?.descriptionLabel.text = "안녕하세요 \(userName)님!\n서비스 초기여서, 원하시는 안주가 많이 없죠..?\n아래에 원하셨던 안주 정보를 입력해주시면,\n더 다양한 안주를 추가할 수 있도록 술술팀이 열심히 달\n려보겠습니다. 조금만 기다려주세요!!\n\n술술팀 드림 🎅🏻"
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.errorPublisher()
+            .sink { [weak self] in
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+            }
+            .store(in: &cancelBag)
     }
     
     @objc private func tapSelectCategoryContainerButton() {
@@ -189,7 +202,7 @@ public class AddSnackViewController: BaseViewController {
         
         descriptionLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 16))
-            $0.leading.equalTo(noFindSnackTitleLabel)
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
 
         lineView.snp.makeConstraints {
