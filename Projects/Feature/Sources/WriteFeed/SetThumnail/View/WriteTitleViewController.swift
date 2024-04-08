@@ -55,6 +55,18 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         $0.font = Font.bold(size: 16)
     }
     
+    private lazy var bottomGradientLayer = CAGradientLayer()
+    
+    private lazy var bottomGradientView = UIView().then {
+        bottomGradientLayer.colors = [UIColor.clear.cgColor,
+                                      DesignSystemAsset.black.color.withAlphaComponent(0.1),
+                                      DesignSystemAsset.black.color.cgColor]
+        bottomGradientLayer.opacity = 1
+        bottomGradientLayer.locations = [0, 0.2]
+        $0.layer.addSublayer(bottomGradientLayer)
+        bottomGradientLayer.frame = CGRect(x: 0, y: 0, width: Int(UIScreen.main.bounds.width), height: Int(moderateScale(number: 270)))
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         if let text = UserDefaultsUtil.shared.getFeedTitle() {
             titleTextView.text = text
@@ -146,6 +158,8 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             titleTextView
         ])
         
+        thumnailImageView.addSubview(bottomGradientView)
+        
         imageScrollView.addSubview(imageStackView)
     }
     
@@ -156,6 +170,11 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             $0.centerX.equalToSuperview()
             $0.top.equalTo(headerView.snp.bottom)
             $0.size.equalTo(moderateScale(number: 353))
+        }
+        
+        bottomGradientView.snp.makeConstraints {
+            $0.bottom.leading.trailing.equalToSuperview()
+            $0.height.equalTo(thumnailImageView).dividedBy(1.5)
         }
         
         titlePlaceholderLabel.snp.makeConstraints {
