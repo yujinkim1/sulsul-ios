@@ -108,6 +108,8 @@ public final class SelectSnackViewController: BaseViewController {
         self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
 
         addViews()
         makeConstraints()
