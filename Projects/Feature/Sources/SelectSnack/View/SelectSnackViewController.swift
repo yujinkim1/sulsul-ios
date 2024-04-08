@@ -71,9 +71,9 @@ public final class SelectSnackViewController: BaseViewController {
     
     private lazy var nextButton = UIButton().then {
         $0.addTarget(self, action: #selector(didTabNextButton), for: .touchUpInside)
-        $0.backgroundColor = DesignSystemAsset.gray300.color
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.titleLabel?.font = Font.bold(size: 16)
-        $0.titleLabel?.textColor = .white
+        $0.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.setTitle("다음", for: .normal)
     }
@@ -255,6 +255,7 @@ extension SelectSnackViewController: OnSelectedValue {
         
         selectedCountLabel.attributedText = attribtuedString
         selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
-        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
+        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
+        nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
     }
 }

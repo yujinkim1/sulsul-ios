@@ -64,6 +64,7 @@ public class AddSnackViewController: BaseViewController {
     private lazy var snackWriteTextField = UITextField().then {
         $0.placeholder = "안주 이름을 입력해주세요"
         $0.delegate = self
+        $0.font = Font.medium(size: 16)
         $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
@@ -103,9 +104,6 @@ public class AddSnackViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = DesignSystemAsset.black.color
-        overrideUserInterfaceStyle = .dark
         
         backButton.onTapped { [weak self] in
             self?.navigationController?.popViewController(animated: true)
@@ -287,9 +285,12 @@ extension AddSnackViewController: UITextFieldDelegate {
         if textField.text == "" {
             submitButton.isEnabled = false
             submitButton.backgroundColor = DesignSystemAsset.gray100.color
+            submitButton.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
+
         } else if textField.text != "" && submitButton.backgroundColor != DesignSystemAsset.yellow050.color {
             submitButton.isEnabled = true
-            submitButton.backgroundColor = DesignSystemAsset.yellow050.color
+            submitButton.backgroundColor = DesignSystemAsset.main.color
+            submitButton.setTitleColor(DesignSystemAsset.gray050.color, for: .normal)
         }
     }
     
