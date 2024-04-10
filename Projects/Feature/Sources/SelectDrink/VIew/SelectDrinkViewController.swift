@@ -9,13 +9,20 @@ import UIKit
 import DesignSystem
 import Combine
 
+enum SelectTasteCase {
+    case next
+    case store
+}
+
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
+    private let selectTasteCase: SelectTasteCase
     var coordinator: Coordinator?
     var cancelBag = Set<AnyCancellable>()
     private let viewModel: SelectDrinkViewModel
     
-    init(viewModel: SelectDrinkViewModel) {
+    init(viewModel: SelectDrinkViewModel, selectTasteCase: SelectTasteCase) {
+        self.selectTasteCase = selectTasteCase
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
@@ -74,6 +81,13 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         addViews()
         makeConstraints()
         bind()
+        
+        switch selectTasteCase {
+        case .next:
+            submitTouchableLabel.text = "다음"
+        case .store:
+            submitTouchableLabel.text = "저장"
+        }
     }
     
     public override func addViews() {
