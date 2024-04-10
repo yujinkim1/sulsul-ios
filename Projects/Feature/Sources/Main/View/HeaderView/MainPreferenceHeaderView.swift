@@ -108,9 +108,6 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainPreferenceHeaderViewCell.self, indexPath: indexPath) else { return .init() }
         var alcohol = viewModel?.getKindOfAlcoholValue()[indexPath.item]
-        
-        print(">>>>>소주없냐")
-        print(alcohol)
         guard let alcohol = alcohol else { return cell }
         
         cell.bind(alcohol)

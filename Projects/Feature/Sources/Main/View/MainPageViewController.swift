@@ -125,7 +125,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                                                       submitLabel: "취향 등록하기!",
                                                       cancelLabel: "아직 괜찮아요",
                                                       description: "아...이게 정말 좋은데... 뭐라 설명할 방법이 없네... 하면 진짜 도움이 많이 될텐데... 쩝.. 하려면 버튼을 눌러줘바",
-                                                      submitCompletion: { self.tabBarController?.setTabBarHidden(false) },
+                                                      submitCompletion: { self.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)},
                                                       cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
                         StaticValues.isFirstLaunch = false
                     }
@@ -147,7 +147,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         viewModel.completeAllFeedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                print("됐냐?")
                 self?.mainCollectionView.reloadData()
             }.store(in: &cancelBag)
         
@@ -256,8 +255,22 @@ extension MainPageViewController: UICollectionViewDataSource {
         switch indexPath.section {
         case 0:
             if viewModel.getSelectedAlcoholFeedsValue().count == 0 {
-                guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
-                return cell
+                if StaticValues.isLoggedIn.value == false { // MARK: - 로그아웃 유저
+                    guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                    cell.bind(nickName: nil, preference: viewModel.getSelectedAlcoholValue())
+                    cell.registerButton.setOpaqueTapGestureRecognizer { [weak self] in
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)
+                    }
+                    return cell
+                } else { // MARK: - 로그인 유저
+                    guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                    cell.bind(nickName: viewModel.getUserInfoValue().nickname,
+                              preference: StaticValues.getDrinkPairingById(viewModel.getUserInfoValue().preference.alcohols[0])?.name ?? "취향 선택 x")
+                    cell.registerButton.setOpaqueTapGestureRecognizer { [weak self] in
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.writeContent), userData: nil)
+                    }
+                    return cell
+                }
             } else {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
                 cell.alcoholBind(viewModel.getSelectedAlcoholFeedsValue())
