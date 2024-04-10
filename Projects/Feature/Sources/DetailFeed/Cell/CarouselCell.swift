@@ -15,7 +15,7 @@ final class CarouselCell: UICollectionViewCell {
         $0.contentMode = .scaleToFill
     }
     
-    private lazy var opaqueView = UIView().then {
+    private lazy var blendView = UIView().then {
         $0.frame = .zero
         $0.layer.backgroundColor = DesignSystemAsset.black.color.cgColor.copy(alpha: 0.2)
     }
@@ -50,11 +50,11 @@ final class CarouselCell: UICollectionViewCell {
     
     private func addViews() {
         self.addSubview(imageView)
-        self.contentView.addSubview(opaqueView)
+        self.contentView.addSubview(blendView)
     }
     
     private func makeConstraints() {
-        self.opaqueView.snp.makeConstraints {
+        self.blendView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         self.imageView.snp.makeConstraints {
