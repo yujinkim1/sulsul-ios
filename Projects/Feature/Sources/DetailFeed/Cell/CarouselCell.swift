@@ -12,7 +12,6 @@ final class CarouselCell: UICollectionViewCell {
     static let reuseIdentifier = "CarouselCell"
     
     private lazy var imageView = UIImageView().then {
-        $0.image = UIImage()
         $0.contentMode = .scaleToFill
     }
     
@@ -31,8 +30,8 @@ final class CarouselCell: UICollectionViewCell {
         
         self.backgroundView = imageView
         
-        addViews()
-        makeConstraints()
+        self.addViews()
+        self.makeConstraints()
     }
     
     @available(*, unavailable)
@@ -40,12 +39,12 @@ final class CarouselCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(_ item: String) {
-        if let imageURL = URL(string: item) {
-            imageView.loadImage(imageURL)
+    func bind(withURL imageURL: String) {
+        if let image = URL(string: imageURL) {
+            self.imageView.loadImage(image)
         } else {
-            print("Image URL is not available.")
-            imageView.image = UIImage()
+            self.imageView.image = UIImage()
+            debugPrint("Image URL is not available.")
         }
     }
     
@@ -55,10 +54,10 @@ final class CarouselCell: UICollectionViewCell {
     }
     
     private func makeConstraints() {
-        opaqueView.snp.makeConstraints {
+        self.opaqueView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        imageView.snp.makeConstraints {
+        self.imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
