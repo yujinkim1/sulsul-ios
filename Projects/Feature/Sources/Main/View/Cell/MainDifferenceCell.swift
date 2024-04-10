@@ -19,19 +19,15 @@ final class MainDifferenceCell: UICollectionViewCell {
         $0.backgroundColor = .white
     })
     
-    private lazy var nickNameLabel = PaddedLabel(padding: .init(top: moderateScale(number: 8),
-                                                                     left: moderateScale(number: 16),
-                                                                     bottom: moderateScale(number: 8),
-                                                                     right: moderateScale(number: 16))).then {
-        $0.text = "usernick"
-        $0.textAlignment = .center
-        $0.font = Font.regular(size: 12)
-        $0.textColor = DesignSystemAsset.gray900.color
+    private lazy var nickNameView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 12)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    })
+    
+    private lazy var nickNameLabel = UILabel().then({
+        $0.font = Font.regular(size: 12)
+        $0.textColor = DesignSystemAsset.gray900.color
+    })
     
     private lazy var drinkView = UIView().then({
         $0.layer.cornerRadius = moderateScale(number: 8)
@@ -101,10 +97,11 @@ final class MainDifferenceCell: UICollectionViewCell {
                                    scoreImageView,
                                    scoreLabel,
                                    contentLabel,
+                                   nickNameView,
                                    detailContentLabel])
         drinkView.addSubview(drinkLabel)
         foodView.addSubview(foodLabel)
-        feedImageView.addSubview(nickNameLabel)
+        nickNameView.addSubview(nickNameLabel)
     }
     
     private func makeConstraints() {
@@ -115,9 +112,13 @@ final class MainDifferenceCell: UICollectionViewCell {
             $0.top.trailing.leading.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 264))
         }
+        nickNameView.snp.makeConstraints {
+            $0.leading.equalTo(feedImageView).offset(moderateScale(number: 12))
+            $0.bottom.equalTo(feedImageView).offset(moderateScale(number: -8))
+        }
         nickNameLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 12))
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -8))
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
         }
         drinkView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 12))
