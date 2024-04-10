@@ -80,16 +80,16 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
              return section
          }
     }
-//    히든이 ture니까 안보이지
-    func updateUI(isHidden: Bool) {
+
+    func updateUI() {
         if StaticValues.isLoggedIn.value {
-            preferecneCollectionView.isHidden = isHidden
+            preferecneCollectionView.isHidden = true
             guard let nickname = viewModel?.getUserInfoValue().nickname else { return }
             let attributedString = NSMutableAttributedString(string: nickname + "님이 선택한\n취향으로 골라봤어요.")
             attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: nickname.count)) // 닉네임의 색상 변경
             titleLabel.attributedText = attributedString
         } else {
-            preferecneCollectionView.isHidden = isHidden
+            preferecneCollectionView.isHidden = false
             guard let title = viewModel?.getSelectedAlcoholValue() else { return }
             
             let attributedString = NSMutableAttributedString(string: title + "랑 어울리는\n안주로 골라봤어요!")
