@@ -267,7 +267,7 @@ extension MainPageViewController: UICollectionViewDataSource {
                     cell.bind(nickName: viewModel.getUserInfoValue().nickname,
                               preference: StaticValues.getDrinkPairingById(viewModel.getUserInfoValue().preference.alcohols[0])?.name ?? "취향 선택 x")
                     cell.registerButton.setOpaqueTapGestureRecognizer { [weak self] in
-                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.writeContent), userData: nil)
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectPhoto), userData: nil)
                     }
                     return cell
                 }

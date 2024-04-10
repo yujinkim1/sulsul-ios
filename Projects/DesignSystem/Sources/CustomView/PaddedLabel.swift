@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+// MARK: - UI 잘리는 현상 있어서 삭제 예정
 public final class PaddedLabel: TouchableLabel {
     private var padding = UIEdgeInsets(top: 16.0, left: 16.0, bottom: 16.0, right: 16.0)
     
