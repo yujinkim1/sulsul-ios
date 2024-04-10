@@ -20,9 +20,8 @@ public final class AuthViewController: BaseViewController {
     }
 
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(40, font: Font.bold(size: 32))
+        $0.setLineHeight(40, text: "만나서\n반가워요! :)", font: Font.bold(size: 32))
         $0.numberOfLines = 2
-        $0.text = "만나서\n반가워요! :)"
         $0.textColor = DesignSystemAsset.gray900.color
     }
 
@@ -113,7 +112,6 @@ public final class AuthViewController: BaseViewController {
                 }
             }.store(in: &cancelBag)
         
-        
         viewModel.getErrorSubject()
             .dropFirst()
             .receive(on: DispatchQueue.main)
@@ -127,8 +125,17 @@ public final class AuthViewController: BaseViewController {
     }
 
     override public func addViews() {
-        view.addSubviews([topView, continueWithKakao, continueWithGoogle, continueWithApple, termsButton])
-        topView.addSubviews([backButton, titleLabel])
+        view.addSubviews([
+            topView,
+            continueWithKakao,
+            continueWithGoogle,
+            continueWithApple,
+            termsButton
+        ])
+        topView.addSubviews([
+            backButton,
+            titleLabel
+        ])
     }
 
     override public func makeConstraints() {
@@ -158,8 +165,7 @@ public final class AuthViewController: BaseViewController {
         continueWithGoogle.snp.makeConstraints {
             $0.top.equalTo(continueWithKakao.snp.bottom).offset(moderateScale(number: 16))
             $0.centerX.equalTo(continueWithKakao)
-            $0.width.equalTo(continueWithKakao)
-            $0.height.equalTo(continueWithKakao)
+            $0.width.height.equalTo(continueWithKakao)
         }
         googleImage.snp.makeConstraints {
             $0.leading.trailing.top.bottom.equalToSuperview()
@@ -167,8 +173,7 @@ public final class AuthViewController: BaseViewController {
         continueWithApple.snp.makeConstraints {
             $0.top.equalTo(continueWithGoogle.snp.bottom).offset(moderateScale(number: 16))
             $0.centerX.equalTo(continueWithGoogle)
-            $0.width.equalTo(continueWithGoogle)
-            $0.height.equalTo(continueWithGoogle)
+            $0.width.height.equalTo(continueWithKakao)
         }
         appleImage.snp.makeConstraints {
             $0.leading.trailing.top.bottom.equalToSuperview()
