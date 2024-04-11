@@ -77,7 +77,7 @@ public final class ProfileMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil) // TODO: - 제거
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()

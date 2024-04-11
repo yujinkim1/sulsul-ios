@@ -226,9 +226,10 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             self?.navigationController?.popViewController(animated: true)
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.tabBarController?.setTabBarHidden(true)
             self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
                                         selectAlbumCompletion: self?.openAlbum,
-                                        baseCompletion: nil)
+                                        baseCompletion: self?.settingBaseImage)
         }
         resetTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
@@ -265,6 +266,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             nextButton.isUserInteractionEnabled = false
         }
         
+    }
+    private func settingBaseImage() {
+        profileTouchableImageView.image = UIImage(named: "profile_notUser")
     }
     
     private func openCamera() {
