@@ -96,18 +96,18 @@ struct ProfileEditViewModel {
         // 이미지 URL을 쿼리 파라미터로 포함하여 요청을 보냅니다.
         let urlString = "/users/\(userId)/image?image_url=\(imageUrl)"
         
-        NetworkWrapper.shared.putUploadImage(stringURL: urlString, header: headers) { result in
-            switch result {
-            case .success(let imageData):
-                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: imageData) {
-                    print(userData)
-                } else {
-                    errorSubject.send("서버 응답에 오류가 있습니다.")
-                }
-            case .failure(let error):
-                errorSubject.send("이미지 업로드 중 오류가 발생했습니다.")
-            }
-        }
+//        NetworkWrapper.shared.putUploadImage(stringURL: urlString, header: headers) { result in
+//            switch result {
+//            case .success(let imageData):
+//                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: imageData) {
+//                    print(userData)
+//                } else {
+//                    errorSubject.send("서버 응답에 오류가 있습니다.")
+//                }
+//            case .failure(let error):
+//                errorSubject.send("이미지 업로드 중 오류가 발생했습니다.")
+//            }
+//        }
     }
     
     func randomNicknamePublisher() -> AnyPublisher<String, Never> {

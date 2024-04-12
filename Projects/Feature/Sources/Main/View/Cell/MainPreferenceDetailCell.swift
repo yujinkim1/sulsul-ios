@@ -13,16 +13,18 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.layer.cornerRadius = 12
+        $0.clipsToBounds = true
     })
     
     private lazy var feedImageView = UIImageView().then({
-        $0.layer.cornerRadius = 12
+        $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
+        $0.clipsToBounds = true
     })
     
     private lazy var nickNameView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
-        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.layer.cornerRadius = moderateScale(number: 8)
     })
     
     private lazy var nickNameLabel = UILabel().then({
@@ -53,6 +55,7 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
     private lazy var contentLabel = UILabel().then({
         $0.text = "testesteat awetawe aetw\naweta"
         $0.numberOfLines = 0
+        $0.lineBreakMode = .byWordWrapping
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
     })
@@ -85,23 +88,23 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
         }
         feedImageView.snp.makeConstraints {
             $0.top.trailing.leading.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -128))
+            $0.height.equalTo(moderateScale(number: 195))
         }
         nickNameView.snp.makeConstraints {
             $0.leading.equalTo(feedImageView).offset(moderateScale(number: 12))
             $0.bottom.equalTo(feedImageView).offset(moderateScale(number: -8))
         }
         nickNameLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 4))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 8))
         }
         foodView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 12))
             $0.top.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: 16))
         }
         foodLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 4))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 8))
         }
         
         scoreImageView.snp.makeConstraints {
@@ -114,15 +117,14 @@ final class MainPreferenceDetailCell: UICollectionViewCell {
             $0.trailing.equalToSuperview().offset(moderateScale(number: -12))
         }
         contentLabel.snp.makeConstraints {
+            $0.top.equalTo(foodView.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))
-            $0.top.equalTo(foodLabel.snp.bottom).offset(moderateScale(number: 8))
-            $0.bottom.equalToSuperview().offset(moderateScale(number: 16))
         }
     }
     
     func bind(_ model: AlcoholFeed.Feed) {
         feedImageView.kf.setImage(with: model.representImage)
-        nickNameLabel.text = model.writerNickname
+        nickNameLabel.text = "@" + model.writerNickname
         contentLabel.text = model.title
         foodLabel.text = model.foods.first
     }
