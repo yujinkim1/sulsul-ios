@@ -93,7 +93,6 @@ final class SelectDrinkViewModel {
             case .success(let response):
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self?.userMapper.userInfoModel(from: userData)
-                    print(">>>술 설정하고 내 정보 : \(mappedUserInfo)")
                     self?.userInfo = mappedUserInfo
                 } else {
                     print("디코딩 모델 에러 9")

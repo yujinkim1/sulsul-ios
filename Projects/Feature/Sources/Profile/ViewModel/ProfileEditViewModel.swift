@@ -9,19 +9,20 @@ import Foundation
 import Combine
 import Alamofire
 import Service
+import UIKit
 
 struct ProfileEditViewModel {
     
-    private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private let userMapper = UserMapper()
     
+    private let errorSubject = CurrentValueSubject<String, Never>("")
     private let randomNickname = PassthroughSubject<String, Never>()
     private var setUserName = PassthroughSubject<Void, Never>()
     
     init() {
-        getUserInfo(userId: 1)
+        
     }
     
     func getRandomNickname() {
@@ -44,7 +45,9 @@ struct ProfileEditViewModel {
         }
     }
     // MARK: - ID로 유저 정보를 조회
-    func getUserInfo(userId: Int) {
+    func getUserInfo() {
+        let userId = UserDefaultsUtil.shared.getInstallationId()
+        
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { result in
             switch result {
             case .success(let response):
@@ -61,6 +64,8 @@ struct ProfileEditViewModel {
     }
     
     func setNickname(_ nickname: String) {
+        let userId = UserDefaultsUtil.shared.getInstallationId()
+        
         guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
@@ -80,16 +85,29 @@ struct ProfileEditViewModel {
         }
     }
     
-    func setProfileImage(userId: Int, imageUrl: URL) {
+    func setProfileImage(imageUrl: String) {
+        let userId = UserDefaultsUtil.shared.getInstallationId()
+        
         guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
         var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
         ]
         
-        let params: [String: Any] = ["user_id": userId]
+        // 이미지 URL을 쿼리 파라미터로 포함하여 요청을 보냅니다.
+        let urlString = "/users/\(userId)/image?image_url=\(imageUrl)"
         
-        NetworkWrapper.shared.putBasicTask(stringURL: "/users/", completion: <#T##(Result<Data, Error>) -> Void#>)
+        NetworkWrapper.shared.putUploadImage(stringURL: urlString, header: headers) { result in
+            switch result {
+            case .success(let imageData):
+                if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: imageData) {
+                    print(userData)
+                } else {
+                    errorSubject.send("서버 응답에 오류가 있습니다.")
+                }
+            case .failure(let error):
+                errorSubject.send("이미지 업로드 중 오류가 발생했습니다.")
+            }
+        }
     }
     
     func randomNicknamePublisher() -> AnyPublisher<String, Never> {

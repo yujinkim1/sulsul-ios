@@ -55,6 +55,38 @@ public struct NetworkWrapper {
         }
     }
     
+    public func putUploadImage(stringURL: String, imageUrl: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        // 이미지 URL을 이용하여 서버에 요청을 보냅니다.
+        guard let url = URL(string: "\(apiDomain)\(stringURL)?image_url=\(imageUrl)") else {
+            completion(.failure(NetworkError(message: "URL 형식이 올바르지 않습니다.")))
+            return
+        }
+
+        var defaultHeader = configureHeader()
+        // 이미지 URL을 쿼리 파라미터로 보내므로 Content-Type은 application/json 또는 다른 적절한 형식으로 변경합니다.
+        defaultHeader["Content-Type"] = "application/json"
+
+        // Alamofire를 사용하여 PUT 요청을 보냅니다.
+        AF.request(url, method: .put, headers: defaultHeader)
+            .validate(statusCode: 200..<300)
+            .responseJSON { response in
+                switch response.result {
+                case .success:
+                    if let responseData = response.data {
+                        completion(.success(responseData))
+                    } else {
+                        completion(.failure(NetworkError(message: "empty data")))
+                    }
+                case .failure(let error):
+                    if let responseData = response.data, let json = try? jsonDecoder.decode(ServerError.self, from: responseData) {
+                        completion(.failure(json))
+                    } else {
+                        completion(.failure(NetworkError(statusCode: response.response?.statusCode, message: error.localizedDescription)))
+                    }
+                }
+            }
+    }
+    
     public func getBasicTask(stringURL: String, parameters: Parameters? = nil, header: HTTPHeaders? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
         var defaultHeader = configureHeader()
         header?.forEach { defaultHeader[$0.name] = $0.value }
