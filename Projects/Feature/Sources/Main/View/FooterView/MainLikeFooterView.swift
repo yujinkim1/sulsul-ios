@@ -9,6 +9,8 @@ import UIKit
 import DesignSystem
 
 final class MainLikeFooterView: UICollectionReusableView {
+    lazy var containerView = TouchableView()
+    
     private lazy var titleLabel = UILabel().then({
         $0.text = "더 많은 조합 보러가기!"
         $0.font = Font.bold(size: 16)
@@ -31,10 +33,14 @@ final class MainLikeFooterView: UICollectionReusableView {
     }
     
     private func addViews() {
-        addSubviews([titleLabel])
+        addSubview(containerView)
+        containerView.addSubviews([titleLabel])
     }
     
     private func makeConstraints() {
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         titleLabel.snp.makeConstraints {
             $0.center.equalToSuperview()
         }

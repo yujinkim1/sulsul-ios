@@ -315,6 +315,9 @@ extension MainPageViewController: UICollectionViewDataSource {
                 return likeHeaderView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }
+                likeFooterView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                    self?.coordinator?.moveTo(appFlow: TabBarFlow.ranking(.main), userData: nil)
+                }
                 return likeFooterView
             }
         } else if indexPath.section == 2 {
