@@ -102,17 +102,14 @@ public final class AuthViewController: BaseViewController {
                 case .initSettingUser:
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
                 case .nickNameSettingUser:
-                    StaticValues.isLoggedIn.send(true)
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectDrink)), userData: nil)
                 case .drinkSettingUser:
-                    StaticValues.isLoggedIn.send(true)
                     coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
                 case .allSettingUSer:
                     StaticValues.isLoggedIn.send(true)
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
-        
         
         viewModel.getErrorSubject()
             .dropFirst()

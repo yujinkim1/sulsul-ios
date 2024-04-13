@@ -19,33 +19,25 @@ final class MainDifferenceCell: UICollectionViewCell {
         $0.backgroundColor = .white
     })
     
-    private lazy var nickNameLabel = PaddedLabel(padding: .init(top: moderateScale(number: 8),
-                                                                     left: moderateScale(number: 16),
-                                                                     bottom: moderateScale(number: 8),
-                                                                     right: moderateScale(number: 16))).then {
-        $0.text = "usernick"
-        $0.textAlignment = .center
-        $0.font = Font.regular(size: 12)
-        $0.textColor = DesignSystemAsset.gray900.color
+    private lazy var nickNameView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 12)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    })
     
-    private lazy var drinkLabel = PaddedLabel(padding: .init(top: moderateScale(number: 8),
-                                                             left: moderateScale(number: 16),
-                                                             bottom: moderateScale(number: 8),
-                                                             right: moderateScale(number: 16))).then {
-        $0.text = "삼겹살"
-        $0.textAlignment = .center
+    private lazy var nickNameLabel = UILabel().then({
+        $0.font = Font.regular(size: 12)
+        $0.textColor = DesignSystemAsset.gray900.color
+    })
+    
+    private lazy var drinkView = UIView().then({
+        $0.layer.cornerRadius = moderateScale(number: 8)
+        $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 0.1)
+    })
+    
+    private lazy var drinkLabel = UILabel().then({
         $0.font = Font.bold(size: 18)
         $0.textColor = DesignSystemAsset.main.color
-        $0.backgroundColor = DesignSystemAsset.gray200.color // TODO: - 색 안나옴
-        $0.layer.cornerRadius = moderateScale(number: 8)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    })
     
     private lazy var andLabel = UILabel().then({
         $0.text = "&"
@@ -53,19 +45,15 @@ final class MainDifferenceCell: UICollectionViewCell {
         $0.textColor = DesignSystemAsset.gray900.color
     })
     
-    private lazy var foodLabel = PaddedLabel(padding: .init(top: moderateScale(number: 8),
-                                                            left: moderateScale(number: 16),
-                                                            bottom: moderateScale(number: 8),
-                                                            right: moderateScale(number: 16))).then {
-        $0.text = "삼겹살"
-        $0.textAlignment = .center
+    private lazy var foodView = UIView().then({
+        $0.layer.cornerRadius = moderateScale(number: 8)
+        $0.backgroundColor = UIColor(red: 255/255, green: 182/255, blue: 2/255, alpha: 0.1)
+    })
+    
+    private lazy var foodLabel = UILabel().then({
         $0.font = Font.bold(size: 18)
         $0.textColor = DesignSystemAsset.main.color
-        $0.backgroundColor = DesignSystemAsset.gray200.color // TODO: - 색 안나옴
-        $0.layer.cornerRadius = moderateScale(number: 8)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    })
     
     private lazy var scoreImageView = UIImageView().then({
         $0.image = UIImage(named: "rate")
@@ -103,14 +91,17 @@ final class MainDifferenceCell: UICollectionViewCell {
     private func addViews() {
         addSubview(containerView)
         containerView.addSubviews([feedImageView,
-                                   drinkLabel,
+                                   drinkView,
                                    andLabel,
-                                   foodLabel,
+                                   foodView,
                                    scoreImageView,
                                    scoreLabel,
                                    contentLabel,
+                                   nickNameView,
                                    detailContentLabel])
-        feedImageView.addSubview(nickNameLabel)
+        drinkView.addSubview(drinkLabel)
+        foodView.addSubview(foodLabel)
+        nickNameView.addSubview(nickNameLabel)
     }
     
     private func makeConstraints() {
@@ -121,34 +112,46 @@ final class MainDifferenceCell: UICollectionViewCell {
             $0.top.trailing.leading.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 264))
         }
-        nickNameLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 12))
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -8))
+        nickNameView.snp.makeConstraints {
+            $0.leading.equalTo(feedImageView).offset(moderateScale(number: 12))
+            $0.bottom.equalTo(feedImageView).offset(moderateScale(number: -8))
         }
-        drinkLabel.snp.makeConstraints {
+        nickNameLabel.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
+        }
+        drinkView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 12))
             $0.top.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: 16))
         }
-        andLabel.snp.makeConstraints {
-            $0.centerY.equalTo(drinkLabel)
-            $0.leading.equalTo(drinkLabel.snp.trailing).offset(moderateScale(number: 10.86))
+        drinkLabel.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
         }
-        foodLabel.snp.makeConstraints {
+        andLabel.snp.makeConstraints {
+            $0.centerY.equalTo(drinkView)
+            $0.leading.equalTo(drinkView.snp.trailing).offset(moderateScale(number: 10.86))
+        }
+        foodView.snp.makeConstraints {
             $0.centerY.equalTo(drinkLabel)
             $0.leading.equalTo(andLabel.snp.trailing).offset(moderateScale(number: 10.86))
         }
+        foodLabel.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 8))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 16))
+        }
         scoreImageView.snp.makeConstraints {
-            $0.centerY.equalTo(foodLabel)
+            $0.centerY.equalTo(foodView)
             $0.size.equalTo(moderateScale(number: 16))
             $0.trailing.equalTo(scoreLabel.snp.leading)
         }
         scoreLabel.snp.makeConstraints {
-            $0.centerY.equalTo(foodLabel)
+            $0.centerY.equalTo(foodView)
             $0.trailing.equalToSuperview().offset(moderateScale(number: -12))
         }
         contentLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))
-            $0.top.equalTo(foodLabel.snp.bottom).offset(moderateScale(number: 8))
+            $0.top.equalTo(foodView.snp.bottom).offset(moderateScale(number: 8))
         }
         detailContentLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 12))

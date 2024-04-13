@@ -34,8 +34,6 @@ final class SelectDrinkViewModel {
     private var completeDrinkPreference = PassthroughSubject<Void, Never>()
     
     init() {
-        print(">.>>>>>>>>술 쪽 아이디")
-        print(userId)
         bind()
     }
     
@@ -54,13 +52,10 @@ final class SelectDrinkViewModel {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + accessToken!
                 ]
-                print(">>>> 술 등록 토큰 값: \(accessToken)")
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
                     case .success(let response):
                         if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
-                            print("셋팅 성공")
-                            print(userData)
                             self?.getUserInfo()
                             self?.completeDrinkPreference.send(())
                         } else {

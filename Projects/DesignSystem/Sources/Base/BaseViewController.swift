@@ -120,18 +120,23 @@ open class BaseViewController: UIViewController {
         })
     }
     
-    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, description: String?, submitCompletion: (() -> Void)?,
+    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, submitLabel: String?, cancelLabel: String?, description: String?, submitCompletion: (() -> Void)?,
                                        cancelCompletion: (() -> Void)?) {
+        guard !view.subviews.contains(where: { $0 is BottomSheetAlertView }) else { return }
         let bottomSheetAlertView = BottomSheetAlertView(bottomSheetAlertType: bottomSheetAlertType)
         bottomSheetAlertView.bind(title: title,
                                   description: description,
+                                  submitLabel: submitLabel,
+                                  cancelLabel: cancelLabel,
                                   submitCompletion: submitCompletion,
                                   cancelCompletion: cancelCompletion)
         view.addSubview(bottomSheetAlertView)
         view.bringSubviewToFront(bottomSheetAlertView)
     }
     
-    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?, selectAlbumCompletion: (() -> Void)?, baseCompletion: (() -> Void)?) {
+    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?,
+                                    selectAlbumCompletion: (() -> Void)?,
+                                    baseCompletion: (() -> Void)?) {
         let cameraBottomSheet = CameraBottomSheet()
         cameraBottomSheet.bind(selectCameraCompletion: selectCameraCompletion,
                                selectAlbumCompletion: selectAlbumCompletion,

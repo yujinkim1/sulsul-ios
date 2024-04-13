@@ -63,7 +63,7 @@ class LikeFeedView: UIView {
         return UICollectionViewCompositionalLayout { _, _ in
 
             //TODO: - 수정 필요
-            let itemHeight: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 80 + 133 + 80 : 220
+            let itemHeight: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 400 : 220
             let itemWidth: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 1 : 1/2
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),

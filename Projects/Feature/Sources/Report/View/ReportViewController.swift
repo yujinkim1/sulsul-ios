@@ -8,17 +8,29 @@
 import UIKit
 import SnapKit
 import DesignSystem
+import Combine
 
 public final class ReportViewController: BaseViewController {
     
     var coordinator: CommonBaseCoordinator?
-    private let viewModel: ReportViewModel = ReportViewModel()
+    private let viewModel: ReportViewModel
     
+    private var cancelBag = Set<AnyCancellable>()
     private var buttonBottomConstraint: Constraint?
     private let textViewPlaceHolder = "텍스트를 입력하세요"
     private let maxTextCount: Int = 100
-    
     private lazy var superViewInset = moderateScale(number: 20)
+    
+    init(viewModel: ReportViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private lazy var topHeaderView = UIView()
     
@@ -61,14 +73,6 @@ public final class ReportViewController: BaseViewController {
         $0.isHidden = true
         $0.delegate = self
     })
-    
-    // MARK: - 임시로 넣어둔거 나중에 기획 변경되면 수정
-    private lazy var textCountLabel = UILabel().then({
-        $0.font = Font.semiBold(size: 16)
-        $0.textColor = DesignSystemAsset.gray900.color
-        $0.isHidden = true
-        $0.text = "0/\(maxTextCount)"
-    })
 
     private lazy var etcReportLabel = UILabel().then({
         $0.font = Font.regular(size: 14)
@@ -83,10 +87,8 @@ public final class ReportViewController: BaseViewController {
         $0.text = "다음"
         $0.textColor = DesignSystemAsset.gray200.color
         $0.font = Font.bold(size: 16)
-        $0.backgroundColor = DesignSystemAsset.main.color
-        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.setClickable(false)
         $0.clipsToBounds = true
-//        $0.isHidden = true
     }
     
     public override func viewDidLoad() {
@@ -95,6 +97,7 @@ public final class ReportViewController: BaseViewController {
         self.tabBarController?.setTabBarHidden(true)
         addViews()
         makeConstraints()
+        bind()
     }
     
     public override func addViews() {
@@ -105,7 +108,6 @@ public final class ReportViewController: BaseViewController {
                           reportTableView,
                           etcReportTextView,
                           etcReportLabel,
-                          textCountLabel,
                           submitTouchableLabel])
         topHeaderView.addSubview(backButton)
     }
@@ -141,10 +143,6 @@ public final class ReportViewController: BaseViewController {
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
             $0.height.equalTo(moderateScale(number: 120))
         }
-        textCountLabel.snp.makeConstraints {
-            $0.bottom.equalTo(etcReportTextView.snp.bottom)
-            $0.trailing.equalTo(etcReportTextView.snp.trailing)
-        }
         etcReportLabel.snp.makeConstraints {
             $0.top.equalTo(etcReportTextView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
@@ -159,6 +157,36 @@ public final class ReportViewController: BaseViewController {
         }
     }
     
+    private func bind() {
+        viewModel.getErrorSubject()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
+            }.store(in: &cancelBag)
+        
+        viewModel.reportSuccessPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }.store(in: &cancelBag)
+        
+        viewModel.currentReportContentPublisher()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] content in
+                if content.isEmpty {
+                    self?.submitTouchableLabel.setClickable(false)
+                } else {
+                    self?.submitTouchableLabel.setClickable(true)
+                }
+            }.store(in: &cancelBag)
+    }
+    
     public override func setupIfNeeded() {
         
         NotificationCenter.default.addObserver(self,
@@ -171,8 +199,11 @@ public final class ReportViewController: BaseViewController {
                                                object: nil)
         
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-    
-            self?.showToastMessageView(toastType: .error, title: "ㅎ이ㅏ멀;ㅐ야러ㅔㅁㄷ")
+            guard let self = self else { return }
+            if viewModel.currentReportContentValue() == ReportReason.other.rawValue {
+                viewModel.sendCurrentReportContent(etcReportTextView.text)
+            }
+            viewModel.sendReportContent()
         }
     }
     
@@ -198,11 +229,6 @@ public final class ReportViewController: BaseViewController {
     private func keyboardWillHide(_ notification: NSNotification) {
         view.frame.origin.y = 0
     }
-
-    private func updateCountLabel(characterCount: Int) {
-        textCountLabel.text = "\(characterCount)/\(maxTextCount)"
-        textCountLabel.asColor(targetString: "\(characterCount)", color: characterCount == 0 ? .lightGray : .blue)
-    }
 }
 
 extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
@@ -225,11 +251,9 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
                 // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
                 etcReportTextView.isHidden = false
                 etcReportLabel.isHidden = false
-                textCountLabel.isHidden = false
             } else {
                 etcReportTextView.isHidden = true
                 etcReportLabel.isHidden = true
-                textCountLabel.isHidden = true
             }
         }
         
@@ -239,8 +263,8 @@ extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.hiddenCellComponet()
             }
         }
-        
-        // 선택된 셀 뷰모델에 저장하고 있다가 제출 누르면 서버 전송되도록
+
+        viewModel.sendCurrentReportContent(viewModel.getReportList(indexPath.row))
     }
 }
 
@@ -256,7 +280,6 @@ extension ReportViewController: UITextViewDelegate {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = textViewPlaceHolder
             textView.textColor = DesignSystemAsset.gray400.color
-            updateCountLabel(characterCount: 0)
         }
     }
 
@@ -267,7 +290,6 @@ extension ReportViewController: UITextViewDelegate {
 
         let characterCount = newString.count
         guard characterCount <= maxTextCount else { return false }
-        updateCountLabel(characterCount: characterCount)
 
         return true
     }

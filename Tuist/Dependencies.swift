@@ -20,6 +20,7 @@ let dependencies = Dependencies(
             .then,
             .swinject,
             .kingfisher,
+            .mantis,
             .kakaoSDK
         ],
         productTypes: [
@@ -44,4 +45,5 @@ public extension Package {
                                            requirement: .upToNextMajor(from: "2.0.0"))
     static let kingfisher: Package = .remote(url: "https://github.com/onevcat/Kingfisher.git",
                                              requirement: .upToNextMajor(from: "7.0.0"))
+    static let mantis: Package = .remote(url: "https://github.com/guoyingtao/Mantis.git", requirement: .upToNextMajor(from: "2.20.0"))
 }

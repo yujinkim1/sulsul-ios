@@ -130,7 +130,7 @@ final class AlertView: UIView {
                 $0.top.equalTo(titleStackView.snp.bottom)
                 $0.leading.bottom.equalToSuperview().inset(moderateScale(number: 24))
                 $0.height.equalTo(moderateScale(number: 52))
-                $0.width.equalTo(moderateScale(number: 99))
+                $0.trailing.equalTo(containerView.snp.centerX).offset(moderateScale(number: -8))
             }
             
             submitTouchableLabel.snp.makeConstraints {
@@ -138,6 +138,8 @@ final class AlertView: UIView {
                 $0.leading.equalTo(cancelTouchableLabel.snp.trailing).offset(moderateScale(number: 8))
                 $0.trailing.bottom.equalToSuperview().inset(moderateScale(number: 24))
             }
+            submitTouchableLabel.title("로그아웃")
+            submitTouchableLabel.backgroundColor = DesignSystemAsset.red050.color
         case .verticalTwoButton:
             cancelTouchableLabel.snp.makeConstraints {
                 $0.top.equalTo(titleStackView.snp.bottom)

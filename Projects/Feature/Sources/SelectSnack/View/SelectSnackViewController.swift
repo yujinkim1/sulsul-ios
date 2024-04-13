@@ -17,6 +17,7 @@ public final class SelectSnackViewController: BaseViewController {
     
     var coordinator: Coordinator?
     private let viewModel: SelectSnackViewModel
+    private let selectTasteCase: SelectTasteCase
     private lazy var cancelBag = Set<AnyCancellable>()
     
     private lazy var superViewInset = moderateScale(number: 20)
@@ -79,8 +80,9 @@ public final class SelectSnackViewController: BaseViewController {
         $0.setTitle("다음", for: .normal)
     }
     
-    init(viewModel: SelectSnackViewModel) {
+    init(viewModel: SelectSnackViewModel, selectTasteCase: SelectTasteCase) {
         self.viewModel = viewModel
+        self.selectTasteCase = selectTasteCase
         super.init(nibName: nil, bundle: nil)
         
         selectSnackView = SelectSnackView(delegate: self,
@@ -116,7 +118,7 @@ public final class SelectSnackViewController: BaseViewController {
         makeConstraints()
         bind()
         
-        noFindSnackButton.onTapped { [weak self] in
+        noFindSnackButton.setOpaqueTapGestureRecognizer { [weak self] in
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
