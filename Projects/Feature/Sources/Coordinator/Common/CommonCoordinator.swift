@@ -55,7 +55,7 @@ final class CommonCoordinator: CommonBaseCoordinator {
         guard let feedId = userData?["feedId"] as? Int else { return }
         
 //        let viewModel = DetailFeedViewModel(feedID: feedId)
-        let viewController = DetailFeedViewController(feedID: feedId)
+        let viewController = FeedDetailViewController(feedID: feedId)
         currentNavigationViewController?.pushViewController(viewController, animated: true)
         }
 
