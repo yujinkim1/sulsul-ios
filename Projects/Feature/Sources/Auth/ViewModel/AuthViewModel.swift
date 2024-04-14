@@ -29,6 +29,7 @@ final class AuthViewModel: NSObject {
     private let errorSubject = CurrentValueSubject<String, Never>("")
     private let userSettingType = PassthroughSubject<UserSettingType, Never>()
     private let loginSuccess = PassthroughSubject<Void, Never>()
+    private let isAvailableKakaoTalk: Bool = UserApi.isKakaoTalkLoginAvailable()
     
     override public init() {
         super.init()
@@ -37,16 +38,16 @@ final class AuthViewModel: NSObject {
     public func continueWithApple() {
         signin(type: .apple)
     }
-
+    
     public func continueWithKakao() {
         signin(type: .kakao)
     }
-
+    
     public func continueWithGoogle(id: String, item: String) {
         signin(type: .google, id: id, item: item)
     }
     
-// TODO: 로그인하고 response 값으로 status에 banned이면 영구정지 사용자임 앱 못들어가게 막아야됨
+    // TODO: 로그인하고 response 값으로 status에 banned이면 영구정지 사용자임 앱 못들어가게 막아야됨
     func getUserInfo(userId: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak self] result in
             guard let self = self else { return }
@@ -153,20 +154,26 @@ extension AuthViewModel {
     }
     
     private func kakaoAuthenticationAdapter() {
-        if UserApi.isKakaoTalkLoginAvailable() {
-            UserApi.shared.loginWithKakaoTalk { (oauthToken, error) in
-                guard error != nil else { return }
+        if self.isAvailableKakaoTalk {
+            UserApi.shared.loginWithKakaoTalk { [weak self] (oauthToken, error) in
+                if let error = error {
+                    debugPrint("\(#function): Authentication failed, Reason is: \(error.localizedDescription)")
+                }
                 
-                if let accessToken = oauthToken?.accessToken {
-                    let url = SignInType.kakao.endpoint()
-                    let parameters: Parameters = ["access_token": accessToken]
-                    NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
-                        switch result {
-                        case .success(let responseData):
-                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                guard let self = self,
+                      let accessToken = oauthToken?.accessToken else { return }
+                
+                let endpoint = SignInType.kakao.endpoint()
+                let parameters: Parameters = ["access_token": accessToken]
+                
+                NetworkWrapper.shared.postBasicTask(stringURL: endpoint, parameters: parameters) { result in
+                    switch result {
+                    case .success(let response):
+                        if KeychainStore.shared.read(label: "accessToken") != nil {
+                            KeychainStore.shared.delete(label: "accessToken")
+                        } else {
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: response) {
                                 let accessToken = data.accessToken
-                                let tokenType = data.tokenType
-                                let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
@@ -175,30 +182,36 @@ extension AuthViewModel {
                             } else {
                                 self.errorSubject.send("앱에서 에러가 발생했습니다")
                             }
-                        case .failure(let error):
-                            if let networkError = error as? NetworkError {
-                                self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
-                            } else {
-                                self.errorSubject.send(error.localizedDescription)
-                            }
+                        }
+                    case .failure(let error):
+                        if let networkError = error as? NetworkError {
+                            self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
+                        } else {
+                            self.errorSubject.send(error.localizedDescription)
                         }
                     }
                 }
             }
         } else {
-            UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-                guard error == nil else { return }
+            UserApi.shared.loginWithKakaoAccount { [weak self] (oauthToken, error) in
+                if let error = error {
+                    debugPrint("\(#function): Authentication failed, Reason is: \(error.localizedDescription)")
+                }
                 
-                if let accessToken = oauthToken?.accessToken {
-                    let url = SignInType.kakao.endpoint()
-                    let parameters: Parameters = ["access_token": accessToken]
-                    NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
-                        switch result {
-                        case .success(let responseData):
-                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                guard let self = self,
+                      let accessToken = oauthToken?.accessToken else { return }
+                
+                let endpoint = SignInType.kakao.endpoint()
+                let parameters: Parameters = ["access_token": accessToken]
+                
+                NetworkWrapper.shared.postBasicTask(stringURL: endpoint, parameters: parameters) { result in
+                    switch result {
+                    case .success(let response):
+                        if KeychainStore.shared.read(label: "accessToken") != nil {
+                            KeychainStore.shared.delete(label: "accessToken")
+                        } else {
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: response) {
                                 let accessToken = data.accessToken
-                                let tokenType = data.tokenType
-                                let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
@@ -207,12 +220,12 @@ extension AuthViewModel {
                             } else {
                                 self.errorSubject.send("앱에서 에러가 발생했습니다")
                             }
-                        case .failure(let error):
-                            if let networkError = error as? NetworkError {
-                                self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
-                            } else {
-                                self.errorSubject.send(error.localizedDescription)
-                            }
+                        }
+                    case .failure(let error):
+                        if let networkError = error as? NetworkError {
+                            self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
+                        } else {
+                            self.errorSubject.send(error.localizedDescription)
                         }
                     }
                 }
@@ -256,7 +269,7 @@ extension AuthViewModel: ASAuthorizationControllerDelegate {
             }
         }
     }
-
+    
     internal func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         print("[!] Authorization Services: \(error.localizedDescription)")
     }
