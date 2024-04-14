@@ -30,6 +30,7 @@ final class AuthViewModel: NSObject {
     private let errorSubject = CurrentValueSubject<String, Never>("")
     private let userSettingType = PassthroughSubject<UserSettingType, Never>()
     private let loginSuccess = PassthroughSubject<Void, Never>()
+    private let isAvailableKakaoTalk: Bool = UserApi.isKakaoTalkLoginAvailable()
     
     override public init() {
         super.init()
@@ -157,20 +158,26 @@ extension AuthViewModel {
     }
     
     private func kakaoAuthenticationAdapter() {
-        if UserApi.isKakaoTalkLoginAvailable() {
-            UserApi.shared.loginWithKakaoTalk { (oauthToken, error) in
-                guard error != nil else { return }
+        if self.isAvailableKakaoTalk {
+            UserApi.shared.loginWithKakaoTalk { [weak self] (oauthToken, error) in
+                if let error = error {
+                    debugPrint("\(#function): Authentication failed, Reason is: \(error.localizedDescription)")
+                }
                 
-                if let accessToken = oauthToken?.accessToken {
-                    let url = SignInType.kakao.endpoint()
-                    let parameters: Parameters = ["access_token": accessToken]
-                    NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
-                        switch result {
-                        case .success(let responseData):
-                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                guard let self = self,
+                      let accessToken = oauthToken?.accessToken else { return }
+                
+                let endpoint = SignInType.kakao.endpoint()
+                let parameters: Parameters = ["access_token": accessToken]
+                
+                NetworkWrapper.shared.postBasicTask(stringURL: endpoint, parameters: parameters) { result in
+                    switch result {
+                    case .success(let response):
+                        if KeychainStore.shared.read(label: "accessToken") != nil {
+                            KeychainStore.shared.delete(label: "accessToken")
+                        } else {
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: response) {
                                 let accessToken = data.accessToken
-                                let tokenType = data.tokenType
-                                let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
                                 print(">>>>카카오 아이디")
@@ -178,32 +185,36 @@ extension AuthViewModel {
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.getUserInfo(userId: id)
-                            } else {
-                                print("디코딩 모델 에러2")
                             }
-                        case .failure(let error):
-                            print(">>>>>> :\(error)")
-                            if let networkError = error as? NetworkError {
-                                self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
-                            }
+                        }
+                    case .failure(let error):
+                        print(">>>>>> :\(error)")
+                        if let networkError = error as? NetworkError {
+                            self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
                         }
                     }
                 }
             }
         } else {
-            UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-                guard error == nil else { return }
+            UserApi.shared.loginWithKakaoAccount { [weak self] (oauthToken, error) in
+                if let error = error {
+                    debugPrint("\(#function): Authentication failed, Reason is: \(error.localizedDescription)")
+                }
                 
-                if let accessToken = oauthToken?.accessToken {
-                    let url = SignInType.kakao.endpoint()
-                    let parameters: Parameters = ["access_token": accessToken]
-                    NetworkWrapper.shared.postBasicTask(stringURL: url, parameters: parameters) { result in
-                        switch result {
-                        case .success(let responseData):
-                            if let data = try? self.jsonDecoder.decode(Token.self, from: responseData) {
+                guard let self = self,
+                      let accessToken = oauthToken?.accessToken else { return }
+                
+                let endpoint = SignInType.kakao.endpoint()
+                let parameters: Parameters = ["access_token": accessToken]
+                
+                NetworkWrapper.shared.postBasicTask(stringURL: endpoint, parameters: parameters) { result in
+                    switch result {
+                    case .success(let response):
+                        if KeychainStore.shared.read(label: "accessToken") != nil {
+                            KeychainStore.shared.delete(label: "accessToken")
+                        } else {
+                            if let data = try? self.jsonDecoder.decode(Token.self, from: response) {
                                 let accessToken = data.accessToken
-                                let tokenType = data.tokenType
-                                let expiresIn = data.expiresIn
                                 let id = data.userID
                                 
                                 UserDefaultsUtil.shared.setUserId(id)
@@ -212,11 +223,11 @@ extension AuthViewModel {
                             } else {
                                 print("디코딩 모델 에러3")
                             }
-                        case .failure(let error):
-                            print(">>>>>> :\(error)")
-                            if let networkError = error as? NetworkError {
-                                self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
-                            }
+                        }
+                    case .failure(let error):
+                        print(">>>>>> :\(error)")
+                        if let networkError = error as? NetworkError {
+                            self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
                         }
                     }
                 }
