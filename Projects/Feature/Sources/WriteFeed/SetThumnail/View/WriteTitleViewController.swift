@@ -271,92 +271,61 @@ extension WriteTitleViewController: ImagePickerDelegate {
 
 extension WriteTitleViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func checkPermission() {
-        PHPhotoLibrary.requestAuthorization() { [weak self] newStatus in
-            guard let selfRef = self else { return }
-            if newStatus == PHAuthorizationStatus.authorized {
-                let imagePicker = ImagePickerController()
-                self?.presentImagePicker(imagePicker, select: { (asset) in
-                    
-                    // User selected an asset. Do something with it. Perhaps begin processing/upload?
-                    
-                }, deselect: { (asset) in
-                    // User deselected an asset. Cancel whatever you did when asset was selected.
-                    
-                }, cancel: { (assets) in
-                    // User canceled selection.
-                    
-                }, finish: { (assets) in
-                    // User finished selection assets.
-                    
-                })
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+            switch status {
+            case .limited:
+                PHPhotoLibrary.shared().register(self)
+                let actionSheet = UIAlertController(title: "",
+                                                    message: "더 많은 사진을 선택하거나 모든 사진에 대한 액세스를 허용하려면 설정으로 이동해주세요.",
+                                                    preferredStyle: .actionSheet)
+                
+                let selectPhotosAction = UIAlertAction(title: "더 많은 사진 선택",
+                                                       style: .default) { [weak self] _ in
+                    guard let self = self else { return }
+                    if #available(iOS 15, *) {
+                        PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self) { [weak self] _ in
+                            self?.imagePickerController?.present(max: 5)
+                        }
+                    } else {
+                        imagePickerController?.present(max: 5)
+                    }
+                }
+                actionSheet.addAction(selectPhotosAction)
+                
+                let allowFullAccessAction = UIAlertAction(title: "권한 설정으로 이동",
+                                                          style: .default) { _ in
+                    guard let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                            UIApplication.shared.canOpenURL(settingsURL) else { return }
+                    UIApplication.shared.open(settingsURL, completionHandler: nil)
+                }
+                actionSheet.addAction(allowFullAccessAction)
+                
+                let cancelAction = UIAlertAction(title: "취소", style: .cancel) { [weak self] _ in
+                    self?.imagePickerController?.present(max: 5)
+                }
+                actionSheet.addAction(cancelAction)
+                
+                present(actionSheet, animated: true, completion: nil)
+                
+            case .authorized:
+                imagePickerController?.present(max: 5)
+            case .notDetermined:
+                PHPhotoLibrary.requestAuthorization() { [weak self] newStatus in
+                    guard let selfRef = self else { return }
+                    if newStatus == PHAuthorizationStatus.authorized {
+                        selfRef.imagePickerController?.present(max: 5)
+                    }
+                }
+            default:
+                showAlertView(withType: .twoButton,
+                              title: "알림",
+                              description: "사진을 불러올 수 없습니다. \n사진 접근 권한을 허용해주세요.",
+                              submitCompletion: {
+                    guard let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                          UIApplication.shared.canOpenURL(settingsURL) else { return }
+                    UIApplication.shared.open(settingsURL, completionHandler: nil)
+                }, cancelCompletion: nil)
             }
-        }
-        
-//        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-//            switch status {
-//            case .limited:
-//                PHPhotoLibrary.shared().register(self)
-//                let actionSheet = UIAlertController(title: "",
-//                                                    message: "더 많은 사진을 선택하거나 모든 사진에 대한 액세스를 허용하려면 설정으로 이동해주세요.",
-//                                                    preferredStyle: .actionSheet)
-//                
-//                let selectPhotosAction = UIAlertAction(title: "더 많은 사진 선택",
-//                                                       style: .default) { [weak self] _ in
-//                    guard let self = self else { return }
-//                    if #available(iOS 15, *) {
-//                        PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self) { [weak self] _ in
-//                            self?.imagePickerController?.present(max: 5)
-//                        }
-//                    } else {
-//                        imagePickerController?.present(max: 5)
-//                    }
-//                }
-//                actionSheet.addAction(selectPhotosAction)
-//                
-//                let allowFullAccessAction = UIAlertAction(title: "권한 설정으로 이동",
-//                                                          style: .default) { _ in
-//                    guard let settingsURL = URL(string: UIApplication.openSettingsURLString),
-//                            UIApplication.shared.canOpenURL(settingsURL) else { return }
-//                    UIApplication.shared.open(settingsURL, completionHandler: nil)
-//                }
-//                actionSheet.addAction(allowFullAccessAction)
-//                
-//                let cancelAction = UIAlertAction(title: "취소", style: .cancel) { [weak self] _ in
-//                    self?.imagePickerController?.present(max: 5)
-//                }
-//                actionSheet.addAction(cancelAction)
-//                
-//                present(actionSheet, animated: true, completion: nil)
-//                
-//            case .authorized:
-//                
-//                
-//                let imagePicker = ImagePickerController()
-//                imagePicker.settings.selection.max = 5
-//                imagePicker.settings.fetch.assets.supportedMediaTypes = [.image]
-//                    print("|| gg")
-//
-//                
-//            case .notDetermined:
-//                PHPhotoLibrary.requestAuthorization() { [weak self] newStatus in
-//                    guard let selfRef = self else { return }
-//                    if newStatus == PHAuthorizationStatus.authorized {
-//                        selfRef.imagePickerController?.present(max: 5)
-//                    }
-//                }
-//            default:
-//                showAlertView(withType: .twoButton,
-//                              title: "알림",
-//                              description: "사진을 불러올 수 없습니다. \n사진 접근 권한을 허용해주세요.",
-//                              submitCompletion: {
-//                    guard let settingsURL = URL(string: UIApplication.openSettingsURLString),
-//                          UIApplication.shared.canOpenURL(settingsURL) else { return }
-//                    UIApplication.shared.open(settingsURL, completionHandler: nil)
-//                }, cancelCompletion: nil)
-//                
-////                coordinator?.currentNavigationViewController?.topViewController?.view.addSubview(twoButtonAlertView)
-////                coordinator?.currentNavigationViewController?.topViewController?.view.bringSubviewToFront(twoButtonAlertView)
-//        }
     }
 }
 
