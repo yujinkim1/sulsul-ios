@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-final class CommentTextFieldView: TouchableView {
+final class CommentTextFieldView: UIView {
     lazy var textField = PaddableTextField(to: 12).then {
         $0.autocorrectionType = .no
         $0.spellCheckingType = .no
