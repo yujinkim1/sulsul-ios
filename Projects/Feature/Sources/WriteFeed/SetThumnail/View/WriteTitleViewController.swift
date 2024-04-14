@@ -134,15 +134,17 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         actionButton.onTapped { [weak self] in
             guard let selfRef = self else { return }
             
-            if !(selfRef.titleTextView.text.replacingOccurrences(of: " ", with: "").isEmpty) {
+            if selfRef.titleTextView.text.replacingOccurrences(of: " ", with: "").isEmpty {
+                selfRef.showToastMessageView(toastType: .error, title: "제목을 입력해주세요")
+            } else if selfRef.thumnailImageView.image == nil {
+                selfRef.showToastMessageView(toastType: .error, title: "이미지를 선택해주세요")
+                
+            } else  {
                 var thumnailFirstSort = selfRef.images
                 let thumnail = thumnailFirstSort.remove(at: selfRef.thumnailIndex)
                 thumnailFirstSort.insert(thumnail, at: 0)
                 
                 selfRef.coordinator?.moveTo(appFlow: AppFlow.tabBar(.common(.writeContent)), userData: ["images": thumnailFirstSort])
-                
-            } else {
-                selfRef.showToastMessageView(toastType: .error, title: "제목을 입력해주세요")
             }
         }
         
@@ -169,6 +171,8 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
     }
     
     private func setSelectedImages(_ images: [UIImage]) {
+        self.images = images
+        
         descriptionLabel.isHidden = images.count != 0
         addImageView.isHidden = images.count != 0
         addedImageView.isHidden = !(1...4).contains(images.count)
@@ -325,6 +329,7 @@ extension WriteTitleViewController: ImagePickerDelegate {
             addImageView.isHidden = false
             addedImageView.isHidden = true
             bottomGradientView.isHidden = true
+            images = []
             
         } else {
             var images: [UIImage] = []
@@ -416,4 +421,3 @@ extension WriteTitleViewController: PHPhotoLibraryChangeObserver {
         LogDebug(changeInstance)
     }
 }
-
