@@ -89,7 +89,7 @@ struct ProfileEditViewModel {
         
         let params: [String: Any] = ["user_id": userId]
         
-        NetworkWrapper.shared.putBasicTask(stringURL: "/users/", completion: <#T##(Result<Data, Error>) -> Void#>)
+        // NetworkWrapper.shared.putBasicTask(stringURL: "/users/", completion: <#T##(Result<Data, Error>) -> Void#>)
     }
     
     func randomNicknamePublisher() -> AnyPublisher<String, Never> {

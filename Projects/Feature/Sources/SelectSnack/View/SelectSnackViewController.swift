@@ -118,7 +118,7 @@ public final class SelectSnackViewController: BaseViewController {
         makeConstraints()
         bind()
         
-        noFindSnackButton.setOpaqueTapGestureRecognizer { [weak self] in
+        noFindSnackButton.onTapped { [weak self] in
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }

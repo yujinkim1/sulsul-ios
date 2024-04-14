@@ -59,14 +59,14 @@ final class CommonCoordinator: CommonBaseCoordinator {
     
     private func moveToSelectDrinkScene() {
         let viewModel = SelectDrinkViewModel()
-        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel, selectTasteCase: .store)
         selectDrinkVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
     }
     
     private func moveToSelectSnackScene() {
         let viewModel = SelectSnackViewModel()
-        let selectSnackVC = SelectSnackViewController(viewModel: viewModel)
+        let selectSnackVC = SelectSnackViewController(viewModel: viewModel, selectTasteCase: .store)
         selectSnackVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
     }
@@ -117,7 +117,7 @@ final class CommonCoordinator: CommonBaseCoordinator {
     }
     
     private func moveToSelectPhoto() {
-        let vc = SelectPhotoViewController()
+        let vc = WriteTitleViewController()
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)
