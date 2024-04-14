@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Service
+import Alamofire
 
 public final class FeedDetailViewModel {
     var feedID: Int
@@ -37,39 +38,37 @@ public final class FeedDetailViewModel {
     
     public init(feedID: Int) {
         self.feedID = feedID
-//        requestFeedDetail()
+        
+        requestFeedDetail()
+        
+        pairingDrinkID
+            .sink { [weak self] value in
+                self?.requestPairingDrink(value)
+            }
+            .store(in: &cancelBag)
+        
+        pairingSnackID
+            .sink { [weak self] value in
+                self?.requestPairingSnack(value)
+            }
+            .store(in: &cancelBag)
     }
     
-//    public func requestFeedDetail() {
-//        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/\(feedID)") { [weak self] result in
-//            guard let self = self else { return }
-//            
-//            switch result {
-//            case .success(let response):
-//                do {
-//                    let data = try? self.jsonDecoder.decode(DetailFeed.Feed.self, from: response)
-//                    print("DetailFeedViewModel.requestDetailFeed(): \(String(describing: data))")
-//                    
-//                    self.detailSubject.send(data!)
-//                    self.numberOfComments.send(data!.commentCount)
-//                    
-//                    guard let alcoholPairingID = data?.alcoholPairingIDs.first,
-//                          let snackPairingID = data?.snackPairingIDs.first
-//                    else { return }
-//                    
-//                    self.requestParingDrink(alcoholPairingID)
-//                    self.requestParingSnack(snackPairingID)
-//                } catch {
-//                    print("Error decoding feed data: \(error)")
-//                }
-//            case .failure(let error):
-//                print("DetailFeedViewModel.requestDetailFeed(): \(error)")
-//            }
-//        }
-//    }
-    
     public func requestFeedDetail() {
-        networkWrapper.getBasicTask(stringURL: "/feeds/\(feedID)") { [weak self] result in
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken")
+        else { return }
+        debugPrint("\(#function): User accessToken is \(accessToken)")
+        
+        var headers: HTTPHeaders? = nil
+        
+        if UserDefaultsUtil.shared.isLogin() {
+            headers = [
+                "Content-Type": "application/json",
+                "Authorization": "Baerer " + accessToken
+            ]
+        }
+        
+        networkWrapper.getBasicTask(stringURL: "/feeds/\(feedID)", header: headers) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
@@ -98,22 +97,7 @@ public final class FeedDetailViewModel {
         }
     }
     
-//    private func requestPairingName(withPairingID alcoholPairingIDs: [Int], foodPairingIDs: [Int]) {
-//        var publishers: [AnyPublisher<String, Never>] = []
-//        
-//        highvalueForAlcohol: for alcoholPairingID in alcoholPairingIDs {
-//            let publisher = networkWrapper.getBasicTask(stringURL: "pairings/\(alcoholPairingID)") { [weak self] result in
-//                guard let self = self else { return }
-//                
-//            }
-//        }
-//            
-//        highvalueForSnack: for foodPairingID in foodPairingIDs {
-//            <#body#>
-//        }
-//    }
-    
-    private func requestParingDrink(_ alcoholPairingID: Int) {
+    private func requestPairingDrink(_ alcoholPairingID: Int) {
         networkWrapper.getBasicTask(stringURL: "/pairings/\(alcoholPairingID)") { [weak self] result in
             guard let self = self else { return }
             
@@ -124,12 +108,12 @@ public final class FeedDetailViewModel {
                     self.pairingDrinkName.send(drinkName)
                 }
             case .failure(let error):
-                print("DetailFeedViewModel.requestPairingDrink(): \(error)")
+                print("\(#function): \(error)")
             }
         }
     }
     
-    private func requestParingSnack(_ foodPairingID: Int) {
+    private func requestPairingSnack(_ foodPairingID: Int) {
         networkWrapper.getBasicTask(stringURL: "/pairings/\(foodPairingID)") { [weak self] result in
             guard let self = self else { return }
             
@@ -140,7 +124,7 @@ public final class FeedDetailViewModel {
                     self.pairingSnackName.send(snackName)
                 }
             case .failure(let error):
-                print("DetailFeedViewModel.requestPairingSnack(): \(error)")
+                print("\(#function): \(error)")
             }
         }
     }
@@ -151,11 +135,16 @@ public final class FeedDetailViewModel {
             
             switch result {
             case .success(let response):
-                if let data = try? self.jsonDecoder.decode(RandomFeedModel.Heart.self, from: response) {
-                    // 결과 반영
+                do {
+                    let data = try self.jsonDecoder.decode(RandomFeedModel.Heart.self, from: response)
+                    
+                    self.isLiked.send(data.is_liked)
+                    debugPrint("\(#function): Decoding success, \(data)")
+                } catch {
+                    debugPrint("\(#function): Decoding failed, Reason is: \(error.localizedDescription)")
                 }
             case .failure(let error):
-                debugPrint("\(self): Request failed.")
+                debugPrint("\(#function): Request failed, Reason is: \(error.localizedDescription)")
             }
         }
     }

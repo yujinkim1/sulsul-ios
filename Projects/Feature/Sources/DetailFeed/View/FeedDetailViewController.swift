@@ -157,35 +157,36 @@ public final class FeedDetailViewController: BaseViewController {
         self.likeTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             
-            if UserDefaultsUtil.shared.isLogin() {
-                // 좋아요 저장
-                print("로그인 되어 있는 사용자")
-            } else if !UserDefaultsUtil.shared.isLogin() {
-                print("로그인 되어있지 않은 사용자")
-                self.showToastMessageView(toastType: .error, title: "로그인해야 좋아요를 남길 수 있어요.")
-            }
+            self.feedDetailViewModel.requestLikeFeed(self.feedID)
+            
+            feedDetailViewModel
+                .isLikedPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { value in
+                    self.updateLikeTouchableImage(with: value)
+                }
+                .store(in: &cancelBag)
         }
         
         self.menuTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             
-            // 신고하기 바텀 시트 추가 필요
             let viewController = SpamBottomSheet()
             viewController.modalPresentationStyle = .overFullScreen
             self.present(viewController, animated: false)
         }
         
-        self.commentTextFieldView.setOpaqueTapGestureRecognizer { [weak self] in
+        // 다음 작업 시 코디네이터로 관리할 수 있는 방법을 찾아 수정해보기
+        self.commentTextFieldView.onTapped { [weak self] in
             guard let self = self else { return }
-            
-            // MARK: - 다음 추가 작업 시 코디네이터로 관리가 가능하도록 수정하는 것이 좋을 것으로 보임
+
             let viewController = CommentViewController(feedID: self.feedID)
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
     
     private func bind() {
-        self.feedDetailViewModel.requestFeedDetail()
+//        self.feedDetailViewModel.requestFeedDetail()
 
         self.feedDetailViewModel
             .detailFeedPublisher
@@ -201,6 +202,7 @@ public final class FeedDetailViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { value in
                 self.updateLikeTouchableImage(with: value)
+                print(value) // 좋아요 표시 가져올 수 없음 항상 false로 나옴
             }
             .store(in: &cancelBag)
     }
@@ -233,9 +235,10 @@ public final class FeedDetailViewController: BaseViewController {
     private func updateLikeTouchableImage(with isLiked: Bool) {
         if UserDefaultsUtil.shared.isLogin(),
            isLiked {
-            likeTouchableImageView.image = UIImage(named: "heart_filled")
+            self.likeTouchableImageView.image = UIImage(named: "heart_filled")
+            self.detailCollectionView.reloadData()
         } else {
-            likeTouchableImageView.image = UIImage(named: "common_heart")
+            self.likeTouchableImageView.image = UIImage(named: "common_heart")
         }
     }
     
@@ -255,7 +258,7 @@ public final class FeedDetailViewController: BaseViewController {
                 
                 return section
             case 1:
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(393))
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: itemSize.heightDimension)
@@ -310,7 +313,7 @@ public final class FeedDetailViewController: BaseViewController {
 
 extension FeedDetailViewController: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // 메인, 댓글, 연관 피드
+        // 피드 내용, 피드 댓글, 연관 피드
         return 3
     }
     
@@ -320,7 +323,7 @@ extension FeedDetailViewController: UICollectionViewDataSource {
     ) -> Int {
         switch section {
         case 0: return 1
-        case 1: return secondSection
+        case 1: return 1
         case 2: return 6 // 보여줄 데이터가 없을 경우 0
         default: return 0
         }
