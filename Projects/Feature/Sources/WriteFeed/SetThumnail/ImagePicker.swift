@@ -101,7 +101,8 @@ open class ImagePicker: ImagePickerProtocol {
         
         presentationController.presentImagePicker(imagePicker, select: { _ in
         }, deselect: { _ in
-        }, cancel: { _ in
+        }, cancel: { [weak self] (assets) in
+            self?.delegate?.didSelect(assets: nil, deletedAssets: nil)
         }, finish: { [weak self] (assets) in
             guard let selfRef = self else { return }
             DispatchQueue.global().async {

@@ -24,7 +24,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
     private lazy var thumnailImageView = UIImageView().then {
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .gray
+        $0.backgroundColor = .darkGray
         $0.clipsToBounds = true
     }
     
@@ -55,7 +55,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
     
     private lazy var reSelectPhotoLabel = UILabel().then {
         $0.text = "사진을 다시 선택하고 싶어요."
-        $0.textColor = DesignSystemAsset.gray400.color
+        $0.textColor = DesignSystemAsset.gray700.color
         $0.font = Font.bold(size: 16)
     }
     
@@ -72,7 +72,27 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         $0.isHidden = true
     }
     
-    private lazy var addImageView = UIImage()
+    private lazy var descriptionLabel = UILabel().then {
+        $0.textColor = DesignSystemAsset.gray500.color
+        $0.numberOfLines = 0
+        $0.setLineHeight(24,
+                         text: "읽어주세요!\n• 제목과 함께 있는 이미지는 썸네일로 사용돼요.\n• 이미지는 최대 5장 까지만 선택할 수 있어요.",
+                         font:  Font.regular(size: 16))
+    }
+    
+    private lazy var addedImageView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray200.color
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.isHidden = true
+    }
+    
+    private lazy var addImageView2 = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addCircle")?.withTintColor(DesignSystemAsset.gray500.color)
+    }
+    
+    private lazy var addImageView = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addCircle")?.withTintColor(DesignSystemAsset.gray500.color)
+    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nil, bundle: nil)
@@ -111,10 +131,6 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         
         setHeaderText("썸네일&제목입력", actionText: "다음")
         
-        reSelectPhotoLabel.onTapped { [weak self] in
-            self?.navigationController?.popViewController(animated: true)
-        }
-        
         actionButton.onTapped { [weak self] in
             guard let selfRef = self else { return }
             
@@ -130,27 +146,47 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             }
         }
         
+        reSelectPhotoLabel.onTapped { [weak self] in
+            self?.checkPermission()
+        }
+        
         thumnailImageView.onTapped { [weak self] in
+            self?.checkPermission()
+        }
+        
+        addedImageView.onTapped { [weak self] in
             self?.checkPermission()
         }
     }
     
-    func setSelectedImages(_ images: [UIImage]) {
-        self.images = images
+    private func updateThumnailImage(_ selectedIndex: Int) {
+        imageStackView.arrangedSubviews.enumerated().forEach { index, imageView in
+            guard let imageView = imageView as? SelectableImageView else { return }
+            
+            imageView.isSelected = (index == selectedIndex + 1)
+            imageView.updateSelection()
+        }
+    }
+    
+    private func setSelectedImages(_ images: [UIImage]) {
+        descriptionLabel.isHidden = images.count != 0
+        addImageView.isHidden = images.count != 0
+        addedImageView.isHidden = !(1...4).contains(images.count)
         
         images.enumerated().forEach { index, image in
             let imageView = SelectableImageView(image: image)
+            imageView.snp.makeConstraints {
+                $0.size.equalTo(moderateScale(number: 72))
+            }
             
+            imageStackView.addArrangedSubview(imageView)
+
             if index == 0 {
                 imageView.isSelected = true
                 thumnailImageView.image = image
             }
             
             imageView.updateSelection()
-
-            imageView.snp.makeConstraints {
-                $0.size.equalTo(moderateScale(number: 72))
-            }
             
             imageView.onTapped { [weak self] in
                 self?.imageScrollView.scrollRectToVisible(imageView.frame,
@@ -159,17 +195,6 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
                 self?.thumnailImageView.image = image
                 self?.updateThumnailImage(index)
             }
-            
-            imageStackView.addArrangedSubview(imageView)
-        }
-    }
-    
-    private func updateThumnailImage(_ selectedIndex: Int) {
-        imageStackView.arrangedSubviews.enumerated().forEach { index, imageView in
-            guard let imageView = imageView as? SelectableImageView else { return }
-            
-            imageView.isSelected = (index == selectedIndex)
-            imageView.updateSelection()
         }
     }
     
@@ -181,21 +206,41 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             imageScrollView,
             reSelectPhotoLabel,
             titlePlaceholderLabel,
-            titleTextView
+            titleTextView,
+            descriptionLabel
         ])
         
+        addedImageView.addSubview(addImageView2)
+        
         thumnailImageView.addSubview(bottomGradientView)
+        thumnailImageView.addSubview(addImageView)
         
         imageScrollView.addSubview(imageStackView)
+        imageStackView.addArrangedSubview(addedImageView)
     }
     
     override func makeConstraints() {
         super.makeConstraints()
         
+        addImageView2.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 32))
+            $0.center.equalToSuperview()
+        }
+        
+        addImageView.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 48))
+            $0.center.equalToSuperview()
+        }
+        
         thumnailImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.top.equalTo(headerView.snp.bottom)
             $0.size.equalTo(moderateScale(number: 353))
+        }
+        
+        descriptionLabel.snp.makeConstraints {
+            $0.top.equalTo(thumnailImageView.snp.bottom).offset(moderateScale(number: 32))
+            $0.leading.trailing.equalTo(thumnailImageView)
         }
         
         bottomGradientView.snp.makeConstraints {
@@ -228,6 +273,10 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         
         imageStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        addedImageView.snp.makeConstraints {
+            $0.size.equalTo(moderateScale(number: 72))
         }
     }
     
@@ -264,8 +313,40 @@ extension WriteTitleViewController: ImagePickerDelegate {
     func didSelect(assets: [PHAsset]?,
                    deletedAssets: [PHAsset]?) {
         
-        print("|| 1. \(assets?.count)")
-        print("|| 2. \(deletedAssets?.count)")
+        imageStackView.arrangedSubviews.forEach { image in
+            image.removeFromSuperview()
+            imageStackView.removeArrangedSubview(image)
+        }
+        imageStackView.addArrangedSubview(addedImageView)
+        
+        if assets == nil {
+            thumnailImageView.image = nil
+            descriptionLabel.isHidden = false
+            addImageView.isHidden = false
+            addedImageView.isHidden = true
+            bottomGradientView.isHidden = true
+            
+        } else {
+            var images: [UIImage] = []
+            
+            assets?.forEach({ asset in
+                images.append(getAssetThumbnail(asset: asset))
+            })
+            
+            setSelectedImages(images)
+            bottomGradientView.isHidden = false
+        }
+    }
+    
+    func getAssetThumbnail(asset: PHAsset) -> UIImage {
+        let manager = PHImageManager.default()
+        let option = PHImageRequestOptions()
+        var thumbnail = UIImage()
+        option.isSynchronous = true
+        manager.requestImage(for: asset, targetSize: CGSize(width: 100, height: 100), contentMode: .aspectFit, options: option, resultHandler: {(result, info)->Void in
+            thumbnail = result!
+        })
+        return thumbnail
     }
 }
 
@@ -335,3 +416,4 @@ extension WriteTitleViewController: PHPhotoLibraryChangeObserver {
         LogDebug(changeInstance)
     }
 }
+

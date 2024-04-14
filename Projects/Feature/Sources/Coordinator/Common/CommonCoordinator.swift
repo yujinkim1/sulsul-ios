@@ -110,7 +110,6 @@ final class CommonCoordinator: CommonBaseCoordinator {
         guard let images = userData?["images"] as? [UIImage] else { return }
         
         let vc = WriteTitleViewController()
-        vc.setSelectedImages(images)
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)
