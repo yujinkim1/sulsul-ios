@@ -10,6 +10,8 @@ import UIKit
 import DesignSystem
 import MobileCoreServices
 import AVFoundation
+import Photos
+import Mantis
 
 public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
     
@@ -18,6 +20,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
+    private let imagePickerController = UIImagePickerController()
     
     private lazy var topHeaderView = BaseTopView()
     
@@ -27,8 +30,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.font = Font.bold(size: 18)
     })
     
-    private lazy var profileTouchableImageView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(systemName: "circle.fill")
+    private lazy var profileTouchableImageView = UIImageView().then({
+        $0.image = UIImage(named: "profile_notUser")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var modifyProfileButton = UIView().then({
@@ -108,6 +112,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         makeConstraints()
         setupIfNeeded()
         bind()
+        imagePickerController.delegate = self
     }
     
     private func bind() {
@@ -221,9 +226,10 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             self?.navigationController?.popViewController(animated: true)
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.tabBarController?.setTabBarHidden(true)
             self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
-                                        selectAlbumCompletion: nil,
-                                        baseCompletion: nil)
+                                        selectAlbumCompletion: self?.openAlbum,
+                                        baseCompletion: self?.settingBaseImage)
         }
         resetTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
@@ -261,25 +267,41 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         }
         
     }
+    private func settingBaseImage() {
+        profileTouchableImageView.image = UIImage(named: "profile_notUser")
+    }
     
     private func openCamera() {
-#if targetEnvironment(simulator)
-        fatalError()
-#endif
+//#if targetEnvironment(simulator)
+//        fatalError()
+//#endif
         // Privacy - Camera Usage Description
         AVCaptureDevice.requestAccess(for: .video) { [weak self] isAuthorized in
+            guard let self = self else { return }
             guard isAuthorized else {
-                self?.showAlertGoToSetting()
+                showAlertGoToSetting()
                 return
             }
             
             DispatchQueue.main.async {
-                let pickerController = UIImagePickerController()
-                pickerController.sourceType = .camera
-                pickerController.allowsEditing = false
-                pickerController.mediaTypes = ["public.image"]
-                pickerController.delegate = self
-                self?.present(pickerController, animated: true)
+                self.imagePickerController.sourceType = .camera
+                self.present(self.imagePickerController, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func openAlbum() {
+        
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] isAuthorized in
+            guard let self = self else { return }
+            guard isAuthorized else {
+                showAlertGoToSetting()
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.imagePickerController.sourceType = .photoLibrary
+                self.present(self.imagePickerController, animated: true, completion: nil)
             }
         }
     }
@@ -313,15 +335,35 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     }
 }
 extension ProfileEditViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    public func imagePickerController(
-        _ picker: UIImagePickerController,
-        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]
-    ) {
-        guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
-            picker.dismiss(animated: true)
-            return
-        }
-        self.profileTouchableImageView.image = image
-        picker.dismiss(animated: true, completion: nil)
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+         if let image = info[.originalImage] as? UIImage {
+             
+             dismiss(animated: true) {
+                 self.openCropVC(image: image)
+             }
+         }
+         dismiss(animated: true, completion: nil)
+     }
+}
+
+extension ProfileEditViewController: CropViewControllerDelegate {
+    public func cropViewControllerDidCrop(_ cropViewController: CropViewController, cropped: UIImage, transformation: Transformation, cropInfo: CropInfo) {
+        // 이미지 크롭 후 할 작업 추가
+        profileTouchableImageView.image = cropped
+        
+        cropViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    public func cropViewControllerDidCancel(_ cropViewController: CropViewController, original: UIImage) {
+        
+        cropViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    private func openCropVC(image: UIImage) {
+        
+        let cropViewController = Mantis.cropViewController(image: image)
+        cropViewController.delegate = self
+        cropViewController.modalPresentationStyle = .fullScreen
+        self.present(cropViewController, animated: true)
     }
 }

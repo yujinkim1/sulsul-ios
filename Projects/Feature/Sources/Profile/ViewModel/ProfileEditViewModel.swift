@@ -69,7 +69,7 @@ struct ProfileEditViewModel {
         
         let params: [String: Any] = ["nickname": nickname]
         
-        NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/nickname", parameters: params,header: headers) { result in
+        NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/nickname", parameters: params, header: headers) { result in
             switch result {
             case .success(let response):
                 setUserName.send(())
@@ -78,6 +78,18 @@ struct ProfileEditViewModel {
                 print(error)
             }
         }
+    }
+    
+    func setProfileImage(userId: Int, imageUrl: URL) {
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
+        ]
+        
+        let params: [String: Any] = ["user_id": userId]
+//        주석처리 해놓을게요
+//        NetworkWrapper.shared.putBasicTask(stringURL: "/users/", completion: <#T##(Result<Data, Error>) -> Void#>)
     }
     
     func randomNicknamePublisher() -> AnyPublisher<String, Never> {

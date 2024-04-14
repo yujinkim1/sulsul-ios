@@ -66,13 +66,15 @@ extension AuthCoordinator {
     }
     private func moveToSelectDrinkScene(_ userData: [String: Any]?) {
         let viewModel = SelectDrinkViewModel()
-        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel,
+                                                      selectTasteCase: .next)
         selectDrinkVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
     }
     private func moveToSelectSnackScene(_ userData: [String: Any]?) {
         let viewModel = SelectSnackViewModel()
-        let selectSnackVC = SelectSnackViewController(viewModel: viewModel)
+        let selectSnackVC = SelectSnackViewController(viewModel: viewModel,
+                                                      selectTasteCase: .next)
         selectSnackVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
     }

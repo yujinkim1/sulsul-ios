@@ -42,8 +42,9 @@ public final class ProfileMainViewController: BaseViewController {
         $0.textColor = DesignSystemAsset.gray300.color
     })
     
-    private lazy var profileTouchableImageView = TouchableImageView(frame: .zero).then({
+    private lazy var profileTouchableImageView = UIImageView().then({
         $0.image = UIImage(named: "profile_notUser")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var selectFeedView = UIStackView().then({
@@ -76,7 +77,7 @@ public final class ProfileMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil) // TODO: - 제거
         view.backgroundColor = DesignSystemAsset.black.color
         addViews()
         makeConstraints()
@@ -88,7 +89,6 @@ public final class ProfileMainViewController: BaseViewController {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-                print("뭐지 : \(result)")
                 guard let self = self else { return }
                 if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     self.profileLabel.text = "로그인 해주세요!"
@@ -123,7 +123,6 @@ public final class ProfileMainViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] loginStatus in
                 guard let self = self else { return }
-                print("userinfo는 호출됨")
                 viewModel.getUserInfo()
             }.store(in: &cancelBag)
         
@@ -213,10 +212,6 @@ public final class ProfileMainViewController: BaseViewController {
         }
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
-        }
-        profileTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
         }
         profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }

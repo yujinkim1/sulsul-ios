@@ -109,7 +109,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 guard let self = self else { return }
                 viewModel.getUserInfo()
             }.store(in: &cancelBag)
-//        여기 하고 잇읍니다
         
         viewModel.userInfoPublisher()
             .receive(on: DispatchQueue.main)
@@ -119,12 +118,23 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
                     viewModel.getFeedsByAlcohol()
+                    if StaticValues.isFirstLaunch {
+                        self.tabBarController?.setTabBarHidden(true, animated: false)
+                        self.showBottomSheetAlertView(bottomSheetAlertType: .verticalTwoButton,
+                                                      title: "취향을 알려주지 않을래?",
+                                                      submitLabel: "취향 등록하기!",
+                                                      cancelLabel: "아직 괜찮아요",
+                                                      description: "아...이게 정말 좋은데... 뭐라 설명할 방법이 없네... 하면 진짜 도움이 많이 될텐데... 쩝.. 하려면 버튼을 눌러줘바",
+                                                      submitCompletion: { self.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)},
+                                                      cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
+                        StaticValues.isFirstLaunch = false
+                    }
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
-                    // MARK: - 밴된 유저
+                    
                 } else { // MARK: - 로그인한 유저
-                    viewModel.getPreferenceFeeds()
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
+                    viewModel.getPreferenceFeeds()
                 }
             }.store(in: &cancelBag)
         
@@ -245,8 +255,22 @@ extension MainPageViewController: UICollectionViewDataSource {
         switch indexPath.section {
         case 0:
             if viewModel.getSelectedAlcoholFeedsValue().count == 0 {
-                guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
-                return cell
+                if StaticValues.isLoggedIn.value == false { // MARK: - 로그아웃 유저
+                    guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                    cell.bind(nickName: nil, preference: viewModel.getSelectedAlcoholValue())
+                    cell.registerButton.setOpaqueTapGestureRecognizer { [weak self] in
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)
+                    }
+                    return cell
+                } else { // MARK: - 로그인 유저
+                    guard let cell = collectionView.dequeueReusableCell(MainNoPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                    cell.bind(nickName: viewModel.getUserInfoValue().nickname,
+                              preference: StaticValues.getDrinkPairingById(viewModel.getUserInfoValue().preference.alcohols[0])?.name ?? "취향 선택 x")
+                    cell.registerButton.setOpaqueTapGestureRecognizer { [weak self] in
+                        self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectPhoto), userData: nil)
+                    }
+                    return cell
+                }
             } else {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
                 cell.alcoholBind(viewModel.getSelectedAlcoholFeedsValue())
@@ -266,7 +290,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             let differenceFeed = viewModel.getDifferenceFeedsValue()[indexPath.item]
             cell.bind(differenceFeed)
             cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": differenceFeed.feeds[0].feedId]) // MARK: feed가 하나밖에 안내려오긴 함
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": differenceFeed.feeds[0].feedId])
             }
             return cell
         default:
@@ -279,7 +303,7 @@ extension MainPageViewController: UICollectionViewDataSource {
             guard let preferenceHeaderView = collectionView.dequeueSupplimentaryView(MainPreferenceHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else {
                 return .init()
             }
-            preferenceHeaderView.updateUI() // MARK: - 비로그인, 로그인 때 업뎃
+            preferenceHeaderView.updateUI()
             if preferenceHeaderView.viewModel == nil {
                 preferenceHeaderView.viewModel = self.viewModel
             }

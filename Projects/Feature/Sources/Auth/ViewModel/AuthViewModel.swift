@@ -25,7 +25,6 @@ final class AuthViewModel: NSObject {
     
     private lazy var jsonDecoder = JSONDecoder()
     private let userMapper = UserMapper()
-//    private var userSettingType: UserSettingType = .initSettingUser
     
     private let errorSubject = CurrentValueSubject<String, Never>("")
     private let userSettingType = PassthroughSubject<UserSettingType, Never>()
@@ -39,16 +38,16 @@ final class AuthViewModel: NSObject {
     public func continueWithApple() {
         signin(type: .apple)
     }
-
+    
     public func continueWithKakao() {
         signin(type: .kakao)
     }
-
+    
     public func continueWithGoogle(id: String, item: String) {
         signin(type: .google, id: id, item: item)
     }
     
-// TODO: 로그인하고 response 값으로 status에 banned이면 영구정지 사용자임 앱 못들어가게 막아야됨
+    // TODO: 로그인하고 response 값으로 status에 banned이면 영구정지 사용자임 앱 못들어가게 막아야됨
     func getUserInfo(userId: Int) {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak self] result in
             guard let self = self else { return }
@@ -56,7 +55,6 @@ final class AuthViewModel: NSObject {
             case .success(let response):
                 if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
-                    print("내정보: \(mappedUserInfo)")
                     if mappedUserInfo.nickname.isEmpty {
                         userSettingType.send(.initSettingUser)
                     } else if mappedUserInfo.preference.alcohols == [0] {
@@ -65,10 +63,9 @@ final class AuthViewModel: NSObject {
                         userSettingType.send(.drinkSettingUser)
                     } else {
                         userSettingType.send(.allSettingUSer)
-                        print(">>>>> 키체인 잘저장되나 :\(KeychainStore.shared.read(label: "accessToken"))")
                     }
                 } else {
-                    print("디코딩 에러")
+                    errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
                 errorSubject.send(error.localizedDescription)
@@ -113,7 +110,6 @@ extension AuthViewModel {
 }
 
 // MARK: - Authentication
-
 extension AuthViewModel {
     private func appleAuthenticationAdapter() {
         let authorizationAppleIDProvider = ASAuthorizationAppleIDProvider()
@@ -180,17 +176,18 @@ extension AuthViewModel {
                                 let accessToken = data.accessToken
                                 let id = data.userID
                                 
-                                print(">>>>카카오 아이디")
-                                print(id)
                                 UserDefaultsUtil.shared.setUserId(id)
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.getUserInfo(userId: id)
+                            } else {
+                                self.errorSubject.send("앱에서 에러가 발생했습니다")
                             }
                         }
                     case .failure(let error):
-                        print(">>>>>> :\(error)")
                         if let networkError = error as? NetworkError {
                             self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
+                        } else {
+                            self.errorSubject.send(error.localizedDescription)
                         }
                     }
                 }
@@ -221,13 +218,14 @@ extension AuthViewModel {
                                 KeychainStore.shared.create(item: accessToken, label: "accessToken")
                                 self.getUserInfo(userId: id)
                             } else {
-                                print("디코딩 모델 에러3")
+                                self.errorSubject.send("앱에서 에러가 발생했습니다")
                             }
                         }
                     case .failure(let error):
-                        print(">>>>>> :\(error)")
                         if let networkError = error as? NetworkError {
                             self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
+                        } else {
+                            self.errorSubject.send(error.localizedDescription)
                         }
                     }
                 }
@@ -257,16 +255,21 @@ extension AuthViewModel: ASAuthorizationControllerDelegate {
                     let id = data.userID
                     
                     KeychainStore.shared.create(item: accessToken, label: "accessToken")
-                    print("로그인된 애플 아이디: \(id)")
                     UserDefaultsUtil.shared.setUserId(id)
                     self.getUserInfo(userId: id)
+                } else {
+                    self.errorSubject.send("앱에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                if let networkError = error as? NetworkError {
+                    self.errorSubject.send(networkError.getErrorMessage() ?? "알 수 없는 에러")
+                } else {
+                    self.errorSubject.send(error.localizedDescription)
+                }
             }
         }
     }
-
+    
     internal func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         print("[!] Authorization Services: \(error.localizedDescription)")
     }

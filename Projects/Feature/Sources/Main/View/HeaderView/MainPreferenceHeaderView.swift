@@ -80,7 +80,7 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
              return section
          }
     }
-    
+
     func updateUI() {
         if StaticValues.isLoggedIn.value {
             preferecneCollectionView.isHidden = true
@@ -95,7 +95,6 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
             let attributedString = NSMutableAttributedString(string: title + "랑 어울리는\n안주로 골라봤어요!")
             attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: title.count)) // 타이틀의 색상 변경
             titleLabel.attributedText = attributedString
-            
         }
         preferecneCollectionView.reloadData()
     }

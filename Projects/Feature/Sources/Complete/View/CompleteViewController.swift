@@ -108,6 +108,7 @@ extension CompleteViewController {
     }
     
     @objc private func mainButtonDidTap() {
+        StaticValues.isLoggedIn.send(true)
         self.coordinator?.currentNavigationViewController?.popToRootViewController(animated: false)
         self.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
     }
