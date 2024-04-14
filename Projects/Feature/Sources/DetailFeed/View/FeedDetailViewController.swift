@@ -16,6 +16,7 @@ public final class FeedDetailViewController: BaseViewController {
     private var firstSection = 0
     private var secondSection = 0
     private var thirdSection = 0
+    private var commentCount = 0
     private var feedDetailViewModel: FeedDetailViewModel
     private var cancelBag = Set<AnyCancellable>()
     
@@ -192,7 +193,6 @@ public final class FeedDetailViewController: BaseViewController {
             .detailFeedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                self?.secondSection = value.commentCount
                 self?.detailCollectionView.reloadData()
             }
             .store(in: &cancelBag)
@@ -323,7 +323,9 @@ extension FeedDetailViewController: UICollectionViewDataSource {
     ) -> Int {
         switch section {
         case 0: return 1
-        case 1: return 1
+        case 1:
+            if self.commentCount == 0 { return 0 }
+            return 1
         case 2: return 6 // 보여줄 데이터가 없을 경우 0
         default: return 0
         }

@@ -68,10 +68,7 @@ final class FeedDetailCommentCell: UICollectionViewCell {
             .store(in: &cancelBag)
         
         if self.numberOfItems == 0 {
-            let backgroundView = UIView()
-            
-            backgroundView.backgroundColor = .red
-            self.commentTableView.backgroundView = backgroundView
+            self.commentTableView.removeFromSuperview()
         } else {
             self.commentTableView.backgroundView = nil
         }
