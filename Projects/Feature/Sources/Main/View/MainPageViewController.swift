@@ -67,7 +67,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         }
         
         settingTouchableImageView.onTapped { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.comment), userData: nil)
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.setting), userData: nil)
         }
     }
     

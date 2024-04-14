@@ -48,7 +48,33 @@ final class CommonCoordinator: CommonBaseCoordinator {
             moveToComment()
         case .detailFeed:
             moveToDetailFeed(userData)
+        case .setting:
+            moveToSetting()
+        case .selectSnack:
+            moveToSelectSnackScene()
+        case .selectDrink:
+            moveToSelectDrinkScene()
         }
+    }
+    
+    private func moveToSelectDrinkScene() {
+        let viewModel = SelectDrinkViewModel()
+        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel, selectTasteCase: .store)
+        selectDrinkVC.coordinator = self
+        currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
+    }
+    
+    private func moveToSelectSnackScene() {
+        let viewModel = SelectSnackViewModel()
+        let selectSnackVC = SelectSnackViewController(viewModel: viewModel, selectTasteCase: .store)
+        selectSnackVC.coordinator = self
+        currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
+    }
+    
+    private func moveToSetting() {
+        let profileSettingVC = ProfileSettingViewController()
+        profileSettingVC.coordinator = self
+        currentNavigationViewController?.pushViewController(profileSettingVC, animated: true)
     }
     
     private func moveToDetailFeed(_ userData: [String: Any]?) {
@@ -84,14 +110,13 @@ final class CommonCoordinator: CommonBaseCoordinator {
         guard let images = userData?["images"] as? [UIImage] else { return }
         
         let vc = WriteTitleViewController()
-        vc.setSelectedImages(images)
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)
     }
     
     private func moveToSelectPhoto() {
-        let vc = SelectPhotoViewController()
+        let vc = WriteTitleViewController()
         vc.coordinator = self
         
         currentNavigationViewController?.pushViewController(vc, animated: true)

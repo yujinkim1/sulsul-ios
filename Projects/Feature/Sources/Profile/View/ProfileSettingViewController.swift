@@ -12,7 +12,7 @@ import Service
 import Combine
 
 public final class ProfileSettingViewController: BaseViewController {
-    var coordinator: MoreBaseCoordinator?
+    var coordinator: Coordinator?
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel = ProfileSettingViewModel()
     private lazy var topHeaderView = BaseTopView()
@@ -59,7 +59,10 @@ public final class ProfileSettingViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
+        
         addViews()
         makeConstraints()
         bind()
@@ -135,11 +138,11 @@ public final class ProfileSettingViewController: BaseViewController {
         }
         drinkSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectDrink), userData: nil)
         }
         snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectSnack), userData: nil)
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }

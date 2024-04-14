@@ -29,10 +29,10 @@ public final class SelectSnackViewController: BaseViewController {
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
-    private lazy var noFindSnackButton = TouchableLabel().then {
-        $0.text = "찾는 안주가 없어요"
-        $0.textColor = DesignSystemAsset.main.color
-        $0.font = Font.semiBold(size: 14)
+    private lazy var noFindSnackButton = UIButton().then {
+        $0.setTitle("찾는 안주가 없어요", for: .normal)
+        $0.titleLabel?.font = Font.semiBold(size: 14)
+        $0.setTitleColor(DesignSystemAsset.main.color, for: .normal)
     }
         
     private lazy var questionNumberLabel = UILabel().then {
@@ -73,9 +73,9 @@ public final class SelectSnackViewController: BaseViewController {
     
     private lazy var nextButton = UIButton().then {
         $0.addTarget(self, action: #selector(didTabNextButton), for: .touchUpInside)
-        $0.backgroundColor = DesignSystemAsset.gray300.color
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.titleLabel?.font = Font.bold(size: 16)
-        $0.titleLabel?.textColor = .white
+        $0.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.setTitle("다음", for: .normal)
     }
@@ -111,12 +111,14 @@ public final class SelectSnackViewController: BaseViewController {
         self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
 
         addViews()
         makeConstraints()
         bind()
         
-        noFindSnackButton.setOpaqueTapGestureRecognizer { [weak self] in
+        noFindSnackButton.onTapped { [weak self] in
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
@@ -256,6 +258,7 @@ extension SelectSnackViewController: OnSelectedValue {
         
         selectedCountLabel.attributedText = attribtuedString
         selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
-        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
+        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
+        nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
     }
 }
