@@ -104,12 +104,6 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        if let text = UserDefaultsUtil.shared.getFeedTitle() {
-            titleTextView.text = text
-        }
-    }
-    
     override func viewDidLayoutSubviews() {
         setTextViewUI()
     }
