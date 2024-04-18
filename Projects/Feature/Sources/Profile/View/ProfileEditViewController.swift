@@ -136,6 +136,8 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                 NotificationCenter.default.post(name: NSNotification.Name("ProfileIsChanged"), object: nil)
                 self.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func addViews() {
@@ -244,29 +246,41 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     
     @objc private func clearButtonDidTap() {
         userNameTextField.text = ""
+        nicknameValidate(text: userNameTextField.text ?? "")
     }
     
     @objc private func textFieldDidChange(_ sender: UITextField) {
         guard let text = sender.text else { return }
-        let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
-        let hasValidLength = (1...10).contains(text.count)
-        
-        specializeGuideImageView.image = containsSpecialCharacters ? UIImage(named: "common_checkmark") : UIImage(named: "checkmark")
-        specializeGuidLabel.textColor = containsSpecialCharacters ? DesignSystemAsset.gray700.color : UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
-        countGuideImageView.image = hasValidLength ? UIImage(named: "checkmark") : UIImage(named: "common_checkmark")
-        countGuideLabel.textColor = hasValidLength ? UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1) :  DesignSystemAsset.gray700.color
-        
-        if !containsSpecialCharacters && hasValidLength {
-            nextButton.textColor = DesignSystemAsset.gray200.color
-            nextButton.backgroundColor = DesignSystemAsset.main.color
-            nextButton.isUserInteractionEnabled = true
-        } else {
-            nextButton.textColor = DesignSystemAsset.gray300.color
-            nextButton.backgroundColor = DesignSystemAsset.gray100.color
-            nextButton.isUserInteractionEnabled = false
-        }
-        
+        nicknameValidate(text: text)
     }
+    
+    private func nicknameValidate(text: String) {
+        if text.isEmpty {
+            specializeGuidLabel.textColor = DesignSystemAsset.gray700.color
+            countGuideLabel.textColor = DesignSystemAsset.gray700.color
+            specializeGuideImageView.image = UIImage(named: "common_checkmark")
+            countGuideImageView.image = UIImage(named: "common_checkmark")
+        } else {
+            let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
+            let hasValidLength = (1...10).contains(text.count)
+            
+            specializeGuideImageView.image = containsSpecialCharacters ? UIImage(named: "xmark") : UIImage(named: "checkmark")
+            specializeGuidLabel.textColor = containsSpecialCharacters ? DesignSystemAsset.red050.color : UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
+            countGuideImageView.image = hasValidLength ? UIImage(named: "checkmark") : UIImage(named: "xmark")
+            countGuideLabel.textColor = hasValidLength ? UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1) :  DesignSystemAsset.red050.color
+            
+            if !containsSpecialCharacters && hasValidLength {
+                nextButton.textColor = DesignSystemAsset.gray200.color
+                nextButton.backgroundColor = DesignSystemAsset.main.color
+                nextButton.isUserInteractionEnabled = true
+            } else {
+                nextButton.textColor = DesignSystemAsset.gray300.color
+                nextButton.backgroundColor = DesignSystemAsset.gray100.color
+                nextButton.isUserInteractionEnabled = false
+            }
+        }
+    }
+    
     private func settingBaseImage() {
         profileTouchableImageView.image = UIImage(named: "profile_notUser")
     }

@@ -37,14 +37,14 @@ struct ProfileEditViewModel {
                 if let nickname = try? self.jsonDecoder.decode(UserName.self, from: response) {
                     randomNickname.send(nickname.value)
                 } else {
-                    print("디코딩 모델 에러4")
+                    errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                errorSubject.send(error.localizedDescription)
             }
         }
     }
-    // MARK: - ID로 유저 정보를 조회
+    
     func getUserInfo() {
         let userId = UserDefaultsUtil.shared.getInstallationId()
         
@@ -53,12 +53,12 @@ struct ProfileEditViewModel {
             case .success(let response):
                 if let userInfo = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userInfo)
-                    print("여기 이제 값 가져와서 모델에 넣어놓자")
+                    randomNickname.send(mappedUserInfo.nickname)
                 } else {
-                    print("디코딩 에러")
+                    errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                errorSubject.send(error.localizedDescription)
             }
         }
     }
@@ -79,23 +79,24 @@ struct ProfileEditViewModel {
             case .success(let response):
                 setUserName.send(())
             case .failure(let error):
-                print("닉네임 설정 실패")
-                print(error)
+                errorSubject.send(error.localizedDescription)
             }
         }
     }
     
-    func setProfileImage(imageUrl: String) {
-        let userId = UserDefaultsUtil.shared.getInstallationId()
-        
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
-        var headers: HTTPHeaders = [
-            "Authorization": "Bearer " + accessToken
-        ]
-        
-        // 이미지 URL을 쿼리 파라미터로 포함하여 요청을 보냅니다.
-        let urlString = "/users/\(userId)/image?image_url=\(imageUrl)"
-        
+
+//    func setProfileImage(imageUrl: String) {
+//        let userId = UserDefaultsUtil.shared.getInstallationId()
+//        
+//        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+//        var headers: HTTPHeaders = [
+//            "Authorization": "Bearer " + accessToken
+//        ]
+//        
+//        // 이미지 URL을 쿼리 파라미터로 포함하여 요청을 보냅니다.
+//        let urlString = "/users/\(userId)/image?image_url=\(imageUrl)"
+//        
+
 //        NetworkWrapper.shared.putUploadImage(stringURL: urlString, header: headers) { result in
 //            switch result {
 //            case .success(let imageData):
@@ -108,7 +109,7 @@ struct ProfileEditViewModel {
 //                errorSubject.send("이미지 업로드 중 오류가 발생했습니다.")
 //            }
 //        }
-    }
+//    }
     
     func randomNicknamePublisher() -> AnyPublisher<String, Never> {
         return randomNickname.eraseToAnyPublisher()
