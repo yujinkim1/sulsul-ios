@@ -76,42 +76,7 @@ public class BaseWebViewController: UIViewController {
 
 // MARK: - WKNavigationDelegate
 extension BaseWebViewController: WKNavigationDelegate {
-//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-//        if let url = navigationAction.request.url {
-//            if #available(iOS 16.0, *) {
-//                if url.host() == URL(string: StaticValues.baseURL)?.host() || url.absoluteString.contains(StaticValues.baseURL) {
-//                    if url.lastPathComponent == "goback" || url.pathComponents.contains("goback") {
-//                        decisionHandler(.cancel)
-//                        navigationController?.popViewController(animated: true)
-//                    } else if url.lastPathComponent == "outbound" || url.pathComponents.contains("outbound") {
-//                        decisionHandler(.cancel)
-//                        coordinator?.moveTo(appFlow: TabBarFlow.transfer(.main), userData: nil)
-//                    } else {
-//                        decisionHandler(.allow)
-//                    }
-//                } else {
-//                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-//                    navigationController?.popViewController(animated: true)
-//                    decisionHandler(.cancel)
-//                }
-//            } else {
-//                if url.host == URL(string: StaticValues.baseURL)?.host || url.absoluteString.contains(StaticValues.baseURL) {
-//                    if url.lastPathComponent == "goback" || url.pathComponents.contains("goback") {
-//                        decisionHandler(.cancel)
-//                        navigationController?.popViewController(animated: true)
-//                    } else if url.lastPathComponent == "outbound" || url.pathComponents.contains("outbound") {
-//                        decisionHandler(.cancel)
-//                        coordinator?.moveTo(appFlow: TabBarFlow.transfer(.main), userData: nil)
-//                    } else {
-//                        decisionHandler(.allow)
-//                    }
-//                } else {
-//                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-//                    decisionHandler(.cancel)
-//                }
-//            }
-//        } else {
-//            decisionHandler(.cancel)
-//        }
-//    }
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        decisionHandler(.allow)
+    }
 }

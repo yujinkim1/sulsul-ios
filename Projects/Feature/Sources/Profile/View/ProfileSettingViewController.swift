@@ -152,6 +152,10 @@ public final class ProfileSettingViewController: BaseViewController {
                 self.showAlertView(withType: .oneButton, title: "로그인", description: "해라", submitCompletion: nil, cancelCompletion: nil)
             }
         }
+        termsSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://www.naver.com")])
+        }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.tabBarController?.setTabBarHidden(true, animated: false)
