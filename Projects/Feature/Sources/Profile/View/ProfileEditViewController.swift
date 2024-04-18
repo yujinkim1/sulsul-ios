@@ -136,6 +136,8 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                 NotificationCenter.default.post(name: NSNotification.Name("ProfileIsChanged"), object: nil)
                 self.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func addViews() {
