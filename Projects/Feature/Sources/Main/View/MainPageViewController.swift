@@ -128,6 +128,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                                                       submitCompletion: { self.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)},
                                                       cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
                         StaticValues.isFirstLaunch = false
+                    } else {
+                        StaticValues.isFirstLaunch = false
                     }
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
                     

@@ -139,6 +139,7 @@ final class AlertView: UIView {
                 $0.trailing.bottom.equalToSuperview().inset(moderateScale(number: 24))
             }
             submitTouchableLabel.title("로그아웃")
+            submitTouchableLabel.textColor(DesignSystemAsset.white.color)
             submitTouchableLabel.backgroundColor = DesignSystemAsset.red050.color
         case .verticalTwoButton:
             cancelTouchableLabel.snp.makeConstraints {

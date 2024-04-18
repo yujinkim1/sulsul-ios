@@ -49,7 +49,7 @@ final class BottomSheetAlertView: UIView {
     private lazy var titleStackView = UIStackView().then {
         $0.spacing = moderateScale(number: 12)
         $0.axis = .vertical
-        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.backgroundColor = DesignSystemAsset.gray050.color
         $0.alignment = .leading
         $0.isLayoutMarginsRelativeArrangement = true
         $0.layoutMargins = .init(top: moderateScale(number: 24),
