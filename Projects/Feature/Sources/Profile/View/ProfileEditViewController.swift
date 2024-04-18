@@ -246,10 +246,15 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     
     @objc private func clearButtonDidTap() {
         userNameTextField.text = ""
+        nicknameValidate(text: userNameTextField.text ?? "")
     }
     
     @objc private func textFieldDidChange(_ sender: UITextField) {
         guard let text = sender.text else { return }
+        nicknameValidate(text: text)
+    }
+    
+    private func nicknameValidate(text: String) {
         let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
         let hasValidLength = (1...10).contains(text.count)
         
@@ -267,8 +272,8 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             nextButton.backgroundColor = DesignSystemAsset.gray100.color
             nextButton.isUserInteractionEnabled = false
         }
-        
     }
+    
     private func settingBaseImage() {
         profileTouchableImageView.image = UIImage(named: "profile_notUser")
     }
