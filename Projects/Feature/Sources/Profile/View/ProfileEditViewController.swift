@@ -255,29 +255,29 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     }
     
     private func nicknameValidate(text: String) {
+        let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
+        let hasValidLength = (1...10).contains(text.count)
         if text.isEmpty {
             specializeGuidLabel.textColor = DesignSystemAsset.gray700.color
             countGuideLabel.textColor = DesignSystemAsset.gray700.color
             specializeGuideImageView.image = UIImage(named: "common_checkmark")
             countGuideImageView.image = UIImage(named: "common_checkmark")
         } else {
-            let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
-            let hasValidLength = (1...10).contains(text.count)
-            
             specializeGuideImageView.image = containsSpecialCharacters ? UIImage(named: "xmark") : UIImage(named: "checkmark")
             specializeGuidLabel.textColor = containsSpecialCharacters ? DesignSystemAsset.red050.color : UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
+            specializeGuidLabel.text = containsSpecialCharacters ? "특수문자가 포함되어 있어요." : "입력된 특수문자가 없어요."
             countGuideImageView.image = hasValidLength ? UIImage(named: "checkmark") : UIImage(named: "xmark")
             countGuideLabel.textColor = hasValidLength ? UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1) :  DesignSystemAsset.red050.color
-            
-            if !containsSpecialCharacters && hasValidLength {
-                nextButton.textColor = DesignSystemAsset.gray200.color
-                nextButton.backgroundColor = DesignSystemAsset.main.color
-                nextButton.isUserInteractionEnabled = true
-            } else {
-                nextButton.textColor = DesignSystemAsset.gray300.color
-                nextButton.backgroundColor = DesignSystemAsset.gray100.color
-                nextButton.isUserInteractionEnabled = false
-            }
+            countGuideLabel.text = hasValidLength ? "적절한 글자수의 닉네임이에요." : "한글/영문, 숫자 포함 1~10자 이내로 설정해주세요."
+        }
+        if !containsSpecialCharacters && hasValidLength {
+            nextButton.textColor = DesignSystemAsset.gray200.color
+            nextButton.backgroundColor = DesignSystemAsset.main.color
+            nextButton.isUserInteractionEnabled = true
+        } else {
+            nextButton.textColor = DesignSystemAsset.gray300.color
+            nextButton.backgroundColor = DesignSystemAsset.gray100.color
+            nextButton.isUserInteractionEnabled = false
         }
     }
     
