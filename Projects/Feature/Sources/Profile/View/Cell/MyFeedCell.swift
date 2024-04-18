@@ -60,6 +60,7 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     private lazy var viewCountImageView = UIImageView().then({
         $0.image = UIImage(named: "eye")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var viewCountLabel = UILabel().then({
@@ -70,6 +71,7 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     private lazy var commentImageView = UIImageView().then({
         $0.image = UIImage(named: "comment")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var commentLabel = UILabel().then({
@@ -80,6 +82,7 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     private lazy var likeImageView = UIImageView().then({
         $0.image = UIImage(named: "like")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var likeCountLabel = UILabel().then({
