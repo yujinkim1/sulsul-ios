@@ -111,9 +111,13 @@ final class CommonCoordinator: CommonBaseCoordinator {
     private func moveToTermsWebScene(_ userData: [String: Any]?) {
         guard let url = userData?["url"] as? URL else { return }
         
-//        let webVC = BaseWebViewController(url: url)
-//        webVC.coordinator = self
-//        
-//        currentNavigationViewController?.pushViewController(webVC, animated: true)
+        let webVC = BaseWebViewController(url: url)
+        webVC.coordinator = self
+        
+        if let delegate = userData?["delegate"] as? BaseWebViewControllerDelegate {
+            webVC.delegate = delegate
+        }
+        
+        currentNavigationViewController?.pushViewController(webVC, animated: true)
     }
 }
