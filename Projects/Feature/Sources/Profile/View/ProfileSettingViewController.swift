@@ -50,16 +50,19 @@ public final class ProfileSettingViewController: BaseViewController {
     private lazy var personalSettingView = SettingView(settingType: .arrow,
                                                        title: "개인정보 처리방침")
     private lazy var signOutSettingView = SettingView(settingType: .arrow,
-                                                      title: "회원탈퇴")
+                                                      title: "회원탈퇴").then({
+        $0.isHidden = !StaticValues.isLoggedIn.value
+    })
     private lazy var logoutTouchaleLabel = TouchableLabel().then({
-        $0.text = "로그아웃"
         $0.textColor = DesignSystemAsset.red050.color
         $0.font = Font.bold(size: 16)
+        $0.text = StaticValues.isLoggedIn.value ? "로그아웃" : "로그인"
     })
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
+        self.tabBarController?.setTabBarHidden(true)
         addViews()
         makeConstraints()
         bind()
@@ -124,7 +127,7 @@ public final class ProfileSettingViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 378))
         }
         logoutTouchaleLabel.snp.makeConstraints {
-            $0.top.equalTo(settingStackView.snp.bottom).offset(moderateScale(number: 67))
+            $0.bottom.equalToSuperview().inset(moderateScale(number: getSafeAreaBottom() + 22))
             $0.centerX.equalToSuperview()
         }
     }
@@ -135,11 +138,19 @@ public final class ProfileSettingViewController: BaseViewController {
         }
         drinkSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            if StaticValues.isLoggedIn.value {
+                self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            } else {
+                self.showAlertView(withType: .oneButton, title: "로그인", description: "해라", submitCompletion: nil, cancelCompletion: nil)
+            }
         }
         snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            if StaticValues.isLoggedIn.value {
+                self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            } else {
+                self.showAlertView(withType: .oneButton, title: "로그인", description: "해라", submitCompletion: nil, cancelCompletion: nil)
+            }
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
