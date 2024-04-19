@@ -92,11 +92,22 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
             preferecneCollectionView.isHidden = false
             guard let title = viewModel?.getSelectedAlcoholValue() else { return }
             
-            let attributedString = NSMutableAttributedString(string: title + "랑 어울리는\n안주로 골라봤어요!")
+            let attributedString = NSMutableAttributedString(string: postPositionText(title) + " 어울리는\n안주로 골라봤어요!")
             attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: title.count)) // 타이틀의 색상 변경
             titleLabel.attributedText = attributedString
         }
         preferecneCollectionView.reloadData()
+    }
+    
+    private func postPositionText(_ word: String) -> String {
+        guard let lastText = word.last else { return word }
+        let unicodeVal = UnicodeScalar(String(lastText))?.value
+        guard let value = unicodeVal else { return word }
+        if (value < 0xAC00 || value > 0xD7A3) { return word }
+        let last = (value - 0xAC00) % 28
+        let str = last > 0 ? "이랑" : "랑"
+        
+        return word + str
     }
 }
 

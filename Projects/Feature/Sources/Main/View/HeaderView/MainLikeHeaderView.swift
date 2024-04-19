@@ -48,16 +48,16 @@ final class MainLikeHeaderView: UICollectionReusableView {
     
     private func makeConstraints() {
         separatorView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(moderateScale(number: 16))
+            $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(moderateScale(number: 0))
+            $0.height.equalTo(moderateScale(number: 12))
         }
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(separatorView.snp.bottom)
+            $0.top.equalTo(separatorView.snp.bottom).offset(moderateScale(number: 16))
             $0.leading.equalToSuperview()
         }
         subTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 2))
             $0.leading.equalToSuperview()
         }
     }

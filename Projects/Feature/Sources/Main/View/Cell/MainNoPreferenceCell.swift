@@ -60,10 +60,23 @@ final class MainNoPreferenceCell: UICollectionViewCell {
     }
     
     func bind(nickName: String?, preference: String) {
+        let connectiveParticle = postPositionText(preference)
+        
         if let nickName = nickName {
-            titleLabel.text = nickName + "님이\n" + preference + "와 함께 즐겼던\n특별한 순간을 공유해주실래요?"
+            titleLabel.text = "\(nickName)님이\n\(connectiveParticle) 함께 즐겼던\n특별한 순간을 공유해주실래요?"
         } else {
-            titleLabel.text = preference + "와 함께 즐겼던\n특별한 순간을 공유해주실래요?"
+            titleLabel.text = "\(connectiveParticle) 함께 즐겼던\n특별한 순간을 공유해주실래요?"
         }
+    }
+
+    private func postPositionText(_ word: String) -> String {
+        guard let lastText = word.last else { return word }
+        let unicodeVal = UnicodeScalar(String(lastText))?.value
+        guard let value = unicodeVal else { return word }
+        if (value < 0xAC00 || value > 0xD7A3) { return word }
+        let last = (value - 0xAC00) % 28
+        let str = last > 0 ? "과" : "와"
+        
+        return word + str
     }
 }

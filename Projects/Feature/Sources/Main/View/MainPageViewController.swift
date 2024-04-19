@@ -36,13 +36,11 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                                      supplementaryViewOfKind: .header)
         $0.registerSupplimentaryView(MainLikeFooterView.self,
                                      supplementaryViewOfKind: .footer)
-//        $0.registerSupplimentaryView(DifferenceHeaderView.self,
-//                                     supplementaryViewOfKind: .header)
         $0.registerCell(MainPreferenceCell.self)
         $0.registerCell(MainNoPreferenceCell.self)
         $0.registerCell(MainLikeCell.self)
         $0.registerCell(MainDifferenceCell.self)
-        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.backgroundColor = DesignSystemAsset.black.color
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
     }
@@ -163,7 +161,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 
                 itemHeight = 323
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24)))
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24 + 12)))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: itemHeight + 24)))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
@@ -193,7 +191,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                     
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 78)))
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(moderateScale(number: 78 + 12 + 16)))
                 
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
                     layoutSize: headerSize,
@@ -218,7 +216,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                     
-                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112+12)))
+                let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(moderateScale(number: 112)))
                 
                 let header = NSCollectionLayoutBoundarySupplementaryItem(
                     layoutSize: headerSize,
@@ -313,7 +311,7 @@ extension MainPageViewController: UICollectionViewDataSource {
         } else if indexPath.section == 1 {
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let likeHeaderView = collectionView.dequeueSupplimentaryView(MainLikeHeaderView.self, supplementaryViewOfKind: .header, indexPath: indexPath) else { return .init() }
-                likeHeaderView.updateView(title: "좋아요 많은 조합", subTitle: "자주, 늘 먹는데에는 이유가 있는 법!")
+                likeHeaderView.updateView(title: "좋아요 많은 조합", subTitle: "자주, 늘 먹는데에는 이유가 있는 법!", separator: true)
                 return likeHeaderView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let likeFooterView = collectionView.dequeueSupplimentaryView(MainLikeFooterView.self, supplementaryViewOfKind: .footer, indexPath: indexPath) else { return .init() }
