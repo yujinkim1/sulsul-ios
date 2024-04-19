@@ -114,10 +114,6 @@ final class CommonCoordinator: CommonBaseCoordinator {
         let webVC = BaseWebViewController(url: url)
         webVC.coordinator = self
         
-        if let delegate = userData?["delegate"] as? BaseWebViewControllerDelegate {
-            webVC.delegate = delegate
-        }
-        
         currentNavigationViewController?.pushViewController(webVC, animated: true)
     }
 }
