@@ -156,6 +156,10 @@ public final class ProfileSettingViewController: BaseViewController {
             guard let self = self else { return }
             self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://www.naver.com")])
         }
+        personalSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://www.google.com")])
+        }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.tabBarController?.setTabBarHidden(true, animated: false)
