@@ -14,7 +14,7 @@ final class CommentTextFieldView: UIView {
         $0.spellCheckingType = .no
         $0.autocapitalizationType = .none
         $0.placeholder = "댓글을 입력해볼까요?"
-        $0.delegate = self
+        $0.isEnabled = false
     }
     
     lazy var touchableLabel = TouchableLabel().then {
@@ -59,21 +59,5 @@ final class CommentTextFieldView: UIView {
             $0.centerY.equalTo(textField)
             $0.height.equalTo(textField)
         }
-    }
-}
-
-extension CommentTextFieldView: UITextFieldDelegate {
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
-        return true
-    }
-    
-    func textFieldShouldReturn(
-        _ textField: UITextField
-    ) -> Bool {
-        return false
     }
 }

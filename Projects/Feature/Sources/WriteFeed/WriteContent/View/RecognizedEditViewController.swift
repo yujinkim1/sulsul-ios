@@ -11,8 +11,8 @@ import DesignSystem
 final class RecognizedEditViewController: BaseHeaderViewController {
     weak var delegate: OnSelectedValue?
     
-    var selectedDrink: String?
-    var selectedSnack: String?
+    var selectedDrink: SnackModel?
+    var selectedSnack: SnackModel?
     
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "인식된 술, 안주 정보를 수정할 수 있어요."
@@ -93,10 +93,17 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         }
         
         saveButton.onTapped { [weak self] in
-            let texts = [self?.selectedDrink ?? "",
-                         self?.selectedSnack ?? ""]
+            var selectedValue: [SnackModel] = []
             
-            self?.delegate?.selectedValue(["writtenText": texts.filter({ $0 != "" })])
+            if let selectedDrink = self?.selectedDrink {
+                selectedValue.append(selectedDrink)
+            }
+            
+            if let selectedSnack = self?.selectedSnack {
+                selectedValue.append(selectedSnack)
+            }
+            
+            self?.delegate?.selectedValue(["selectedValue": selectedValue])
             self?.navigationController?.popViewController(animated: true)
         }
     }
@@ -201,14 +208,14 @@ final class RecognizedEditViewController: BaseHeaderViewController {
 
 extension RecognizedEditViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        if let selectedDrink = value["selectedDrink"] as? String {
-            placeholderLabel.text = selectedDrink
+        if let selectedDrink = value["selectedDrink"] as? SnackModel {
+            placeholderLabel.text = selectedDrink.name
             placeholderLabel.textColor = DesignSystemAsset.gray900.color
             self.selectedDrink = selectedDrink
         }
         
-        if let selectedSnack = value["selectedSnack"] as? String {
-            snackPlaceholderLabel.text = selectedSnack
+        if let selectedSnack = value["selectedSnack"] as? SnackModel {
+            snackPlaceholderLabel.text = selectedSnack.name
             snackPlaceholderLabel.textColor = DesignSystemAsset.gray900.color
             self.selectedSnack = selectedSnack
         }

@@ -94,6 +94,7 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
         super.viewDidLoad()
         
         self.tabBarController?.setTabBarHidden(true)
+        self.searchTextField.becomeFirstResponder()
     }
     
     private func bind() {

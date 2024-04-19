@@ -18,31 +18,27 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
     
+    private lazy var selectedSnackDrink: [SnackModel] = []
     private lazy var viewModel = WriteContentViewModel()
     private lazy var images: [UIImage] = []
-    
     private lazy var imageScrollView = UIScrollView().then {
         $0.showsHorizontalScrollIndicator = false
     }
-    
     private lazy var imageStackView = UIStackView().then {
         $0.distribution = .equalSpacing
         $0.spacing = moderateScale(number: 8)
         $0.layoutMargins = UIEdgeInsets(top: 0, left: moderateScale(number: 20), bottom: 0, right: moderateScale(number: 20))
         $0.isLayoutMarginsRelativeArrangement = true
     }
-    
     private lazy var recognizedStackView = UIStackView().then {
         $0.distribution = .fill
         $0.spacing = moderateScale(number: 4)
     }
-    
     private lazy var recognizedTitleLabel = UILabel().then {
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
     }
-    
     private lazy var recognizedContentLabel = UILabel().then {
         $0.text = "AI가 열심히 찾고있어요!"
         $0.textColor = DesignSystemAsset.gray400.color
@@ -220,6 +216,25 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                 }
             }
             .store(in: &cancelBag)
+        
+        viewModel.completeCreateFeed
+            .sink { [weak self] isSuccessed in
+                if isSuccessed {
+                    let rootVC = self?.coordinator?.currentNavigationViewController?.viewControllers.first as? BaseViewController
+                    rootVC?.showToastMessageView(toastType: .success, title: "게시글 작성 완료!")
+                    
+                    self?.coordinator?.currentNavigationViewController?.popToRootViewController(animated: true)
+                } else {
+                    self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+                }
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.errorPublisher()
+            .sink { [weak self] in
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+            }
+            .store(in: &cancelBag)
     }
     
     private func setTabEvents() {
@@ -263,6 +278,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             
             if !isTextEmpty {
                 let vc = ScoreBottomSheetViewController(snack: snack, drink: drink)
+                vc.delegate = self
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
             }
@@ -510,17 +526,37 @@ extension WriteContentViewController: UITextViewDelegate {
 
 extension WriteContentViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        if let writtenText = value["writtenText"] as? [String] {
-            if writtenText.count == 2 {
+        if let selectedValue = value["selectedValue"] as? [SnackModel] {
+            selectedSnackDrink = selectedValue
+            
+            if selectedValue.count == 2 {
                 recognizedContentLabel.isHidden = true
                 drinkSnackStackView.isHidden = false
-                recognizedDrinkLabel.text = "\(writtenText[0])"
-                recognizedSnackLabel.text = "\(writtenText[1])"
+                recognizedDrinkLabel.text = "\(selectedValue[0].name)"
+                recognizedSnackLabel.text = "\(selectedValue[1].name)"
                 
-            } else if writtenText.count == 1 {
+            } else if selectedValue.count == 1 {
                 recognizedContentLabel.isHidden = false
                 drinkSnackStackView.isHidden = true
-                recognizedContentLabel.text = "\(writtenText[0])"
+                recognizedContentLabel.text = "\(selectedValue[0].name)"
+            }
+        }
+        
+        if let _ = value["shouldGoMain"] as? Void,
+           let score = value["score"] as? Int {
+            
+            if let title = UserDefaultsUtil.shared.getFeedTitle(),
+               let thumnailImage = viewModel.imageServerURLOfThumnail{
+                viewModel.requestModel = .init(title: title,
+                                               content: contentTextView.text,
+                                               represent_image: thumnailImage,
+                                               images: viewModel.imageServerURLArrOfFeed,
+                                               alcohol_pairing_ids: [selectedSnackDrink[1].id],
+                                               food_pairing_ids: [selectedSnackDrink[0].id],
+                                               user_tags_raw_string: tagTextView.text,
+                                               score: score)
+                
+                viewModel.shouldUploadFeed.send(images)
             }
         }
     }

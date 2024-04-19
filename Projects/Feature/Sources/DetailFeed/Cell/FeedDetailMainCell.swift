@@ -1,5 +1,5 @@
 //
-//  DetailFeedMainCell.swift
+//  FeedDetailMainCell.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-03-14.
@@ -8,7 +8,9 @@
 import UIKit
 import DesignSystem
 
-final class DetailFeedMainCell: UICollectionViewCell {
+// TODO: - 데이터가 없는 경우에도 예외적인 UI 만들어야 함
+
+final class FeedDetailMainCell: UICollectionViewCell {
     static let reuseIdentifier: String = "DetailFeedMainCell"
     
     private var carouselCurrentIndex: Int = 1
@@ -30,6 +32,10 @@ final class DetailFeedMainCell: UICollectionViewCell {
         $0.backgroundColor = .clear
         $0.showsHorizontalScrollIndicator = false
         $0.isPagingEnabled = true
+        $0.layer.cornerRadius = CGFloat(20)
+        $0.layer.borderColor = .none
+        $0.layer.borderWidth = .zero
+        $0.layer.masksToBounds = true
         $0.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseIdentifier)
         $0.dataSource = self
         $0.delegate = self
@@ -278,9 +284,13 @@ final class DetailFeedMainCell: UICollectionViewCell {
         }
     }
     
-    func bind(_ model: DetailFeed.Feed) {
+    func bind(_ model: FeedDetail) {
         imageOfList = model.images
         carouselCollectionView.reloadData()
+        
+        if imageOfList.isEmpty {
+            indexLabel.removeFromSuperview()
+        }
         
         updateIndex(to: carouselCurrentIndex)
         updateScore(to: model.score)
@@ -379,12 +389,12 @@ final class DetailFeedMainCell: UICollectionViewCell {
             $0.leading.equalTo(carouselCollectionView)
             $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
             $0.height.equalTo(moderateScale(number: 2))
-            $0.width.equalToSuperview().dividedBy(count)
+            $0.width.equalToSuperview()/*.dividedBy(count)*/
         }
     }
 }
 
-extension DetailFeedMainCell: UICollectionViewDataSource {
+extension FeedDetailMainCell: UICollectionViewDataSource {
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -401,13 +411,13 @@ extension DetailFeedMainCell: UICollectionViewDataSource {
         
         let item = imageOfList[indexPath.item]
         
-        cell.configure(item)
+        cell.bind(withURL: item)
         
         return cell
     }
 }
 
-extension DetailFeedMainCell: UICollectionViewDelegate {
+extension FeedDetailMainCell: UICollectionViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageWidth = scrollView.frame.size.width
         let currentPage = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth) + 1
@@ -420,7 +430,7 @@ extension DetailFeedMainCell: UICollectionViewDelegate {
                 $0.leading.equalTo(carouselCollectionView)
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
-                $0.width.equalToSuperview().dividedBy(imageOfList.count)
+                $0.width.equalToSuperview()/*.dividedBy(imageOfList.count)*/
             }
             UIView.animate(withDuration: 0.3) {
                 self.layoutIfNeeded()

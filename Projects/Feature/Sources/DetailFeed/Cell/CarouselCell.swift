@@ -12,11 +12,10 @@ final class CarouselCell: UICollectionViewCell {
     static let reuseIdentifier = "CarouselCell"
     
     private lazy var imageView = UIImageView().then {
-        $0.image = UIImage()
         $0.contentMode = .scaleToFill
     }
     
-    private lazy var opaqueView = UIView().then {
+    private lazy var blendView = UIView().then {
         $0.frame = .zero
         $0.layer.backgroundColor = DesignSystemAsset.black.color.cgColor.copy(alpha: 0.2)
     }
@@ -31,8 +30,8 @@ final class CarouselCell: UICollectionViewCell {
         
         self.backgroundView = imageView
         
-        addViews()
-        makeConstraints()
+        self.addViews()
+        self.makeConstraints()
     }
     
     @available(*, unavailable)
@@ -40,25 +39,25 @@ final class CarouselCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(_ item: String) {
-        if let imageURL = URL(string: item) {
-            imageView.loadImage(imageURL)
+    func bind(withURL imageURL: String) {
+        if let image = URL(string: imageURL) {
+            self.imageView.loadImage(image)
         } else {
-            print("Image URL is not available.")
-            imageView.image = UIImage()
+            self.imageView.image = UIImage()
+            debugPrint("Image URL is not available.")
         }
     }
     
     private func addViews() {
         self.addSubview(imageView)
-        self.contentView.addSubview(opaqueView)
+        self.contentView.addSubview(blendView)
     }
     
     private func makeConstraints() {
-        opaqueView.snp.makeConstraints {
+        self.blendView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        imageView.snp.makeConstraints {
+        self.imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }

@@ -8,21 +8,33 @@
 import Service
 import UIKit
 import Combine
+import Alamofire
+
+enum LogicType {
+    case getAIData
+    case createFeed
+}
 
 final class WriteContentViewModel {
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
-
+    
+    private lazy var currentLogicType: LogicType = .getAIData
     private lazy var imageCount = 0
-    private lazy var imageServerURL: String? = nil
+    lazy var imageServerURLOfThumnail: String? = nil
+    lazy var imageServerURLArrOfFeed = [String]()
+    
+    lazy var requestModel: WriteContentModel.WriteFeedRequestModel? = nil
     
     // MARK: trigger
     private lazy var completeUpload = PassthroughSubject<Void, Never>()
     private lazy var recognizeImageToAI = PassthroughSubject<Void, Never>()
-    lazy var shouldUploadFeed = PassthroughSubject<WriteContentModel.WriteFeedRequestModel, Never>()
+    lazy var shouldUploadFeed = PassthroughSubject<[UIImage], Never>()
     
     // MARK: output
     lazy var completeRecognizeAI = PassthroughSubject<WriteContentModel.Recognized, Never>()
+    lazy var completeCreateFeed = PassthroughSubject<Bool, Never>()
+    private lazy var error = CurrentValueSubject<Void, Never>(())
     
     init() {
         completeUpload
@@ -33,15 +45,26 @@ final class WriteContentViewModel {
         
         recognizeImageToAI
             .sink { [weak self] in
+                self?.currentLogicType = .getAIData
                 self?.requestRecognizeImage()
             }
             .store(in: &cancelBag)
         
         shouldUploadFeed
-            .sink { [weak self] requestModel in
-                self?.uploadFeed(requestModel)
+            .sink { [weak self] images in
+                self?.imageServerURLArrOfFeed = []
+                self?.imageCount = images.count
+                self?.currentLogicType = .createFeed
+                
+                images.forEach { image in
+                    self?.uploadImage(image)
+                }
             }
             .store(in: &cancelBag)
+    }
+    
+    func errorPublisher() -> AnyPublisher<Void, Never> {
+        return error.dropFirst().eraseToAnyPublisher()
     }
     
     func uploadImage(_ image: UIImage) {
@@ -51,42 +74,65 @@ final class WriteContentViewModel {
             switch result {
             case .success(let response):
                 if let decodedData = try? selfRef.jsonDecoder.decode(WriteContentModel.self, from: response) {
-                    selfRef.imageServerURL = decodedData.url
-                    selfRef.completeUpload.send(())
+                    if selfRef.currentLogicType == .createFeed {
+                        selfRef.imageServerURLArrOfFeed.append(decodedData.url)
+                        if selfRef.imageServerURLArrOfFeed.count == selfRef.imageCount,
+                           let requestModel = selfRef.requestModel {
+                            
+                            selfRef.imageServerURLArrOfFeed.removeFirst()
+                            selfRef.uploadFeed(requestModel)
+                        }
+                        
+                    } else if selfRef.currentLogicType == .getAIData {
+                        selfRef.imageServerURLOfThumnail = decodedData.url
+                        selfRef.completeUpload.send(())
+                    }
                 } else {
+                    selfRef.error.send(())
                     print("[/users/id] Fail Decode")
                 }
             case .failure(let error):
+                selfRef.error.send(())
                 print("[/files/upload] Fail : \(error)")
             }
         }
     }
     
-    // 피드 작성 시 이미지 모두 위 API로 urlㅣ 받은다음에 그 url로 feed 작성 API 호출하도롥 처리
     private func uploadFeed(_ requestModel: WriteContentModel.WriteFeedRequestModel) {
-        guard let url = imageServerURL else { return }
+        guard let url = imageServerURLOfThumnail else {
+            error.send(())
+            return
+        }
         
-        NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/classifications?image_url=\(url)") { [weak self] result in
+        let parameters: Parameters = [
+            "title": requestModel.title,
+            "content": requestModel.content,
+            "represent_image": url,
+            "images": imageServerURLArrOfFeed,
+            "alcohol_pairing_ids": requestModel.alcohol_pairing_ids,
+            "food_pairing_ids": requestModel.food_pairing_ids,
+            "user_tags_raw_string": requestModel.user_tags_raw_string,
+            "score": requestModel.score
+        ]
+        
+        NetworkWrapper.shared.postBasicTask(stringURL: "/feeds", parameters: parameters, needToken: true) { [weak self] result in
             guard let selfRef = self else { return }
 
             switch result {
             case .success(let response):
-                if let decodedData = try? selfRef.jsonDecoder.decode(WriteContentModel.Recognized.self, from: response) {
-                    
-                    selfRef.completeRecognizeAI.send(decodedData)
-                } else {
-                    selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
-                    print("[/feeds/classifications] Fail Decode")
-                }
+                UserDefaultsUtil.shared.remove(.feedTitle)
+                UserDefaultsUtil.shared.remove(.feedContent)
+                selfRef.completeCreateFeed.send(true)
+                
             case .failure(let error):
-                selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
-                print("[/feeds/classifications] Fail : \(error)")
+                selfRef.completeCreateFeed.send(false)
+                print("[/feeds] Fail : \(error)")
             }
         }
     }
     
     private func requestRecognizeImage() {
-        guard let url = imageServerURL else { return }
+        guard let url = imageServerURLOfThumnail else { return }
         
         NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/classifications?image_url=\(url)") { [weak self] result in
             guard let selfRef = self else { return }
@@ -101,6 +147,7 @@ final class WriteContentViewModel {
                     print("[/feeds/classifications] Fail Decode")
                 }
             case .failure(let error):
+                selfRef.error.send(())
                 selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                 print("[/feeds/classifications] Fail : \(error)")
             }
