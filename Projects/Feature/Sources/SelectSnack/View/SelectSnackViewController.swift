@@ -260,5 +260,9 @@ extension SelectSnackViewController: OnSelectedValue {
         selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
         nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
         nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
+        
+        if selectedSnackCount == 5 {
+            showToastMessageView(toastType: .error, title: "5개 이상은 선택할 수 없어요")
+        }
     }
 }
