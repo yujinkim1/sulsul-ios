@@ -29,7 +29,7 @@ public struct NetworkWrapper {
             return
         }
         
-        var defaultHeader = configureHeader()
+        var defaultHeader = tokenHeader()
         defaultHeader["Content-Type"] = "multipart/form-data"
 
         AF.upload(multipartFormData: { multipartFormData in
