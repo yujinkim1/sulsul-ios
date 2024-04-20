@@ -56,22 +56,19 @@ final class FeedDetailCommentCell: UICollectionViewCell {
     
     public func bind(withID feedID: Int) {
         self.viewModel = CommentViewModel(feedId: feedID)
+        
         self.viewModel?.reloadData
             .sink { [weak self] in
                 guard let self = self else { return }
                 
-                if let count = viewModel?.comments.count {
-                    self.numberOfItems = count
+                if let comments = viewModel?.comments {
+                    self.numberOfItems = comments.count
                 }
+                
                 self.commentTableView.reloadData()
+                debugPrint("\(#file) >>>> numberOfItems: \(self.numberOfItems)")
             }
             .store(in: &cancelBag)
-        
-        if self.numberOfItems == 0 {
-            self.commentTableView.removeFromSuperview()
-        } else {
-            self.commentTableView.backgroundView = nil
-        }
     }
 }
 
@@ -86,7 +83,10 @@ extension FeedDetailCommentCell: UITableViewDataSource {
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        return min(numberOfItems, 5)
+        if numberOfItems > 5 {
+            return min(numberOfItems, 5)
+        }
+        return numberOfItems
     }
     
     func tableView(
