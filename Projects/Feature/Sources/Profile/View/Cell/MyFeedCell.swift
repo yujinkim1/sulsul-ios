@@ -24,8 +24,10 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var feedImageView = UIImageView().then({
-        $0.backgroundColor = .red
         $0.layer.cornerRadius = moderateScale(number: 20)
+        $0.contentMode = .scaleAspectFit
+        $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
     })
     
     private lazy var feedCountView = UIView().then({
@@ -155,10 +157,9 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         feedDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.trailing.equalToSuperview()
-            // TODO: - 바텀 이어줘야 할듯
-//            $0.bottom.equalTo(viewCountImageView.snp.top).offset(moderateScale(number: 11))
         }
         viewCountImageView.snp.makeConstraints {
+            $0.top.equalTo(feedDescriptionLabel.snp.bottom).offset(moderateScale(number: 11))
             $0.leading.equalToSuperview()
             $0.bottom.equalToSuperview().offset(moderateScale(number: -19))
         }

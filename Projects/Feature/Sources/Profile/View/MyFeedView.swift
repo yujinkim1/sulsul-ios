@@ -94,12 +94,12 @@ class MyFeedView: UIView {
             }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
-                                                  heightDimension: .absolute(moderateScale(number: itemHeight)))
+                                                  heightDimension: .estimated(moderateScale(number: itemHeight)))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
         
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
+                                                   heightDimension: .estimated(moderateScale(number: itemHeight)))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             let section = NSCollectionLayoutSection(group: group)
