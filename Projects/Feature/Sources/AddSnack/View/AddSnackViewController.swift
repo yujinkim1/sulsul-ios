@@ -116,6 +116,11 @@ public class AddSnackViewController: BaseViewController {
             }
         }
         
+        containerView.onTapped { [weak self] in
+            self?.view.endEditing(true)
+            self?.resetUI()
+        }
+        
         bind()
     }
     
@@ -324,18 +329,22 @@ extension AddSnackViewController: UIScrollViewDelegate {
         let scrollUp = translation.y > 0 ? false : true
         
         if !scrollUp {
-            snackWriteTextField.resignFirstResponder()
-            
-            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: { [weak self] in
-                guard let selfRef = self else { return }
-                
-                selfRef.submitButton.isHidden = false
-                selfRef.submitButton.snp.updateConstraints {
-                    $0.top.equalTo(selfRef.selectCategoryContainerButton.snp.bottom).offset(moderateScale(number: 135))
-                }
-                
-                selfRef.contentScrollView.layoutIfNeeded()
-            })
+            resetUI()
         }
+    }
+    
+    private func resetUI() {
+        snackWriteTextField.resignFirstResponder()
+        
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+            guard let selfRef = self else { return }
+            
+            selfRef.submitButton.isHidden = false
+            selfRef.submitButton.snp.updateConstraints {
+                $0.top.equalTo(selfRef.selectCategoryContainerButton.snp.bottom).offset(moderateScale(number: 135))
+            }
+            
+            selfRef.contentScrollView.layoutIfNeeded()
+        })
     }
 }

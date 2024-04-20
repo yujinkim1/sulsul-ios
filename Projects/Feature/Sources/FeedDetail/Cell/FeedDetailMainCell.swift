@@ -8,8 +8,6 @@
 import UIKit
 import DesignSystem
 
-// TODO: - 데이터가 없는 경우에도 예외적인 UI 만들어야 함
-
 final class FeedDetailMainCell: UICollectionViewCell {
     static let reuseIdentifier: String = "DetailFeedMainCell"
     
@@ -40,6 +38,10 @@ final class FeedDetailMainCell: UICollectionViewCell {
         $0.dataSource = self
         $0.delegate = self
     }
+    
+//    private lazy var carouselCollectionView = CarouselCollectionView(frame: .zero, collectionViewLayout: .init())
+    
+    private lazy var userTagCollectionView = UserTagCollectionView(frame: .zero, collectionViewLayout: .init())
     
     private lazy var indexLabel = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
         $0.setLineHeight(18, font: Font.regular(size: 12))
@@ -117,12 +119,6 @@ final class FeedDetailMainCell: UICollectionViewCell {
         $0.text = "작성된 내용이 없습니다."
     }
     
-    private lazy var userTagStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = CGFloat(8)
-        $0.distribution = .fillProportionally
-    }
-    
     private lazy var feedViewsImageView = UIImageView().then {
         $0.image = UIImage(named: "views")
     }
@@ -188,8 +184,8 @@ final class FeedDetailMainCell: UICollectionViewCell {
         
         self.backgroundColor = .clear
         
-        addViews()
-        makeConstraints()
+        self.addViews()
+        self.makeConstraints()
     }
     
     @available(*, unavailable)
@@ -198,16 +194,20 @@ final class FeedDetailMainCell: UICollectionViewCell {
     }
     
     private func addViews() {
-        containerView.addSubviews([carouselCollectionView, indicatorView, profileImageView,
-                                   usernameLabel, createdAtLabel, textView,
-                                   scoreLabel, scoreLevelImageView, feedViewsStackView,
-                                   feedCommentsStackView, feedLikesStackView, pairingStackView, 
-                                   userTagStackView, separatorView])
+        self.containerView.addSubviews([
+            self.carouselCollectionView, self.indicatorView,
+            self.profileImageView, self.usernameLabel,
+            self.createdAtLabel, self.textView,
+            self.scoreLabel, self.scoreLevelImageView,
+            self.feedViewsStackView, self.feedCommentsStackView,
+            self.feedLikesStackView, self.pairingStackView,
+            self.userTagCollectionView, self.separatorView
+        ])
         
         self.addSubviews([
-            containerView,
-            indexLabel,
-            titleLabel
+            self.containerView,
+            self.indexLabel,
+            self.titleLabel
         ])
         
         self.bringSubviewToFront(indexLabel)
@@ -215,70 +215,72 @@ final class FeedDetailMainCell: UICollectionViewCell {
     }
     
     private func makeConstraints() {
-        containerView.snp.makeConstraints {
+        self.containerView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        carouselCollectionView.snp.makeConstraints {
-            $0.leading.trailing.top.equalToSuperview().inset(moderateScale(number: 20))
+        self.carouselCollectionView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.equalToSuperview().inset(moderateScale(number: 4))
             $0.size.equalTo(moderateScale(number: 353))
         }
-        indexLabel.snp.makeConstraints {
+        self.indexLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel)
+            $0.top.equalTo(carouselCollectionView.snp.top).inset(moderateScale(number: 239))
             $0.bottom.equalTo(titleLabel.snp.top).offset(moderateScale(number: -4))
         }
-        titleLabel.snp.makeConstraints {
+        self.titleLabel.snp.makeConstraints {
             $0.leading.equalTo(carouselCollectionView.snp.leading).inset(moderateScale(number: 18))
             $0.bottom.equalTo(carouselCollectionView.snp.bottom).inset(moderateScale(number: 16))
             $0.width.equalTo(moderateScale(number: 317))
-            $0.height.equalTo(moderateScale(number: 72))
         }
-        profileImageView.snp.makeConstraints {
+        self.profileImageView.snp.makeConstraints {
             $0.leading.equalTo(carouselCollectionView)
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 26))
             $0.size.equalTo(moderateScale(number: 40))
         }
-        usernameLabel.snp.makeConstraints {
+        self.usernameLabel.snp.makeConstraints {
             $0.leading.equalTo(profileImageView.snp.trailing).offset(moderateScale(number: 12))
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 24))
         }
-        scoreLabel.snp.makeConstraints {
+        self.scoreLabel.snp.makeConstraints {
             $0.trailing.equalTo(scoreLevelImageView.snp.leading).offset(moderateScale(number: -7.11))
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 27))
         }
-        scoreLevelImageView.snp.makeConstraints {
+        self.scoreLevelImageView.snp.makeConstraints {
             $0.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(scoreLabel)
         }
-        pairingStackView.snp.makeConstraints {
+        self.pairingStackView.snp.makeConstraints {
             $0.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(scoreLabel.snp.bottom).offset(moderateScale(number: 2))
         }
-        createdAtLabel.snp.makeConstraints {
+        self.createdAtLabel.snp.makeConstraints {
             $0.leading.equalTo(usernameLabel)
             $0.top.equalTo(usernameLabel.snp.bottom).offset(moderateScale(number: 8))
         }
-        textView.snp.makeConstraints {
+        self.textView.snp.makeConstraints {
             $0.leading.trailing.equalTo(carouselCollectionView)
             $0.top.equalTo(profileImageView.snp.bottom).offset(moderateScale(number: 18))
             $0.height.equalTo(moderateScale(number: 144))
         }
-        userTagStackView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(carouselCollectionView)
-            $0.top.equalTo(textView.snp.bottom).offset(moderateScale(number: 4))
+        self.userTagCollectionView.snp.makeConstraints {
+            $0.leading.trailing.equalTo(textView)
+            $0.bottom.equalTo(feedViewsStackView.snp.top).offset(moderateScale(number: -16))
+            $0.height.equalTo(moderateScale(number: 52))
         }
-        feedViewsStackView.snp.makeConstraints {
+        self.feedViewsStackView.snp.makeConstraints {
             $0.leading.equalTo(carouselCollectionView)
             $0.bottom.equalTo(separatorView.snp.top).offset(moderateScale(number: -22))
         }
-        feedCommentsStackView.snp.makeConstraints {
+        self.feedCommentsStackView.snp.makeConstraints {
             $0.leading.equalTo(feedViewsStackView.snp.trailing).offset(moderateScale(number: 16))
             $0.bottom.equalTo(feedViewsStackView)
         }
-        feedLikesStackView.snp.makeConstraints {
+        self.feedLikesStackView.snp.makeConstraints {
             $0.leading.equalTo(feedCommentsStackView.snp.trailing).offset(moderateScale(number: 16))
             $0.bottom.equalTo(feedViewsStackView)
         }
-        separatorView.snp.makeConstraints {
+        self.separatorView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 10))
         }
@@ -294,7 +296,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
         
         updateIndex(to: carouselCurrentIndex)
         updateScore(to: model.score)
-        updateUserTags(to: model.userTags ?? [])
+//        updateUserTags(to: model.userTags ?? [])
         updateIndicatorViewWidth()
         
         textView.text = model.content
@@ -354,21 +356,6 @@ final class FeedDetailMainCell: UICollectionViewCell {
         }
     }
     
-    private func updateUserTags(to tags: [String]) {
-        if !tags.isEmpty {
-            tags.forEach { tag in
-                let label = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
-                    $0.textColor = DesignSystemAsset.gray300.color
-                    $0.setLineHeight(18, font: Font.regular(size: 12))
-                    $0.font = Font.regular(size: 12)
-                    $0.layer.cornerRadius = CGFloat(8)
-                    $0.backgroundColor = DesignSystemAsset.gray050.color
-                }
-                userTagStackView.addArrangedSubview(label)
-            }
-        }
-    }
-    
     private func updateTextViewHeight(_ textView: UITextView) {
         let contentSize = textView.sizeThatFits(CGSize(width: textView.frame.width, height: CGFloat.greatestFiniteMagnitude))
         
@@ -383,13 +370,21 @@ final class FeedDetailMainCell: UICollectionViewCell {
     }
     
     private func updateIndicatorViewWidth() {
-        let count = imageOfList.count
-        
-        indicatorView.snp.makeConstraints {
-            $0.leading.equalTo(carouselCollectionView)
-            $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
-            $0.height.equalTo(moderateScale(number: 2))
-            $0.width.equalToSuperview()/*.dividedBy(count)*/
+        if !imageOfList.isEmpty {
+            let count = imageOfList.count
+            
+            indicatorView.snp.makeConstraints {
+                $0.leading.equalTo(carouselCollectionView)
+                $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
+                $0.height.equalTo(moderateScale(number: 2))
+                $0.width.equalToSuperview().multipliedBy(1.0 / CGFloat(count))
+            }
+        } else {
+            indicatorView.snp.makeConstraints {
+                $0.leading.trailing.equalTo(carouselCollectionView)
+                $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
+                $0.height.equalTo(moderateScale(number: 2))
+            }
         }
     }
 }
@@ -430,7 +425,7 @@ extension FeedDetailMainCell: UICollectionViewDelegate {
                 $0.leading.equalTo(carouselCollectionView)
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
-                $0.width.equalToSuperview()/*.dividedBy(imageOfList.count)*/
+                $0.width.equalToSuperview().dividedBy(imageOfList.count)
             }
             UIView.animate(withDuration: 0.3) {
                 self.layoutIfNeeded()

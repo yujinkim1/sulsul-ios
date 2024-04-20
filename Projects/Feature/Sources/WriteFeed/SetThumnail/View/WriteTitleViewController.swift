@@ -104,12 +104,6 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        if let text = UserDefaultsUtil.shared.getFeedTitle() {
-            titleTextView.text = text
-        }
-    }
-    
     override func viewDidLayoutSubviews() {
         setTextViewUI()
     }
@@ -335,23 +329,57 @@ extension WriteTitleViewController: ImagePickerDelegate {
             var images: [UIImage] = []
             
             assets?.forEach({ asset in
-                images.append(getAssetThumbnail(asset: asset))
+                asset.getUIImage(width: moderateScale(number: 353),
+                                 height: moderateScale(number: 353)) { uiimage, _ in
+                    images.append(uiimage)
+                    
+                    if images.count == assets?.count {
+                        self.setSelectedImages(images)
+                        self.bottomGradientView.isHidden = false
+                    }
+                }
             })
-            
-            setSelectedImages(images)
-            bottomGradientView.isHidden = false
         }
     }
-    
-    func getAssetThumbnail(asset: PHAsset) -> UIImage {
+}
+
+extension PHAsset {
+    func getUIImage(width: CGFloat,
+                    height: CGFloat, completion: @escaping (UIImage, Bool) -> Void) {
+        
+        var img: UIImage?
         let manager = PHImageManager.default()
-        let option = PHImageRequestOptions()
-        var thumbnail = UIImage()
-        option.isSynchronous = true
-        manager.requestImage(for: asset, targetSize: CGSize(width: 100, height: 100), contentMode: .aspectFit, options: option, resultHandler: {(result, info)->Void in
-            thumbnail = result!
-        })
-        return thumbnail
+        let options = PHImageRequestOptions()
+        
+        options.isNetworkAccessAllowed = true
+        options.isSynchronous = false
+        options.version = .current
+        options.deliveryMode = .highQualityFormat
+        
+        manager.requestImage(for: self,
+                             targetSize: PHImageManagerMaximumSize,
+                             contentMode: PHImageContentMode.aspectFit,
+                             options: options) { (image, info) in
+            
+            let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool) ?? false
+            
+            DispatchQueue.main.async {
+                let newWidth = width
+                let height = height
+                let scale = (image?.size.width ?? 1.0) / newWidth
+                let newHeight = (image?.size.height ?? 1.0) / scale
+                let newSize = CGSize(width: width, height: newHeight)
+                let render = UIGraphicsImageRenderer(size: newSize)
+                
+                let renderImage = render.image { _ in
+                    image?.draw(in: CGRect(origin: .zero, size: newSize))
+                }
+                
+                img = renderImage
+                guard let img = img else { return }
+                completion(img, isDegraded)
+            }
+        }
     }
 }
 

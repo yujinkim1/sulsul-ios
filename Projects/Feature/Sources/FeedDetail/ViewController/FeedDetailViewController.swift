@@ -13,10 +13,10 @@ import Service
 public final class FeedDetailViewController: BaseViewController {
     var feedID: Int
     
-    private var firstSection = 0
-    private var secondSection = 0
-    private var thirdSection = 0
     private var commentCount = 0
+    private var feedUserID = 0
+    private var selectedFeedID = 0
+    private var relatedTitle = ""
     private var feedDetailViewModel: FeedDetailViewModel
     private var cancelBag = Set<AnyCancellable>()
     
@@ -52,6 +52,7 @@ public final class FeedDetailViewController: BaseViewController {
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
+        $0.delegate = self
         $0.register(FeedDetailMainCell.self, forCellWithReuseIdentifier: FeedDetailMainCell.reuseIdentifier)
         $0.register(FeedDetailCommentCell.self, forCellWithReuseIdentifier: FeedDetailCommentCell.reuseIdentifier)
         $0.register(RelatedFeedCell.self, forCellWithReuseIdentifier: RelatedFeedCell.reuseIdentifier)
@@ -170,11 +171,10 @@ public final class FeedDetailViewController: BaseViewController {
         }
         
         self.menuTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            
-            let viewController = SpamBottomSheet()
-            viewController.modalPresentationStyle = .overFullScreen
-            self.present(viewController, animated: false)
+            self?.tabBarController?.setTabBarHidden(true)
+            self?.showFeedDetailMenuBottomSheet(editHandler: self?.editFeed,
+                                                deleteHandler: self?.deleteFeed,
+                                                reportHandler: self?.reportFeed)
         }
         
         // 다음 작업 시 코디네이터로 관리할 수 있는 방법을 찾아 수정해보기
@@ -187,12 +187,17 @@ public final class FeedDetailViewController: BaseViewController {
     }
     
     private func bind() {
-//        self.feedDetailViewModel.requestFeedDetail()
-
+        self.feedDetailViewModel.displayHashtags(withTags: [])
         self.feedDetailViewModel
             .detailFeedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
+                self?.commentCount = value.commentCount
+                
+                if let userID = value.writerInfo?.userID {
+                    self?.feedUserID = userID
+                }
+                
                 self?.detailCollectionView.reloadData()
             }
             .store(in: &cancelBag)
@@ -246,10 +251,10 @@ public final class FeedDetailViewController: BaseViewController {
         return UICollectionViewCompositionalLayout { sectionIndex, _ in
             switch sectionIndex {
             case 0:
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(747-140))
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(747))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(747-140))
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: itemSize.heightDimension)
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 
                 let section = NSCollectionLayoutSection(group: group)
@@ -309,6 +314,54 @@ public final class FeedDetailViewController: BaseViewController {
     }
 }
 
+// MARK: - Custom method
+
+extension FeedDetailViewController {
+    private func editFeed() {
+        // TODO: 피드 수정은 어떻게?
+    }
+    
+    private func deleteFeed() {
+        // TODO: 피드 삭제 구현해야함
+    }
+    
+    private func reportFeed() {
+        let viewModel = ReportViewModel(reportType: .feed, targetId: feedID)
+        let viewController = ReportViewController(viewModel: viewModel)
+        
+        self.navigationController?.pushViewController(viewController, animated: true)
+        self.tabBarController?.setTabBarHidden(true)
+    }
+    
+    private func showFeedDetailMenuBottomSheet(
+        editHandler: (() -> Void)?,
+        deleteHandler: (() -> Void)?,
+        reportHandler: (() -> Void)?
+    ) {
+        let userID = UserDefaultsUtil.shared.getInstallationId()
+        
+        if UserDefaultsUtil.shared.isLogin(), feedUserID == userID {
+            let menuBottomSheet = FeedDetailMenuBottomSheet(type: .mine)
+            menuBottomSheet.bind(editHandler: editHandler,
+                                 deleteHandler: deleteHandler, 
+                                 reportHandler: nil)
+            
+            self.view.addSubview(menuBottomSheet)
+            self.view.bringSubviewToFront(menuBottomSheet)
+        } else if UserDefaultsUtil.shared.isLogin(), feedUserID != userID {
+            let menuBottomSheet = FeedDetailMenuBottomSheet(type: .someone)
+            menuBottomSheet.bind(editHandler: nil,
+                                 deleteHandler: nil,
+                                 reportHandler: reportHandler)
+            
+            self.view.addSubview(menuBottomSheet)
+            self.view.bringSubviewToFront(menuBottomSheet)
+        } else {
+            self.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")
+        }
+    }
+}
+
 // MARK: - UICollectionView Datasource
 
 extension FeedDetailViewController: UICollectionViewDataSource {
@@ -322,12 +375,18 @@ extension FeedDetailViewController: UICollectionViewDataSource {
         numberOfItemsInSection section: Int
     ) -> Int {
         switch section {
-        case 0: return 1
-        case 1:
-            if self.commentCount == 0 { return 0 }
+        case 0: 
             return 1
-        case 2: return 6 // 보여줄 데이터가 없을 경우 0
-        default: return 0
+        case 1:
+            if self.commentCount == 0 {
+                return 0
+            } else {
+                return 1
+            }
+        case 2: 
+            return feedDetailViewModel.fetchRelatedFeedCount()
+        default:
+            return 0
         }
     }
     
@@ -369,6 +428,8 @@ extension FeedDetailViewController: UICollectionViewDataSource {
         case 2:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RelatedFeedCell.reuseIdentifier, for: indexPath) as? RelatedFeedCell
             else { return .init() }
+            
+            cell.bind(feedDetailViewModel.relatedFeeds[indexPath.item])
             
             return cell
         default: 
@@ -425,6 +486,11 @@ extension FeedDetailViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        
+        if indexPath.section == 2 {
+            let selectedFeedID = feedDetailViewModel.relatedFeeds[indexPath.item].feedID
+            let viewController = FeedDetailViewController(feedID: selectedFeedID)
+            
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 }
