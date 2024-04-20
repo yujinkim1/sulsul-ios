@@ -370,13 +370,21 @@ final class FeedDetailMainCell: UICollectionViewCell {
     }
     
     private func updateIndicatorViewWidth() {
-        let count = imageOfList.count
-        
-        indicatorView.snp.makeConstraints {
-            $0.leading.equalTo(carouselCollectionView)
-            $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
-            $0.height.equalTo(moderateScale(number: 2))
-            $0.width.equalToSuperview()/*.dividedBy(count)*/
+        if !imageOfList.isEmpty {
+            let count = imageOfList.count
+            
+            indicatorView.snp.makeConstraints {
+                $0.leading.equalTo(carouselCollectionView)
+                $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
+                $0.height.equalTo(moderateScale(number: 2))
+                $0.width.equalToSuperview().multipliedBy(1.0 / CGFloat(count))
+            }
+        } else {
+            indicatorView.snp.makeConstraints {
+                $0.leading.trailing.equalTo(carouselCollectionView)
+                $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
+                $0.height.equalTo(moderateScale(number: 2))
+            }
         }
     }
 }
@@ -417,7 +425,7 @@ extension FeedDetailMainCell: UICollectionViewDelegate {
                 $0.leading.equalTo(carouselCollectionView)
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
-                $0.width.equalToSuperview()/*.dividedBy(imageOfList.count)*/
+                $0.width.equalToSuperview().dividedBy(imageOfList.count)
             }
             UIView.animate(withDuration: 0.3) {
                 self.layoutIfNeeded()
