@@ -12,7 +12,7 @@ final class UserTagCollectionView: UICollectionView {
     private let userTags: [String] = [
         "#첫번째",
         "#두번째",
-        "#세번째_입력값_이렇게_붙어있으면_하나로_처리"
+        "#세번째_입력값_이렇게_이어지면_하나"
     ]
     
     // MARK: - Initializer
@@ -67,7 +67,8 @@ extension UserTagCollectionView: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserTagCell.reuseIdentifier, for: indexPath) as? UserTagCell
         else { return .init() }
         
-        // TODO: 실제 데이터를 가져오도록 해야함
+        // 실제 데이터를 가져오도록 해야함
+        // 게시글 작성이 안되서 테스트 불가
         let item = userTags[indexPath.item]
         
         cell.bind(withUserTag: item)
