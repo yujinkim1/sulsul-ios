@@ -91,7 +91,7 @@ open class ImagePicker: ImagePickerProtocol {
         }
         
         DispatchQueue.main.async { [weak self] in
-            self?.imagePicker.modalPresentationStyle = .pageSheet
+            self?.imagePicker.modalPresentationStyle = .fullScreen
         }
         
         imagePicker.settings.fetch.album.fetchResults = [
@@ -101,8 +101,7 @@ open class ImagePicker: ImagePickerProtocol {
         
         presentationController.presentImagePicker(imagePicker, select: { _ in
         }, deselect: { _ in
-        }, cancel: { [weak self] (assets) in
-            self?.delegate?.didSelect(assets: nil, deletedAssets: nil)
+        }, cancel: { _ in
         }, finish: { [weak self] (assets) in
             guard let selfRef = self else { return }
             DispatchQueue.global().async {
