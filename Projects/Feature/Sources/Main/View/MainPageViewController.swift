@@ -29,6 +29,13 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         $0.tintColor = DesignSystemAsset.gray900.color
     })
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(collectionViewIsRefreshed) , for: .valueChanged)
+        
+        return refreshControl
+    }()
+    
     private lazy var mainCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then {
         $0.registerSupplimentaryView(MainPreferenceHeaderView.self,
                                      supplementaryViewOfKind: .header)
@@ -43,6 +50,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
+        $0.refreshControl = refreshControl
     }
     
 //    init(viewModel: MainPageViewModel) {
@@ -151,6 +159,18 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             }.store(in: &cancelBag)
         
         viewModel.getUserInfo()
+    }
+    
+    @objc
+    private func collectionViewIsRefreshed() {
+        viewModel.getPopularFeeds()
+        viewModel.getDifferenceFeeds()
+        if StaticValues.isLoggedIn.value {
+            viewModel.getPreferenceFeeds()
+        } else {
+            viewModel.getFeedsByAlcohol()
+        }
+        refreshControl.endRefreshing()
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
