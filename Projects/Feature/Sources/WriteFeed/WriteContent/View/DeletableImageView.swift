@@ -33,6 +33,7 @@ final class DeletableImageView: UIImageView {
             $0.size.equalTo(moderateScale(number: 16.68))
         }
         
+        contentMode = .scaleAspectFill
         layer.cornerRadius = moderateScale(number: 11.2)
         clipsToBounds = true
     }
