@@ -88,11 +88,21 @@ final class WriteContentViewModel {
                         selfRef.completeUpload.send(())
                     }
                 } else {
-                    selfRef.error.send(())
+                    if selfRef.currentLogicType == .createFeed {
+                        selfRef.error.send(())
+                        
+                    } else {
+                        selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
+                    }
                     print("[/users/id] Fail Decode")
                 }
             case .failure(let error):
-                selfRef.error.send(())
+                if selfRef.currentLogicType == .createFeed {
+                    selfRef.error.send(())
+                    
+                } else {
+                    selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
+                }
                 print("[/files/upload] Fail : \(error)")
             }
         }
@@ -147,7 +157,6 @@ final class WriteContentViewModel {
                     print("[/feeds/classifications] Fail Decode")
                 }
             case .failure(let error):
-                selfRef.error.send(())
                 selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                 print("[/feeds/classifications] Fail : \(error)")
             }
