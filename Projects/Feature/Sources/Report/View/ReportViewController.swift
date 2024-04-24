@@ -10,9 +10,14 @@ import SnapKit
 import DesignSystem
 import Combine
 
+protocol ReportViewControllerDelegate: AnyObject {
+    func reportIsComplete()
+}
+
 public final class ReportViewController: BaseViewController {
     
     var coordinator: CommonBaseCoordinator?
+    var delegate: ReportViewControllerDelegate
     private let viewModel: ReportViewModel
     
     private var cancelBag = Set<AnyCancellable>()
@@ -21,7 +26,8 @@ public final class ReportViewController: BaseViewController {
     private let maxTextCount: Int = 100
     private lazy var superViewInset = moderateScale(number: 20)
     
-    init(viewModel: ReportViewModel) {
+    init(viewModel: ReportViewModel, delegate: ReportViewControllerDelegate) {
+        self.delegate = delegate
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
@@ -172,6 +178,7 @@ public final class ReportViewController: BaseViewController {
         viewModel.reportSuccessPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+                self?.delegate.reportIsComplete()
                 self?.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
         

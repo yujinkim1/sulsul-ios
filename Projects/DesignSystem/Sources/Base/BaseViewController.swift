@@ -99,7 +99,7 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(alertView)
     }
     
-    open func showToastMessageView(toastType: ToastType, title: String) {
+    open func showToastMessageView(toastType: ToastType, title: String, completion: (() -> Void)? = nil) {
         let toastView = ToastMessageView()
         toastView.bind(toastType: toastType, title: title)
         
@@ -117,6 +117,7 @@ open class BaseViewController: UIViewController {
             toastView.alpha = 0.0
         }, completion: { [weak self] _ in
             toastView.removeFromSuperview()
+            completion?()
         })
     }
     

@@ -327,7 +327,8 @@ extension FeedDetailViewController {
     
     private func reportFeed() {
         let viewModel = ReportViewModel(reportType: .feed, targetId: feedID)
-        let viewController = ReportViewController(viewModel: viewModel)
+        let viewController = ReportViewController(viewModel: viewModel,
+                                                  delegate: self)
         
         self.navigationController?.pushViewController(viewController, animated: true)
         self.tabBarController?.setTabBarHidden(true)
@@ -492,5 +493,11 @@ extension FeedDetailViewController: UICollectionViewDelegate {
             
             self.navigationController?.pushViewController(viewController, animated: true)
         }
+    }
+}
+
+extension FeedDetailViewController: ReportViewControllerDelegate {
+    func reportIsComplete() {
+        self.showToastMessageView(toastType: .success, title: "정상적으로 신고가 접수되었어요.")
     }
 }

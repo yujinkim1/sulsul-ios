@@ -129,7 +129,8 @@ extension RandomFeedViewController: UICollectionViewDataSource {
         cell.spamView.onTapped { [weak self] in
             if UserDefaultsUtil.shared.isLogin() {
                 self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.reportContent), userData: ["targetId": self?.viewModel.randomFeeds[indexPath.row].feed_id,
-                                                                                                 "reportType": ReportType.feed])
+                                                                                                 "reportType": ReportType.feed,
+                                                                                                 "delegate": self])
             } else {
                 self?.showToastMessageView(toastType: .error, title: "로그인이 필요한 서비스입니다.")
             }
@@ -145,5 +146,11 @@ extension RandomFeedViewController: UICollectionViewDataSource {
         }
         
         return cell
+    }
+}
+
+extension RandomFeedViewController: ReportViewControllerDelegate {
+    func reportIsComplete() {
+        self.showToastMessageView(toastType: .success, title: "정상적으로 신고가 접수되었어요.")
     }
 }
