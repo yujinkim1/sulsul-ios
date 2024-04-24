@@ -13,7 +13,7 @@ import AVFoundation
 import Photos
 import Mantis
 
-public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
+public final class ProfileEditViewController: BaseViewController {
     
     var coordinator: MoreBaseCoordinator?
     private let viewModel = ProfileEditViewModel()
@@ -95,14 +95,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.textColor = DesignSystemAsset.gray700.color
     })
     
-    public lazy var nextButton = IndicatorTouchableView().then {
-        $0.text = "다음"
-        $0.textColor = DesignSystemAsset.gray300.color
-        $0.backgroundColor = DesignSystemAsset.gray100.color
-        $0.layer.cornerRadius = moderateScale(number: 12)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    public lazy var nextButton = DefaultButton(title: "완료")
     
     public override func viewDidLoad() {
         self.tabBarController?.setTabBarHidden(true)
@@ -125,9 +118,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                 countGuideImageView.image = UIImage(named: "checkmark")
                 countGuideLabel.textColor = UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
                 
-                self.nextButton.textColor = DesignSystemAsset.gray200.color
-                self.nextButton.backgroundColor = DesignSystemAsset.main.color
-                self.nextButton.isUserInteractionEnabled = true
+                self.nextButton.setClickable(true)
             }.store(in: &cancelBag)
         
         viewModel.setUserNamePublisher()
@@ -237,9 +228,8 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             guard let self = self else { return }
             self.viewModel.getRandomNickname()
         }
-        nextButton.setOpaqueTapGestureRecognizer { [weak self] in
+        nextButton.onTapped { [weak self] in
             guard let self = self else { return }
-            // TODO: - validation 검증로직 추가 통과 안되면 nextButton 비활성화
             self.viewModel.setNickname(userNameTextField.text!)
         }
     }
@@ -271,13 +261,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             countGuideLabel.text = hasValidLength ? "적절한 글자수의 닉네임이에요." : "한글/영문, 숫자 포함 1~10자 이내로 설정해주세요."
         }
         if !containsSpecialCharacters && hasValidLength {
-            nextButton.textColor = DesignSystemAsset.gray200.color
-            nextButton.backgroundColor = DesignSystemAsset.main.color
-            nextButton.isUserInteractionEnabled = true
+            nextButton.setClickable(true)
         } else {
-            nextButton.textColor = DesignSystemAsset.gray300.color
-            nextButton.backgroundColor = DesignSystemAsset.gray100.color
-            nextButton.isUserInteractionEnabled = false
+            nextButton.setClickable(false)
         }
     }
     
