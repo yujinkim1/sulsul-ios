@@ -16,11 +16,12 @@ protocol ReportViewControllerDelegate: AnyObject {
 
 public final class ReportViewController: BaseViewController, UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        <#code#>
+        return 5
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        <#code#>
+        guard let cell = collectionView.dequeueReusableCell(ReportCell.self, indexPath: indexPath) else { return .init() }
+        return cell
     }
     
     

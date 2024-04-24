@@ -148,6 +148,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                     self?.showAlertView(withType: .oneButton,
                                         title: "선택 불가",
                                         description: "3개 이상 선택할 수 없어요.",
+                                        isSubmitColorYellow: true,
                                         submitCompletion: nil,
                                         cancelCompletion: nil)
                 } else {

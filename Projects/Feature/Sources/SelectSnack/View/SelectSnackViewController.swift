@@ -262,7 +262,12 @@ extension SelectSnackViewController: OnSelectedValue {
         nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
         
         if selectedSnackCount == 5 {
-            showToastMessageView(toastType: .error, title: "5개 이상은 선택할 수 없어요")
+            self.showAlertView(withType: .oneButton,
+                                title: "선택 불가",
+                                description: "5개 이상 선택할 수 없어요.",
+                                isSubmitColorYellow: true,
+                                submitCompletion: nil,
+                                cancelCompletion: nil)
         }
     }
 }
