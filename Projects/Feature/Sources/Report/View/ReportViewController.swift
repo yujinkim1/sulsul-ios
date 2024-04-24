@@ -14,7 +14,15 @@ protocol ReportViewControllerDelegate: AnyObject {
     func reportIsComplete()
 }
 
-public final class ReportViewController: BaseViewController {
+public final class ReportViewController: BaseViewController, UICollectionViewDataSource {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        <#code#>
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        <#code#>
+    }
+    
     
     var coordinator: CommonBaseCoordinator?
     var delegate: ReportViewControllerDelegate
@@ -57,14 +65,37 @@ public final class ReportViewController: BaseViewController {
         $0.textColor = DesignSystemAsset.white.color
     })
     
-    private lazy var reportTableView = UITableView(frame: .zero, style: .plain).then {
+//    private lazy var reportTableView = UITableView(frame: .zero, style: .plain).then {
+//        $0.backgroundColor = DesignSystemAsset.black.color
+//        $0.register(ReportTableViewCell.self, forCellReuseIdentifier: ReportTableViewCell.reuseIdentifier)
+//        $0.delegate = self
+//        $0.dataSource = self
+//        $0.separatorStyle = .none
+//        $0.sectionFooterHeight = 0
+//        $0.rowHeight = moderateScale(number: 52)
+//    }
+    
+    private lazy var reportCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.backgroundColor = DesignSystemAsset.black.color
-        $0.register(ReportTableViewCell.self, forCellReuseIdentifier: ReportTableViewCell.reuseIdentifier)
-        $0.delegate = self
+        $0.registerCell(ReportCell.self)
+        $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
-        $0.separatorStyle = .none
-        $0.sectionFooterHeight = 0
-        $0.rowHeight = moderateScale(number: 52)
+    })
+    
+    private func layout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { [weak self] _, _ in
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3),
+                                                  heightDimension: .absolute(moderateScale(number: 18)))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                   heightDimension: .absolute(moderateScale(number: 18)))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            let section = NSCollectionLayoutSection(group: group)
+            section.interGroupSpacing = moderateScale(number: 9)
+            
+            return section
+        }
     }
     
     private lazy var etcReportTextView = UITextView().then({
@@ -112,7 +143,7 @@ public final class ReportViewController: BaseViewController {
         view.addSubviews([topHeaderView,
                           titleLabel,
                           subTitleLabel,
-                          reportTableView,
+                          reportCollectionView,
                           etcReportTextView,
                           etcReportLabel,
                           submitTouchableLabel])
@@ -140,13 +171,14 @@ public final class ReportViewController: BaseViewController {
             $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.equalToSuperview().inset(superViewInset)
         }
-        reportTableView.snp.makeConstraints {
+        reportCollectionView.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(moderateScale(number: 16))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
-            $0.height.equalTo(moderateScale(number: 272))
+//            $0.height.equalTo(moderateScale(number: 272))
+            $0.bottom.equalToSuperview()
         }
         etcReportTextView.snp.makeConstraints {
-            $0.top.equalTo(reportTableView.snp.bottom).offset(moderateScale(number: 8))
+            $0.top.equalTo(reportCollectionView.snp.bottom).offset(moderateScale(number: 8))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
             $0.height.equalTo(moderateScale(number: 120))
         }
@@ -196,6 +228,13 @@ public final class ReportViewController: BaseViewController {
     }
     
     public override func setupIfNeeded() {
+        submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            if viewModel.currentReportContentValue() == ReportReason.other.rawValue {
+                viewModel.sendCurrentReportContent(etcReportTextView.text)
+            }
+            viewModel.sendReportContent()
+        }
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow(_:)),
@@ -206,13 +245,8 @@ public final class ReportViewController: BaseViewController {
                                                name: UIResponder.keyboardWillHideNotification,
                                                object: nil)
         
-        submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            if viewModel.currentReportContentValue() == ReportReason.other.rawValue {
-                viewModel.sendCurrentReportContent(etcReportTextView.text)
-            }
-            viewModel.sendReportContent()
-        }
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        view.addGestureRecognizer(tapGestureRecognizer)
     }
     
     @objc private func didTabBackButton() {
@@ -230,51 +264,60 @@ public final class ReportViewController: BaseViewController {
     
     @objc
     private func keyboardWillShow(_ notification: NSNotification) {
-        view.frame.origin.y -= 300
+        animateWithKeyboard(notification: notification) { [weak self] keyboardFrame in
+            self?.buttonBottomConstraint?.update(inset: keyboardFrame.height + 10)
+        }
     }
     
     @objc
     private func keyboardWillHide(_ notification: NSNotification) {
-        view.frame.origin.y = 0
-    }
-}
-
-extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.reportListCount()
+        animateWithKeyboard(notification: notification) { [weak self] _ in
+            self?.buttonBottomConstraint?.update(inset: getSafeAreaBottom() + moderateScale(number: 12))
+        }
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ReportTableViewCell.reuseIdentifier, for: indexPath) as? ReportTableViewCell else { return UITableViewCell() }
-        
-        cell.bind(viewModel.getReportList(indexPath.row))
-        cell.selectionStyle = .none
-        return cell
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? ReportTableViewCell {
-            cell.showCellComponent()
-            if indexPath.row == 4 {
-                // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
-                etcReportTextView.isHidden = false
-                etcReportLabel.isHidden = false
-            } else {
-                etcReportTextView.isHidden = true
-                etcReportLabel.isHidden = true
-            }
-        }
-        
-        for visibleIndexPath in tableView.indexPathsForVisibleRows ?? [] {
-            if visibleIndexPath != indexPath,
-               let cell = tableView.cellForRow(at: visibleIndexPath) as? ReportTableViewCell {
-                cell.hiddenCellComponet()
-            }
-        }
-
-        viewModel.sendCurrentReportContent(viewModel.getReportList(indexPath.row))
+    @objc
+    private func handleTapGesture(_ gesture: UITapGestureRecognizer) {
+        view.endEditing(true)
     }
 }
+
+//extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
+//    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return viewModel.reportListCount()
+//    }
+//    
+//    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: ReportTableViewCell.reuseIdentifier, for: indexPath) as? ReportTableViewCell else { return UITableViewCell() }
+//        
+//        cell.bind(viewModel.getReportList(indexPath.row))
+//        cell.selectionStyle = .none
+//        return cell
+//    }
+//
+//    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        if let cell = tableView.cellForRow(at: indexPath) as? ReportTableViewCell {
+//            cell.showCellComponent()
+//            if indexPath.row == 4 {
+//                // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
+//                etcReportTextView.isHidden = false
+//                etcReportLabel.isHidden = false
+//            } else {
+//                etcReportTextView.isHidden = true
+//                etcReportLabel.isHidden = true
+//            }
+//        }
+//        
+//        for visibleIndexPath in tableView.indexPathsForVisibleRows ?? [] {
+//            if visibleIndexPath != indexPath,
+//               let cell = tableView.cellForRow(at: visibleIndexPath) as? ReportTableViewCell {
+//                cell.hiddenCellComponet()
+//            }
+//        }
+//
+//        viewModel.sendCurrentReportContent(viewModel.getReportList(indexPath.row))
+//    }
+//}
 
 extension ReportViewController: UITextViewDelegate {
     public func textViewDidBeginEditing(_ textView: UITextView) {
