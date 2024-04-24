@@ -93,8 +93,9 @@ public final class ReportViewController: BaseViewController {
         $0.text = "다음"
         $0.textColor = DesignSystemAsset.gray200.color
         $0.font = Font.bold(size: 16)
-        $0.setClickable(false)
+        $0.layer.cornerRadius = moderateScale(number: 12)
         $0.clipsToBounds = true
+        $0.setClickable(false)
     }
     
     public override func viewDidLoad() {
