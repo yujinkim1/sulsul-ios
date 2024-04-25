@@ -10,6 +10,8 @@ import DesignSystem
 
 final class ReportCell: UICollectionViewCell {
     
+    lazy var containerView = TouchableView()
+    
     private lazy var cellBackgroundView = UIView().then {
         $0.backgroundColor = UIColor(red: 54/255, green: 54/255, blue: 54/255, alpha: 1)
         $0.layer.cornerRadius = moderateScale(number: 8)
@@ -36,20 +38,26 @@ final class ReportCell: UICollectionViewCell {
         fatalError()
     }
     
-    func bind(_ title: String) {
-        titleLabel.text = title
+    func bind(_ model: ReportSelectModel) {
+        titleLabel.text = model.title.rawValue
+        cellBackgroundView.isHidden = model.isChecked ? false : true
+        checkImageView.isHidden = model.isChecked ? false : true
     }
     
     private func addViews() {
-        contentView.addSubview(cellBackgroundView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(checkImageView)
+        addSubview(containerView)
+        containerView.addSubview(cellBackgroundView)
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(checkImageView)
     }
     
     private func makeConstraints() {
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         cellBackgroundView.snp.makeConstraints {
-            $0.bottom.width.centerY.equalToSuperview()
-            $0.height.equalTo(moderateScale(number: 48))
+            $0.edges.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints {
@@ -62,15 +70,5 @@ final class ReportCell: UICollectionViewCell {
             $0.centerY.equalToSuperview()
             $0.size.equalTo(moderateScale(number: 24))
         }
-    }
-    
-    func hiddenCellComponet() {
-        cellBackgroundView.isHidden = true
-        checkImageView.isHidden = true
-    }
-    
-    func showCellComponent() {
-        cellBackgroundView.isHidden = false
-        checkImageView.isHidden = false
     }
 }

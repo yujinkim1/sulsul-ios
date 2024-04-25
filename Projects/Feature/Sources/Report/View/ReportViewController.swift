@@ -14,17 +14,8 @@ protocol ReportViewControllerDelegate: AnyObject {
     func reportIsComplete()
 }
 
-public final class ReportViewController: BaseViewController, UICollectionViewDataSource {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(ReportCell.self, indexPath: indexPath) else { return .init() }
-        return cell
-    }
-    
-    
+public final class ReportViewController: BaseViewController {
+
     var coordinator: CommonBaseCoordinator?
     var delegate: ReportViewControllerDelegate
     private let viewModel: ReportViewModel
@@ -66,16 +57,6 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
         $0.textColor = DesignSystemAsset.white.color
     })
     
-//    private lazy var reportTableView = UITableView(frame: .zero, style: .plain).then {
-//        $0.backgroundColor = DesignSystemAsset.black.color
-//        $0.register(ReportTableViewCell.self, forCellReuseIdentifier: ReportTableViewCell.reuseIdentifier)
-//        $0.delegate = self
-//        $0.dataSource = self
-//        $0.separatorStyle = .none
-//        $0.sectionFooterHeight = 0
-//        $0.rowHeight = moderateScale(number: 52)
-//    }
-    
     private lazy var reportCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.registerCell(ReportCell.self)
@@ -85,15 +66,13 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
     
     private func layout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] _, _ in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3),
-                                                  heightDimension: .absolute(moderateScale(number: 18)))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                  heightDimension: .estimated(moderateScale(number: 52)))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                   heightDimension: .absolute(moderateScale(number: 18)))
+                                                   heightDimension: .estimated(moderateScale(number: 52)))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             let section = NSCollectionLayoutSection(group: group)
-            section.interGroupSpacing = moderateScale(number: 9)
             
             return section
         }
@@ -149,6 +128,8 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
                           etcReportLabel,
                           submitTouchableLabel])
         topHeaderView.addSubview(backButton)
+        view.bringSubviewToFront(etcReportTextView)
+        view.bringSubviewToFront(etcReportLabel)
     }
     
     public override func makeConstraints() {
@@ -175,8 +156,7 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
         reportCollectionView.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(moderateScale(number: 16))
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
-//            $0.height.equalTo(moderateScale(number: 272))
-            $0.bottom.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 272))
         }
         etcReportTextView.snp.makeConstraints {
             $0.top.equalTo(reportCollectionView.snp.bottom).offset(moderateScale(number: 8))
@@ -186,7 +166,7 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
         etcReportLabel.snp.makeConstraints {
             $0.top.equalTo(etcReportTextView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
-            $0.height.equalTo(moderateScale(number: 66))
+            $0.bottom.equalTo(submitTouchableLabel.snp.top)
         }
         submitTouchableLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
@@ -216,15 +196,22 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
                 self?.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
         
-        viewModel.currentReportContentPublisher()
+        viewModel.reportReasonsPublisher()
             .dropFirst()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] content in
-                if content.isEmpty {
-                    self?.submitTouchableLabel.setClickable(false)
+            .sink { [weak self] response in
+                guard let self = self else { return }
+                if let otherItem = response.first(where: { $0.title == .other && $0.isChecked }) {
+                    self.etcReportTextView.isHidden = false
+                    self.etcReportLabel.isHidden = false
+                    self.submitTouchableLabel.setClickable(false)
                 } else {
-                    self?.submitTouchableLabel.setClickable(true)
+                    self.view.endEditing(true)
+                    self.etcReportTextView.isHidden = true
+                    self.etcReportLabel.isHidden = true
+                    self.submitTouchableLabel.setClickable(true)
                 }
+                self.reportCollectionView.reloadData()
             }.store(in: &cancelBag)
     }
     
@@ -232,7 +219,7 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
         submitTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             if viewModel.currentReportContentValue() == ReportReason.other.rawValue {
-                viewModel.sendCurrentReportContent(etcReportTextView.text)
+                viewModel.setCurrentReportContent(etcReportTextView.text)
             }
             viewModel.sendReportContent()
         }
@@ -283,48 +270,14 @@ public final class ReportViewController: BaseViewController, UICollectionViewDat
     }
 }
 
-//extension ReportViewController: UITableViewDelegate, UITableViewDataSource {
-//    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return viewModel.reportListCount()
-//    }
-//    
-//    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        guard let cell = tableView.dequeueReusableCell(withIdentifier: ReportTableViewCell.reuseIdentifier, for: indexPath) as? ReportTableViewCell else { return UITableViewCell() }
-//        
-//        cell.bind(viewModel.getReportList(indexPath.row))
-//        cell.selectionStyle = .none
-//        return cell
-//    }
-//
-//    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if let cell = tableView.cellForRow(at: indexPath) as? ReportTableViewCell {
-//            cell.showCellComponent()
-//            if indexPath.row == 4 {
-//                // MARK: - 그 외 기타사유 클릭시, 나중에 인덱스가 아닌 타입으로 리팩토링 진행 필요
-//                etcReportTextView.isHidden = false
-//                etcReportLabel.isHidden = false
-//            } else {
-//                etcReportTextView.isHidden = true
-//                etcReportLabel.isHidden = true
-//            }
-//        }
-//        
-//        for visibleIndexPath in tableView.indexPathsForVisibleRows ?? [] {
-//            if visibleIndexPath != indexPath,
-//               let cell = tableView.cellForRow(at: visibleIndexPath) as? ReportTableViewCell {
-//                cell.hiddenCellComponet()
-//            }
-//        }
-//
-//        viewModel.sendCurrentReportContent(viewModel.getReportList(indexPath.row))
-//    }
-//}
-
 extension ReportViewController: UITextViewDelegate {
     public func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.text == textViewPlaceHolder {
             textView.text = nil
             textView.textColor = DesignSystemAsset.gray900.color
+            submitTouchableLabel.setClickable(false)
+        } else {
+            submitTouchableLabel.setClickable(true)
         }
     }
 
@@ -332,6 +285,18 @@ extension ReportViewController: UITextViewDelegate {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = textViewPlaceHolder
             textView.textColor = DesignSystemAsset.gray400.color
+            submitTouchableLabel.setClickable(false)
+        } else {
+            submitTouchableLabel.setClickable(true)
+        }
+    }
+    
+    public func textViewDidChange(_ textView: UITextView) {
+        let text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.isEmpty {
+            submitTouchableLabel.setClickable(false)
+        } else {
+            submitTouchableLabel.setClickable(true)
         }
     }
 
@@ -344,5 +309,22 @@ extension ReportViewController: UITextViewDelegate {
         guard characterCount <= maxTextCount else { return false }
 
         return true
+    }
+}
+
+extension ReportViewController: UICollectionViewDataSource {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.reportListCount()
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(ReportCell.self, indexPath: indexPath) else { return .init() }
+        let reason = viewModel.getReportList()[indexPath.item]
+        cell.bind(reason)
+        cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.viewModel.selectReason(of: indexPath.item)
+        }
+        
+        return cell
     }
 }

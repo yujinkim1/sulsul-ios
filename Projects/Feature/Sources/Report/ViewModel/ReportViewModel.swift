@@ -23,6 +23,10 @@ enum ReportReason: String {
     case other = "💬 그 외 기타사유"
 }
 
+struct ReportSelectModel {
+    let title: ReportReason
+    var isChecked: Bool
+}
 
 final class ReportViewModel {
     
@@ -31,15 +35,15 @@ final class ReportViewModel {
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     
+    private var currentReportContent: String = ""
+    
     private let errorSubject = PassthroughSubject<String, Never>()
     private let reportSuccess = PassthroughSubject<Void, Never>()
-    private let currentReportContent = CurrentValueSubject<String, Never>("")
-    
-    private let reportReasons: [ReportReason] = [.profanity,
-                                                 .conflict,
-                                                 .spam,
-                                                 .inappropriateNickname,
-                                                 .other]
+    private let reportReasons = CurrentValueSubject<[ReportSelectModel], Never>([.init(title: .profanity, isChecked: false),
+                                                                                  .init(title: .conflict, isChecked: false),
+                                                                                  .init(title: .spam, isChecked: false),
+                                                                                  .init(title: .inappropriateNickname, isChecked: false),
+                                                                                  .init(title: .other, isChecked: false)])
     init(reportType: ReportType, targetId: Int) {
         self.reportType = reportType
         self.targetId = targetId
@@ -66,36 +70,51 @@ final class ReportViewModel {
         }
     }
     
+    func selectReason(of index: Int) {
+        guard index < reportReasons.value.count else { return }
+        var changedSignOutReasons = reportReasons.value
+        
+        for subIndex in 0..<changedSignOutReasons.count {
+            changedSignOutReasons[subIndex].isChecked = false
+        }
+        
+        changedSignOutReasons[index].isChecked = true
+        reportReasons.value = changedSignOutReasons
+        
+        currentReportContent = changedSignOutReasons[index].title.rawValue
+    }
+    
     func reportSuccessPublisher() -> AnyPublisher<Void, Never> {
         return reportSuccess.eraseToAnyPublisher()
     }
     
     func reportListCount() -> Int {
-        return reportReasons.count
+        return reportReasons.value.count
     }
     
-    func getReportList(_ index: Int) -> String {
-        return reportReasons[index].rawValue
+    func getReportList() -> [ReportSelectModel] {
+        return reportReasons.value
+    }
+    
+    func reportReasonsPublisher() -> AnyPublisher<[ReportSelectModel], Never> {
+        return reportReasons.eraseToAnyPublisher()
     }
     
     func getErrorSubject() -> AnyPublisher<String, Never> {
         return errorSubject.eraseToAnyPublisher()
     }
     
-    func sendCurrentReportContent(_ content: String) {
-        currentReportContent.send(content)
-    }
-    
     func sendReportContent() {
-        setReports(reason: currentReportContent.value, type: self.reportType, targetId: self.targetId)
-    }
-    
-    func currentReportContentPublisher() -> AnyPublisher<String, Never> {
-        return currentReportContent.eraseToAnyPublisher()
+        print(currentReportContent)
+        setReports(reason: currentReportContent, type: self.reportType, targetId: self.targetId)
     }
     
     func currentReportContentValue() -> String {
-        return currentReportContent.value
+        return currentReportContent
+    }
+    
+    func setCurrentReportContent(_ content: String) {
+        currentReportContent = content
     }
 }
 
