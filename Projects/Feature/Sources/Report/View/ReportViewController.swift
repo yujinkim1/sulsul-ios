@@ -128,6 +128,7 @@ public final class ReportViewController: BaseViewController {
                           etcReportLabel,
                           submitTouchableLabel])
         topHeaderView.addSubview(backButton)
+        // TODO: - 이 로직 없애도 되는지 확인 필요
         view.bringSubviewToFront(etcReportTextView)
         view.bringSubviewToFront(etcReportLabel)
     }

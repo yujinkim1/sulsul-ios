@@ -232,6 +232,9 @@ public final class ProfileEditViewController: BaseViewController {
             guard let self = self else { return }
             self.viewModel.setNickname(userNameTextField.text!)
         }
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        view.addGestureRecognizer(tapGestureRecognizer)
     }
     
     @objc private func clearButtonDidTap() {
@@ -242,6 +245,11 @@ public final class ProfileEditViewController: BaseViewController {
     @objc private func textFieldDidChange(_ sender: UITextField) {
         guard let text = sender.text else { return }
         nicknameValidate(text: text)
+    }
+    
+    @objc
+    private func handleTapGesture(_ gesture: UITapGestureRecognizer) {
+        view.endEditing(true)
     }
     
     private func nicknameValidate(text: String) {
