@@ -50,8 +50,6 @@ public class BaseWebViewController: BaseViewController {
     init(url: URL) {
         self.url = url
         super.init(nibName: nil, bundle: nil)
-        
-        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)

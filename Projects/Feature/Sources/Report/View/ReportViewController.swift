@@ -30,7 +30,6 @@ public final class ReportViewController: BaseViewController {
         self.delegate = delegate
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)
