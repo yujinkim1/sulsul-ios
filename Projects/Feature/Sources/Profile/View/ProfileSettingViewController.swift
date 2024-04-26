@@ -61,10 +61,8 @@ public final class ProfileSettingViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tabBarController?.setTabBarHidden(true)
-        view.backgroundColor = DesignSystemAsset.black.color
         self.tabBarController?.setTabBarHidden(true)
+        view.backgroundColor = DesignSystemAsset.black.color
         
         addViews()
         makeConstraints()
@@ -162,10 +160,6 @@ public final class ProfileSettingViewController: BaseViewController {
         personalSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://www.google.com")])
-        }
-        snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.selectSnack), userData: nil)
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }

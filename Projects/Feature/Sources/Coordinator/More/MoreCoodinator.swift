@@ -58,10 +58,10 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
             currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
         case .selectSnack:
             let viewModel = SelectSnackViewModel()
-            let selectDrinkVC = SelectSnackViewController(viewModel: viewModel,
+            let selectSnackVC = SelectSnackViewController(viewModel: viewModel,
                                                           selectTasteCase: .store)
-            selectDrinkVC.coordinator = self
-            currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
+            selectSnackVC.coordinator = self
+            currentNavigationViewController?.pushViewController(selectSnackVC, animated: false)
         }
     }
 }

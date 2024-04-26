@@ -16,9 +16,9 @@ protocol SearchSnack: AnyObject {
 public final class SelectSnackViewController: BaseViewController {
     
     var coordinator: Coordinator?
+    private lazy var cancelBag = Set<AnyCancellable>()
     private let viewModel: SelectSnackViewModel
     private let selectTasteCase: SelectTasteCase
-    private lazy var cancelBag = Set<AnyCancellable>()
     
     private lazy var superViewInset = moderateScale(number: 20)
     
@@ -117,6 +117,13 @@ public final class SelectSnackViewController: BaseViewController {
         addViews()
         makeConstraints()
         bind()
+        
+        switch selectTasteCase {
+        case .next:
+            nextButton.setTitle("다음", for: .normal)
+        case .store:
+            nextButton.setTitle("저장", for: .normal)
+        }
         
         noFindSnackButton.onTapped { [weak self] in
             let vc = AddSnackViewController()
