@@ -74,13 +74,13 @@ public final class FeedDetailViewModel {
     }
     
     public func requestFeedDetail() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken")
-        else { return }
-        debugPrint("\(#function): User accessToken is \(accessToken)")
-        
         var headers: HTTPHeaders? = nil
         
         if UserDefaultsUtil.shared.isLogin() {
+            guard let accessToken = KeychainStore.shared.read(label: "accessToken")
+            else { return }
+            debugPrint("\(#function): User accessToken is \(accessToken)")
+            
             headers = [
                 "Content-Type": "application/json",
                 "Authorization": "Baerer " + accessToken

@@ -144,11 +144,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
             recognizedImageView.image = UIImage(named: "writeFeed_progress")
         }
-        
-        if let text = UserDefaultsUtil.shared.getFeedContent() {
-            contentTextView.text = text
-            setTextViewUI()
-        }
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
@@ -302,6 +297,12 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             
             if index == 0 {
                 imageView.setDisplayDeleteIcon(true)
+                
+            } else {
+                imageView.onTapped { [weak self] in
+                    self?.images.removeAll(where: { $0 == image })
+                    imageView.removeFromSuperview()
+                }
             }
 
             imageView.snp.makeConstraints {
@@ -309,11 +310,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             }
             
             imageStackView.addArrangedSubview(imageView)
-            
-            imageView.onTapped { [weak self] in
-                self?.images.removeAll(where: { $0 == image })
-                imageView.removeFromSuperview()
-            }
         }
     }
     
