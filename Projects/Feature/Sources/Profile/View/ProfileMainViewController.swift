@@ -77,11 +77,14 @@ public final class ProfileMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil) // TODO: - 제거
-        view.backgroundColor = DesignSystemAsset.black.color
+
         addViews()
         makeConstraints()
         bind()
+    }
+    
+    override public func viewWillAppear(_ animated: Bool) {
+        viewModel.getUserInfo()
     }
     
     private func bind() {
@@ -94,6 +97,7 @@ public final class ProfileMainViewController: BaseViewController {
                     self.profileLabel.text = "로그인 해주세요!"
                     self.profileEditTouchableLabel.isHidden = true
                     self.myFeedView.updateState(.notLogin)
+                    self.likeFeedView.updateState(.notLogin)
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
                     // MARK: - 밴된 유저
                 } else { // MARK: - 로그인한 유저
@@ -125,8 +129,7 @@ public final class ProfileMainViewController: BaseViewController {
                 guard let self = self else { return }
                 viewModel.getUserInfo()
             }.store(in: &cancelBag)
-        
-        viewModel.getUserInfo()
+    
     }
     
     public override func addViews() {

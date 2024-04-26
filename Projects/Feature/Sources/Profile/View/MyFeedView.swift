@@ -9,13 +9,13 @@ import UIKit
 import Combine
 import DesignSystem
 
+enum MyFeedState {
+    case loginFeedExist
+    case loginFeedNotExist
+    case notLogin
+}
+
 class MyFeedView: UIView {
-    
-    enum MyFeedState {
-        case loginFeedExist
-        case loginFeedNotExist
-        case notLogin
-    }
     
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
@@ -90,7 +90,7 @@ class MyFeedView: UIView {
             case .notLogin:
                 itemHeight = 400
             case nil:
-                itemHeight = 0
+                return nil
             }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
