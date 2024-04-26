@@ -70,7 +70,6 @@ public final class CommentViewController: BaseHeaderViewController {
         self.feedID = feedID
         self.viewModel = CommentViewModel(feedId: feedID)
         
-//        debugPrint("지금 피드의 아이디 >>>> \(feedID)")
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -127,7 +126,6 @@ public final class CommentViewController: BaseHeaderViewController {
                 self?.viewModel.didTabWriteComment(selfRef.feedID,
                                                    content: text,
                                                    parentId: selfRef.parentId)
-//                print("지금 피드의 아이디 >>>> \(selfRef.feedID)")
             }
         }
     }
