@@ -16,16 +16,16 @@ enum SelectTasteCase {
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
-    private let selectTasteCase: SelectTasteCase
     var coordinator: Coordinator?
     var cancelBag = Set<AnyCancellable>()
+    
     private let viewModel: SelectDrinkViewModel
+    private let selectTasteCase: SelectTasteCase
     
     init(viewModel: SelectDrinkViewModel, selectTasteCase: SelectTasteCase) {
         self.selectTasteCase = selectTasteCase
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)
@@ -75,9 +75,9 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }()
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         super.viewDidLoad()
-        view.backgroundColor = DesignSystemAsset.black.color
+        self.tabBarController?.setTabBarHidden(true)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         addViews()
         makeConstraints()
         bind()

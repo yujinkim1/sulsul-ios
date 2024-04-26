@@ -31,13 +31,19 @@ open class SelectTasteBaseViewController: BaseViewController {
         $0.clipsToBounds = true
     }
     
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
     open override func addViews() {
+        super.addViews()
         view.addSubviews([topView,
                           nextButtonBackgroundView])
         nextButtonBackgroundView.addSubview(submitTouchableLabel)
     }
     
     open override func makeConstraints() {
+        super.makeConstraints()
         topView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(getSafeAreaTop())
             $0.leading.trailing.equalToSuperview()
