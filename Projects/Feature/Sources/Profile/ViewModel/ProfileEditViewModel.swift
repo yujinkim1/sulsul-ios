@@ -34,7 +34,7 @@ struct ProfileEditViewModel {
         NetworkWrapper.shared.getBasicTask(stringURL: "/users/nickname", header: headers) { result in
             switch result {
             case .success(let response):
-                if let nickname = try? self.jsonDecoder.decode(UserName.self, from: response) {
+                if let nickname = try? self.jsonDecoder.decode(Nickname.self, from: response) {
                     randomNickname.send(nickname.value)
                 } else {
                     errorSubject.send("엡에서 에러가 발생했습니다")
