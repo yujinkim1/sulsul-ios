@@ -22,24 +22,19 @@ final class FeedDetailMainCell: UICollectionViewCell {
     private lazy var flowLayout = UICollectionViewFlowLayout().then {
         $0.scrollDirection = .horizontal
         $0.itemSize = CGSize(width: 353, height: 353)
-        $0.minimumLineSpacing = 0
-        $0.minimumInteritemSpacing = 0
+        $0.sectionInset = .init(top: 0, left: 20, bottom: 0, right: 20)
+        $0.minimumLineSpacing = 20
+        $0.minimumInteritemSpacing = 20
     }
     
     private lazy var carouselCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout).then {
         $0.backgroundColor = .clear
         $0.showsHorizontalScrollIndicator = false
         $0.isPagingEnabled = true
-        $0.layer.cornerRadius = CGFloat(20)
-        $0.layer.borderColor = .none
-        $0.layer.borderWidth = .zero
-        $0.layer.masksToBounds = true
         $0.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseIdentifier)
         $0.dataSource = self
         $0.delegate = self
     }
-    
-//    private lazy var carouselCollectionView = CarouselCollectionView(frame: .zero, collectionViewLayout: .init())
     
     private lazy var userTagCollectionView = UserTagCollectionView(frame: .zero, collectionViewLayout: .init())
     
@@ -216,7 +211,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
             $0.edges.equalToSuperview()
         }
         self.carouselCollectionView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
+            $0.leading.trailing.equalToSuperview()
             $0.top.equalToSuperview().inset(moderateScale(number: 4))
             $0.size.equalTo(moderateScale(number: 353))
         }
@@ -226,12 +221,12 @@ final class FeedDetailMainCell: UICollectionViewCell {
             $0.bottom.equalTo(titleLabel.snp.top).offset(moderateScale(number: -4))
         }
         self.titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(carouselCollectionView.snp.leading).inset(moderateScale(number: 18))
+            $0.leading.equalTo(carouselCollectionView.snp.leading).inset(moderateScale(number: 38))
             $0.bottom.equalTo(carouselCollectionView.snp.bottom).inset(moderateScale(number: 16))
             $0.width.equalTo(moderateScale(number: 317))
         }
         self.profileImageView.snp.makeConstraints {
-            $0.leading.equalTo(carouselCollectionView)
+            $0.leading.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 26))
             $0.size.equalTo(moderateScale(number: 40))
         }
@@ -244,11 +239,11 @@ final class FeedDetailMainCell: UICollectionViewCell {
             $0.top.equalTo(indicatorView.snp.bottom).offset(moderateScale(number: 27))
         }
         self.scoreLevelImageView.snp.makeConstraints {
-            $0.trailing.equalTo(carouselCollectionView)
+            $0.trailing.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
             $0.top.equalTo(scoreLabel)
         }
         self.pairingStackView.snp.makeConstraints {
-            $0.trailing.equalTo(carouselCollectionView)
+            $0.trailing.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
             $0.top.equalTo(scoreLabel.snp.bottom).offset(moderateScale(number: 2))
         }
         self.createdAtLabel.snp.makeConstraints {
@@ -256,7 +251,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
             $0.top.equalTo(usernameLabel.snp.bottom).offset(moderateScale(number: 8))
         }
         self.textView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(carouselCollectionView)
+            $0.leading.trailing.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
             $0.top.equalTo(profileImageView.snp.bottom).offset(moderateScale(number: 18))
             $0.height.equalTo(moderateScale(number: 144))
         }
@@ -266,7 +261,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
             $0.height.equalTo(moderateScale(number: 52))
         }
         self.feedViewsStackView.snp.makeConstraints {
-            $0.leading.equalTo(carouselCollectionView)
+            $0.leading.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
             $0.bottom.equalTo(separatorView.snp.top).offset(moderateScale(number: -22))
         }
         self.feedCommentsStackView.snp.makeConstraints {
@@ -387,14 +382,14 @@ final class FeedDetailMainCell: UICollectionViewCell {
             let count = imageOfList.count
             
             indicatorView.snp.makeConstraints {
-                $0.leading.equalTo(carouselCollectionView)
+                $0.leading.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
                 $0.width.equalToSuperview().multipliedBy(1.0 / CGFloat(count))
             }
         } else {
             indicatorView.snp.makeConstraints {
-                $0.leading.trailing.equalTo(carouselCollectionView)
+                $0.leading.trailing.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
             }
@@ -435,7 +430,7 @@ extension FeedDetailMainCell: UICollectionViewDelegate {
 
         if carouselCurrentIndex != imageOfList.count {
             indicatorView.snp.remakeConstraints {
-                $0.leading.equalTo(carouselCollectionView)
+                $0.leading.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
                 $0.width.equalToSuperview().dividedBy(imageOfList.count)
@@ -445,7 +440,7 @@ extension FeedDetailMainCell: UICollectionViewDelegate {
             }
         } else if carouselCurrentIndex == imageOfList.count {
             indicatorView.snp.remakeConstraints {
-                $0.leading.equalTo(carouselCollectionView)
+                $0.leading.equalTo(carouselCollectionView).inset(moderateScale(number: 20))
                 $0.top.equalTo(carouselCollectionView.snp.bottom).offset(moderateScale(number: 16))
                 $0.height.equalTo(moderateScale(number: 2))
                 $0.width.equalToSuperview().inset(moderateScale(number: 20))
