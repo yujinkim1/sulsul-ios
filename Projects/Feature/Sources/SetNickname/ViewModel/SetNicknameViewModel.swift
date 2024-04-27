@@ -1,5 +1,5 @@
 //
-//  SelectUserNameViewModel.swift
+//  SetNicknameViewModel.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2023-12-17.
@@ -10,9 +10,9 @@ import Combine
 import Service
 import Alamofire
 
-final class SelectUserNameViewModel: NSObject {
-    
+public final class SetNicknameViewModel {
     private let jsonDecoder = JSONDecoder()
+    private let networkWrapper = NetworkWrapper.shared
     
     // PassthroughSubject를 사용해서 외부로 전달하기
     var userNameSubject = PassthroughSubject<String, Never>()
@@ -20,9 +20,7 @@ final class SelectUserNameViewModel: NSObject {
     
     var userName: String = ""
     
-    override init() {
-        
-    }
+    public init() {}
     
     public func requestRandomNickname() {
         let accessToken = KeychainStore.shared.read(label: "accessToken")
@@ -31,11 +29,12 @@ final class SelectUserNameViewModel: NSObject {
             "Authorization": "Bearer " + accessToken!
         ]
         
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/nickname", header: headers) { [weak self] result in
+        networkWrapper.getBasicTask(stringURL: "/users/nickname", header: headers) { [weak self] result in
             guard let self = self else { return }
+            
             switch result {
-            case .success(let responseData):
-                if let userName = self.parseRandomNickname(from: responseData) {
+            case .success(let response):
+                if let userName = self.parseRandomNickname(from: response) {
                     self.userNameSubject.send(userName)
                 }
             case .failure(let error):
@@ -46,7 +45,7 @@ final class SelectUserNameViewModel: NSObject {
     
     private func parseRandomNickname(from data: Data) -> String? {
         do {
-            let response = try jsonDecoder.decode(UserName.self, from: data)
+            let response = try jsonDecoder.decode(Nickname.self, from: data)
             return response.value
         } catch {
             print("parseRandomNickname(): \(error)")
@@ -63,10 +62,10 @@ final class SelectUserNameViewModel: NSObject {
         
         let params: [String: Any] = ["nickname": userNickName]
         
-        NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/nickname", parameters: params,header: headers) { [weak self] result in
+        networkWrapper.putBasicTask(stringURL: "/users/\(userId)/nickname", parameters: params,header: headers) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success(let response):
+            case .success:
                 setUserName.send(())
             case .failure(let error):
                 print("닉네임 설정 실패")

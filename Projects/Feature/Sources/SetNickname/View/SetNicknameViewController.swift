@@ -1,5 +1,5 @@
 //
-//  SetUserNameViewController.swift
+//  SetNicknameViewController.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2023-12-17.
@@ -10,13 +10,17 @@ import UIKit
 import DesignSystem
 import Service
 
-public final class SetUserNameViewController: BaseViewController {
-    
+public final class SetNicknameViewController: BaseViewController {
+    // MARK: - Properties
+    //
     var coordinator: AuthBaseCoordinator?
-    private var viewModel: SelectUserNameViewModel
+    
+    private var viewModel: SetNicknameViewModel
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
     
+    // MARK: - Components
+    //
     private lazy var topHeaderView = UIView()
     
     private lazy var defaultStackView = ValidationLabelStackView().then {
@@ -95,15 +99,20 @@ public final class SetUserNameViewController: BaseViewController {
         $0.isEnabled = true
     }
     
-    init(viewModel: SelectUserNameViewModel) {
+    // MARK: - Initializer
+    //
+    public init(viewModel: SetNicknameViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Life cycle
+    //
     public override func viewDidLoad() {
         self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
@@ -194,9 +203,15 @@ public final class SetUserNameViewController: BaseViewController {
     public override func deinitialize() {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
 }
 
-extension SetUserNameViewController: UITextFieldDelegate {
+// MARK: - UITextField Delegate
+//
+extension SetNicknameViewController: UITextFieldDelegate {
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
         updateValidationLabelStackView(text: textField.text)
         return true
@@ -219,8 +234,8 @@ extension SetUserNameViewController: UITextFieldDelegate {
 }
 
 // MARK: - Custom method
-
-extension SetUserNameViewController {
+//
+extension SetNicknameViewController {
     private func bind() {
         viewModel.userNamePublisher()
             .sink { [weak self] userName in
@@ -308,8 +323,8 @@ extension SetUserNameViewController {
 }
 
 // MARK: - @objc
-
-extension SetUserNameViewController {
+//
+extension SetNicknameViewController {
     @objc private func backButtonDidTap() {}
     
     @objc private func clearButtonDidTap() {
@@ -355,7 +370,7 @@ extension SetUserNameViewController {
             self?.nextButton.snp.remakeConstraints {
                 $0.leading.equalToSuperview().offset(20)
                 $0.trailing.equalToSuperview().offset(-20)
-                $0.bottom.equalTo(self?.view.safeAreaLayoutGuide ?? 0)
+                $0.bottom.equalTo(self?.view.safeAreaLayoutGuide ?? 0).offset(-moderateScale(number: 50))
                 $0.height.equalTo(moderateScale(number: 50))
             }
             self?.nextButton.layer.cornerRadius = CGFloat(12)
