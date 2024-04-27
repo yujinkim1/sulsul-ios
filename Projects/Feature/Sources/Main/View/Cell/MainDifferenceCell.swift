@@ -164,7 +164,7 @@ final class MainDifferenceCell: UICollectionViewCell {
         for feed in feed.feeds {
             contentLabel.text = feed.title
             detailContentLabel.text = feed.content
-            nickNameLabel.text = feed.userNickname
+            nickNameLabel.text = "@" + feed.userNickname
             if let url = URL(string: feed.representImage) {
                 feedImageView.kf.setImage(with: url)
             } else {
