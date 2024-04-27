@@ -199,10 +199,9 @@ final class ScoreBottomSheetViewController: BaseViewController {
             guard let selfRef = self else { return }
             
             if selfRef.currentScore != 0 {
+                self?.hideBottomSheetAndGoBack()
                 self?.delegate?.selectedValue(["shouldGoMain": (),
                                                "score": selfRef.currentScore])
-                self?.hideBottomSheetAndGoBack()
-                
             } else {
                 self?.showToastMessageView(toastType: .error, title: "점수를 선택해주세요!")
             }

@@ -13,19 +13,16 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     static let reuseIdentifer = "MyFeedCell"
     
-    lazy var containerView = TouchableView().then({
-        $0.backgroundColor = DesignSystemAsset.black.color
-    })
+    lazy var containerView = TouchableView()
     
     private lazy var dateLabel = UILabel().then({
-        $0.text = "12월 10일(일요일)"
         $0.font = Font.bold(size: 18)
         $0.textColor = DesignSystemAsset.white.color
     })
     
     private lazy var feedImageView = UIImageView().then({
         $0.layer.cornerRadius = moderateScale(number: 20)
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleAspectFill
         $0.layer.masksToBounds = true
         $0.clipsToBounds = true
     })
@@ -33,10 +30,13 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     private lazy var feedCountView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 6)
+        $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
     })
     
     private lazy var feedCountImageView = UIImageView().then({
         $0.image = UIImage(named: "album")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var feedCountLabel = UILabel().then({
@@ -45,7 +45,6 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var feedTitleLabel = UILabel().then({
-        $0.text = "썸네일이 위스키인 피드들에 최적의 소맥의 비율을 묻다"
         $0.lineBreakMode = .byCharWrapping
         $0.numberOfLines = 0
         $0.font = Font.bold(size: 24)
@@ -53,7 +52,6 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var feedDescriptionLabel = UILabel().then({
-        $0.text = "이번에 위스키를 처음 먹어봤습니다.맨날 하이볼로만 먹다가 온더락으로 마셔봤는데, 향이 좋았습니다. 안주의 맛이 강하지 않은 나초 오리지널과 먹"
         $0.lineBreakMode = .byCharWrapping
         $0.numberOfLines = 0
         $0.font = Font.medium(size: 16)
@@ -66,7 +64,6 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var viewCountLabel = UILabel().then({
-        $0.text = "test"
         $0.font = Font.regular(size: 14)
         $0.textColor = DesignSystemAsset.gray900.color
     })
@@ -77,7 +74,6 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var commentLabel = UILabel().then({
-        $0.text = "test"
         $0.font = Font.regular(size: 14)
         $0.textColor = DesignSystemAsset.gray900.color
     })
@@ -88,7 +84,6 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     })
     
     private lazy var likeCountLabel = UILabel().then({
-        $0.text = "test"
         $0.font = Font.regular(size: 14)
         $0.textColor = DesignSystemAsset.gray900.color
     })
@@ -187,15 +182,21 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
     
     override func bind(_ model: Feed) {
         super.bind(model)
-        dateLabel.text = model.createdAt
+
         feedTitleLabel.text = model.title
         feedDescriptionLabel.text = model.content
-        feedCountLabel.text = String(model.images.count)
+        feedCountLabel.text = String(model.images.count + 1)
         viewCountLabel.text = String(model.viewCount)
         commentLabel.text = String(model.commentsCount)
         likeCountLabel.text = String(model.likesCount)
         if let imageURL = URL(string: model.representImage) {
             feedImageView.kf.setImage(with: imageURL)
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        if let date = dateFormatter.date(from: model.createdAt) {
+            dateLabel.text = date.relativeDate(.MM월dd일요일)
         }
     }
 }

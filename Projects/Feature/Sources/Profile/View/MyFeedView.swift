@@ -132,6 +132,11 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
             let model = viewModel.getMyFeedsValue()[indexPath.row]
             cell.bind(model)
             
+            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                guard let self = self else { return }
+                self.viewModel.sendDetailFeed(model.feedId)
+            }
+            
             return cell
         case .loginFeedNotExist:
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }

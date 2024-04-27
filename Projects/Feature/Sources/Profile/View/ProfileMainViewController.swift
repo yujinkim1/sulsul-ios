@@ -123,6 +123,13 @@ public final class ProfileMainViewController: BaseViewController {
                   self?.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
               }.store(in: &cancelBag)
         
+        viewModel.detailFeedPublisher()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] response in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": response])
+            }.store(in: &cancelBag)
+        
         StaticValues.isLoggedInPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] loginStatus in
