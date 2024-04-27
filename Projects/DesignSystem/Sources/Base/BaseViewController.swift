@@ -113,7 +113,7 @@ open class BaseViewController: UIViewController {
             $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: inset))
         }
         
-        UIView.animate(withDuration: 1, delay: 0.5, options: .curveEaseOut, animations: { [weak self] in
+        UIView.animate(withDuration: 1, delay: 2, options: .curveEaseOut, animations: { [weak self] in
             toastView.alpha = 0.0
         }, completion: { [weak self] _ in
             toastView.removeFromSuperview()
