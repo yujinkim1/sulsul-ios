@@ -50,8 +50,8 @@ final class CommentViewModel {
                     commentWithParentId.parent_comment_id = parentId
                     commentWithParentId.isChildren = true
                     
-                    if let parentIndex = self?.comments.firstIndex(where: { $0.comment_id == parentId }),
-                       let originChildrenCount = selfRef.comments[parentIndex].children_comments?.count {
+                    if let parentIndex = self?.comments.firstIndex(where: { $0.comment_id == parentId }) {
+                        let originChildrenCount = selfRef.comments[parentIndex].children_comments?.count ?? 0
                         self?.comments.insert(commentWithParentId, at: parentIndex + originChildrenCount + 1)
                         self?.comments[parentIndex].children_comments?.append(commentWithParentId)
                     }
@@ -120,7 +120,7 @@ extension CommentViewModel {
             
             let parameters: Parameters = [
                 "content": request.content,
-                "parent_comment_id": request.parent_comment_id
+                "parent_comment_id": request.parent_comment_id == 0 ? nil : request.parent_comment_id
             ]
             
             NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/\(request.feed_id)/comments", parameters: parameters, needToken: true) { [weak self] result in
