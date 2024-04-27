@@ -76,7 +76,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        titleLabel.text = "술&안주 정보 수정"
+        setHeaderText("술&안주 정보 수정", actionText: "초기화")
         
         drinkBackView.onTapped { [weak self] in
             let vc = SelectDrinkBottomSheetViewController()
@@ -105,6 +105,20 @@ final class RecognizedEditViewController: BaseHeaderViewController {
             
             self?.delegate?.selectedValue(["selectedValue": selectedValue])
             self?.navigationController?.popViewController(animated: true)
+        }
+        
+        actionButton.onTapped { [weak self] in
+            self?.selectedDrink = nil
+            self?.selectedSnack = nil
+       
+            self?.placeholderLabel.text = "안주이름을 검색해보세요"
+            self?.placeholderLabel.textColor = DesignSystemAsset.gray400.color
+      
+            self?.snackPlaceholderLabel.text = "안주이름을 검색해보세요"
+            self?.snackPlaceholderLabel.textColor = DesignSystemAsset.gray400.color
+
+            self?.saveButton.textColor = DesignSystemAsset.gray300.color
+            self?.saveButton.backgroundColor = DesignSystemAsset.gray100.color
         }
     }
     

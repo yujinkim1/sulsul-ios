@@ -10,7 +10,6 @@ import Combine
 import Service
 import DesignSystem
 
-// MARK: VC 생성할 때 FeedId 전달받을 수 있도록 처리
 public final class CommentViewController: BaseHeaderViewController {
     var feedID: Int
     
@@ -126,6 +125,7 @@ public final class CommentViewController: BaseHeaderViewController {
                 self?.viewModel.didTabWriteComment(selfRef.feedID,
                                                    content: text,
                                                    parentId: selfRef.parentId)
+                self?.parentId = 0
             }
         }
     }
