@@ -46,7 +46,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
     private lazy var indexLabel = PaddableLabel(edgeInsets: 2, 8, 2, 8).then {
         $0.setLineHeight(18, font: Font.regular(size: 12))
         $0.font = Font.regular(size: 12)
-        $0.text = "\(carouselCurrentIndex)/\(imageOfList.count)"
+//        $0.text = "\(carouselCurrentIndex)/\(imageOfList.count)"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = CGFloat(8)
@@ -56,9 +56,9 @@ final class FeedDetailMainCell: UICollectionViewCell {
     private lazy var titleLabel = UILabel().then {
         $0.setLineHeight(36, font: Font.bold(size: 24))
         $0.font = Font.bold(size: 24)
-        $0.text = "썸네일이 위스키인 피드글에 최적의 소맥 비율을 묻다"
         $0.textColor = DesignSystemAsset.white.color
         $0.numberOfLines = 2
+        $0.sizeToFit()
     }
     
     private lazy var indicatorView = UIView().then {
@@ -67,7 +67,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
     }
     
     private lazy var profileImageView = UIImageView().then {
-        $0.backgroundColor = .white
+        $0.backgroundColor = .clear
         $0.contentMode = .scaleToFill
         $0.layer.cornerRadius = CGFloat(20)
         $0.layer.masksToBounds = true
@@ -76,14 +76,12 @@ final class FeedDetailMainCell: UICollectionViewCell {
     private lazy var usernameLabel = UILabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
-        $0.text = "알 수 없음"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
     private lazy var createdAtLabel = UILabel().then {
         $0.setLineHeight(16, font: Font.regular(size: 10))
         $0.font = Font.regular(size: 10)
-        $0.text = "24.03.14"
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
@@ -116,7 +114,6 @@ final class FeedDetailMainCell: UICollectionViewCell {
         $0.font = Font.medium(size: 16)
         $0.backgroundColor = .clear
         $0.textColor = DesignSystemAsset.gray800.color
-        $0.text = "작성된 내용이 없습니다."
     }
     
     private lazy var feedViewsImageView = UIImageView().then {
@@ -296,7 +293,6 @@ final class FeedDetailMainCell: UICollectionViewCell {
         
         updateIndex(to: carouselCurrentIndex)
         updateScore(to: model.score)
-//        updateUserTags(to: model.userTags ?? [])
         updateIndicatorViewWidth()
         
         textView.text = model.content
@@ -306,6 +302,12 @@ final class FeedDetailMainCell: UICollectionViewCell {
         feedViewsLabel.text = String(model.viewCount)
         feedCommentsLabel.text = String(model.commentCount)
         feedLikesLabel.text = String(model.likeCount)
+        
+        if let userTags = model.userTags {
+            self.updateUserTags(to: userTags)
+        } else {
+            self.updateUserTags(to: [])
+        }
         
         if let username = model.writerInfo?.nickname {
             usernameLabel.text = username
@@ -318,7 +320,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
             profileImageView.loadImage(profileImage)
         } else {
             print("Image URL is not available.")
-            profileImageView.image = UIImage()
+            profileImageView.image = UIImage(named: "detail_profile")
         }
         
         let dateFormatter = DateFormatter()
@@ -330,6 +332,17 @@ final class FeedDetailMainCell: UICollectionViewCell {
             createdAtLabel.text = displayDateFormat.string(from: createdAtDate)
         } else {
             createdAtLabel.text = model.createdAt
+        }
+    }
+    
+    private func updateUserTags(to tags: [String]) {
+        debugPrint("\(#file): \(tags)")
+        if !tags.isEmpty {
+            self.userTagCollectionView.bind(tags)
+        }
+        
+        if tags.isEmpty {
+            self.userTagCollectionView.removeFromSuperview()
         }
     }
     

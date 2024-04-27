@@ -32,6 +32,12 @@ public final class FeedDetailViewController: BaseViewController {
         $0.layer.masksToBounds = false
     }
     
+    private lazy var activityIndicatorView = UIActivityIndicatorView(style: .large).then {
+        $0.color = .gray
+        $0.center = view.center
+        $0.hidesWhenStopped = true
+    }
+    
     private lazy var titleLabel = UILabel().then {
         $0.setLineHeight(28, font: Font.bold(size: 18))
         $0.font = Font.bold(size: 18)
@@ -78,15 +84,16 @@ public final class FeedDetailViewController: BaseViewController {
         
         self.tabBarController?.setTabBarHidden(true)
         
-        self.verifyLoginUser()
-        self.addViews()
-        self.makeConstraints()
-        
         if feedID != 0 {
-            bind()
+            self.activityIndicatorView.startAnimating()
+            self.bind()
         } else {
             showNotFoundView()
         }
+        
+        self.verifyLoginUser()
+        self.addViews()
+        self.makeConstraints()
     }
     
     public override func addViews() {
@@ -105,6 +112,7 @@ public final class FeedDetailViewController: BaseViewController {
             self.commentTextFieldView
         ])
         
+        self.view.addSubview(self.activityIndicatorView)
         self.view.bringSubviewToFront(self.commentTextFieldView)
     }
     
@@ -199,6 +207,7 @@ public final class FeedDetailViewController: BaseViewController {
                 }
                 
                 self?.detailCollectionView.reloadData()
+                self?.activityIndicatorView.stopAnimating()
             }
             .store(in: &cancelBag)
         
@@ -207,7 +216,6 @@ public final class FeedDetailViewController: BaseViewController {
             .receive(on: DispatchQueue.main)
             .sink { value in
                 self.updateLikeTouchableImage(with: value)
-                print(value) // 좋아요 표시 가져올 수 없음 항상 false로 나옴
             }
             .store(in: &cancelBag)
     }

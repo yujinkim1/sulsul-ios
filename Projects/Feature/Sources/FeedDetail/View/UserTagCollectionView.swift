@@ -9,11 +9,9 @@ import UIKit
 import DesignSystem
 
 final class UserTagCollectionView: UICollectionView {
-    private let userTags: [String] = [
-        "#첫번째",
-        "#두번째",
-        "#세번째_입력값_이렇게_이어지면_하나"
-    ]
+    // MARK: - Properites
+    //
+    private var userTags: [String] = []
     
     // MARK: - Initializer
     //
@@ -35,8 +33,13 @@ final class UserTagCollectionView: UICollectionView {
 }
 
 // MARK: - Custom Method
-
+//
 extension UserTagCollectionView {
+    func bind(_ tags: [String]) {
+        self.userTags = tags
+        self.reloadData()
+    }
+    
     private func createFlowLayout() -> UICollectionViewFlowLayout {
         let flowLayout = UICollectionViewFlowLayout().then {
             $0.scrollDirection = .horizontal
@@ -67,9 +70,8 @@ extension UserTagCollectionView: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserTagCell.reuseIdentifier, for: indexPath) as? UserTagCell
         else { return .init() }
         
-        // 실제 데이터를 가져오도록 해야함
-        // 게시글 작성이 안되서 테스트 불가
         let item = userTags[indexPath.item]
+        debugPrint("\(#file): userTags[indexPath.item] >>>> \(userTags[indexPath.item])")
         
         cell.bind(withUserTag: item)
         
@@ -78,7 +80,7 @@ extension UserTagCollectionView: UICollectionViewDataSource {
 }
 
 // MARK: - UICollectionView Delegate
-
+//
 extension UserTagCollectionView: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
