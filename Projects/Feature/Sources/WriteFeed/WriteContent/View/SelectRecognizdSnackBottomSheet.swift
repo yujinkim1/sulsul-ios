@@ -17,7 +17,7 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
     
     private lazy var viewModel = SelectSnackViewModel()
     
-    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 150
+    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 68
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!
     
@@ -86,11 +86,10 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         }
         
         bottomSheetView.translatesAutoresizingMaskIntoConstraints = false
-        let topConstant = view.safeAreaInsets.bottom + view.safeAreaLayoutGuide.layoutFrame.height
-        bottomSheetViewTopConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstant)
+        bottomSheetViewTopConstraint = bottomSheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         NSLayoutConstraint.activate([
-            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: moderateScale(number: 18)),
-            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: moderateScale(number: -18)),
+            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0),
+            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0),
             bottomSheetView.heightAnchor.constraint(equalToConstant: bottomHeight),
             bottomSheetViewTopConstraint
         ])
@@ -122,7 +121,7 @@ extension SelectRecognizdSnackBottomSheet {
         let bottomPadding: CGFloat = view.safeAreaInsets.bottom
         let bottomSheetBottomInset = moderateScale(number: 42)
         
-        bottomSheetViewTopConstraint.constant = (safeAreaHeight + bottomPadding) - bottomHeight - bottomSheetBottomInset
+        bottomSheetViewTopConstraint.constant = 0
         
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
             self.dimmedBackView.alpha = 0.5
