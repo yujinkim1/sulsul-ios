@@ -14,12 +14,13 @@ final class LikeFeedCell: BaseCollectionViewCell<Feed> {
     
     lazy var containerView = TouchableView().then({
         $0.backgroundColor = .black
-        $0.layer.cornerRadius = 12
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
     })
     
     private lazy var feedImageView = UIImageView().then({
-        $0.layer.cornerRadius = 12
-        $0.image = UIImage(systemName: "circle.fill")
+        $0.contentMode = .scaleAspectFill
     })
     
     private lazy var feedTimeLabel = UILabel().then({
@@ -71,23 +72,14 @@ final class LikeFeedCell: BaseCollectionViewCell<Feed> {
     override func bind(_ model: Feed) {
         super.bind(model)
         feedTitleLabel.text = model.title
-        feedTimeLabel.text = model.updatedAt
         if let imageURL = URL(string: model.representImage) {
             feedImageView.kf.setImage(with: imageURL)
         }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        if let date = dateFormatter.date(from: model.createdAt) {
+            feedTimeLabel.text = date.relativeDate()
+        }
     }
-    
-//    override func bind(_ model: Feed) {
-//        super.bind(model)
-//        dateLabel.text = model.createdAt
-//        feedTitleLabel.text = model.title
-//        feedDescriptionLabel.text = model.content
-//        feedCountLabel.text = String(model.images.count)
-//        viewCountLabel.text = String(model.viewCount)
-//        commentLabel.text = String(model.commentsCount)
-//        likeCountLabel.text = String(model.likesCount)
-//        if let imageURL = URL(string: model.representImage) {
-//            feedImageView.kf.setImage(with: imageURL)
-//        }
-//    }
+
 }
