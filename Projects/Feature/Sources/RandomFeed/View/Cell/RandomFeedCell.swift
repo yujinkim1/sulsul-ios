@@ -176,7 +176,8 @@ extension RamdomFeedCell {
         
         bottomGradientView.snp.makeConstraints {
             $0.height.equalTo(moderateScale(number: 270))
-            $0.bottom.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(moderateScale(number: -5))
         }
         
         seeAllLabel.snp.makeConstraints {

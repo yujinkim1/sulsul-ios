@@ -101,6 +101,7 @@ final class WriteContentViewModel {
                     selfRef.error.send(())
                     
                 } else {
+                    selfRef.error.send(())
                     selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                 }
                 print("[/files/upload] Fail : \(error)")
@@ -110,7 +111,7 @@ final class WriteContentViewModel {
     
     private func uploadFeed(_ requestModel: WriteContentModel.WriteFeedRequestModel) {
         guard let url = imageServerURLOfThumnail else {
-            error.send(())
+            completeCreateFeed.send(false)
             return
         }
         

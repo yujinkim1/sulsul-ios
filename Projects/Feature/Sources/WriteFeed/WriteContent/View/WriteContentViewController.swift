@@ -293,13 +293,15 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         self.images = images
         
         images.enumerated().forEach { index, image in
-            let imageView = DeletableImageView(image: image)
+            let imageView = DeletableImageView()
+            
+            imageView.imageView.image = image
             
             if index == 0 {
                 imageView.setDisplayDeleteIcon(true)
                 
             } else {
-                imageView.onTapped { [weak self] in
+                imageView.deleteBackView.onTapped { [weak self] in
                     self?.images.removeAll(where: { $0 == image })
                     imageView.removeFromSuperview()
                 }
