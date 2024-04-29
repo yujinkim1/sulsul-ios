@@ -8,18 +8,19 @@
 import UIKit
 import DesignSystem
 
-final class DeletableImageView: UIImageView {
-    private lazy var deleteBackView = UIView().then {
-        $0.backgroundColor = .clear
-    }
+final class DeletableImageView: UIView {
+    
+    lazy var imageView = UIImageView()
+    
+    lazy var deleteBackView = UIView()
     
     private lazy var deleteImageView = UIImageView().then {
         $0.image = UIImage(named: "filled_clear")?.withTintColor(DesignSystemAsset.gray900.color)
     }
     
-    override init(image: UIImage?) {
-        super.init(image: image)
-        
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        addSubview(imageView)
         addSubview(deleteBackView)
         deleteBackView.addSubview(deleteImageView)
         
@@ -33,9 +34,13 @@ final class DeletableImageView: UIImageView {
             $0.size.equalTo(moderateScale(number: 16.68))
         }
         
-        contentMode = .scaleAspectFill
-        layer.cornerRadius = moderateScale(number: 11.2)
-        clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = moderateScale(number: 11.2)
+        imageView.clipsToBounds = true
+        
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     func setDisplayDeleteIcon(_ isHidden: Bool = false) {
