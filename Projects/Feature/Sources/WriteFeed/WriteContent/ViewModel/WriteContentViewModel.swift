@@ -111,7 +111,7 @@ final class WriteContentViewModel {
     
     private func uploadFeed(_ requestModel: WriteContentModel.WriteFeedRequestModel) {
         guard let url = imageServerURLOfThumnail else {
-            error.send(())
+            completeCreateFeed.send(false)
             return
         }
         
