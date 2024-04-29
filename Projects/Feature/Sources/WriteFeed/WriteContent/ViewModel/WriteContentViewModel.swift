@@ -101,6 +101,7 @@ final class WriteContentViewModel {
                     selfRef.error.send(())
                     
                 } else {
+                    selfRef.error.send(())
                     selfRef.completeRecognizeAI.send(.init(foods: [], alcohols: []))
                 }
                 print("[/files/upload] Fail : \(error)")
