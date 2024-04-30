@@ -38,12 +38,14 @@ public final class ProfileEditViewController: BaseViewController {
     private lazy var modifyProfileButton = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.isHidden = true
     })
     
     private lazy var modifyProfileLabel = TouchableLabel().then({
         $0.text = "사진 변경"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
+        $0.isHidden = true
     })
     
     private lazy var induceUserNameLabel = UILabel().then {
