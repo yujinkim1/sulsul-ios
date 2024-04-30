@@ -232,6 +232,10 @@ public final class SelectSnackViewController: BaseViewController {
     @objc private func didTabNextButton() {
         self.viewModel.sendSetUserSnackPreference()
     }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension SelectSnackViewController: SearchSnack {

@@ -141,4 +141,8 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return moderateScale(number: 22)
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        endEditing(true)
+    }
 }
