@@ -194,8 +194,9 @@ public final class SetNicknameViewController: BaseViewController {
             $0.centerX.equalTo(nextButton)
         }
         nextButton.snp.makeConstraints {
-            $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalTo(topHeaderView).inset(moderateScale(number: 20))
+            let offset = getSafeAreaBottom() + moderateScale(number: 12)
+            $0.bottom.equalToSuperview().inset(offset)
             $0.height.equalTo(moderateScale(number: 50))
         }
     }
