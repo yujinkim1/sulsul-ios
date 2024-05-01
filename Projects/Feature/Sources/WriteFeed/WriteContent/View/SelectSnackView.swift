@@ -108,6 +108,8 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
             
         } else if viewModel.selectedSnackCount() < 5 {
             viewModel.changeSelectedState(isSelect: true, indexPath: indexPath)
+        } else {
+            didTabSnack?.selectedValue(["shouldShowErrorAlert": ()])
         }
 
         if isEditView {
@@ -140,5 +142,9 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return moderateScale(number: 22)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        endEditing(true)
     }
 }

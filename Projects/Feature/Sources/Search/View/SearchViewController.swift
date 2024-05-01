@@ -134,6 +134,12 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
                 }
             }
             .store(in: &cancelBag)
+        
+        viewModel.error
+            .sink { [weak self] in
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+            }
+            .store(in: &cancelBag)
     }
     
     private func setTabEvents() {
@@ -287,6 +293,10 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         }
                 
         return cell
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        view.endEditing(true)
     }
 }
 

@@ -24,21 +24,25 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     private lazy var imageScrollView = UIScrollView().then {
         $0.showsHorizontalScrollIndicator = false
     }
+    
     private lazy var imageStackView = UIStackView().then {
         $0.distribution = .equalSpacing
         $0.spacing = moderateScale(number: 8)
         $0.layoutMargins = UIEdgeInsets(top: 0, left: moderateScale(number: 20), bottom: 0, right: moderateScale(number: 20))
         $0.isLayoutMarginsRelativeArrangement = true
     }
+    
     private lazy var recognizedStackView = UIStackView().then {
         $0.distribution = .fill
         $0.spacing = moderateScale(number: 4)
     }
+    
     private lazy var recognizedTitleLabel = UILabel().then {
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
     }
+    
     private lazy var recognizedContentLabel = UILabel().then {
         $0.text = "AI가 열심히 찾고있어요!"
         $0.textColor = DesignSystemAsset.gray400.color
@@ -117,7 +121,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var iconContainerView = UIView()
+    private lazy var iconContainerView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+    }
+    
     private lazy var iconLineView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray200.color
     }
@@ -519,6 +526,10 @@ extension WriteContentViewController: UITextViewDelegate {
         } else {
             changeActionColor(DesignSystemAsset.main.color)
         }
+    }
+    
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
     }
 }
 
