@@ -65,8 +65,7 @@ class MyFeedView: UIView {
     private func makeConstraints() {
         collectionView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 18))
-            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
     }

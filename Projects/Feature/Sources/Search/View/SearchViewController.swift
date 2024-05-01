@@ -79,7 +79,7 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
     
     public init() {
         super.init(nibName: nil, bundle: nil)
-        
+        hidesBottomBarWhenPushed = true
         titleLabel.text = "검색"
 
         bind()
@@ -93,7 +93,6 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tabBarController?.setTabBarHidden(true)
         self.searchTextField.becomeFirstResponder()
     }
     

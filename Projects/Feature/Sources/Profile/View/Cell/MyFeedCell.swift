@@ -88,6 +88,10 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         $0.textColor = DesignSystemAsset.gray900.color
     })
     
+    private lazy var separateView = UIView().then({
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+    })
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addViews()
@@ -110,7 +114,8 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
                                    commentImageView,
                                    commentLabel,
                                    likeImageView,
-                                   likeCountLabel])
+                                   likeCountLabel,
+                                   separateView])
         feedCountView.addSubviews([feedCountImageView,
                                    feedCountLabel])
     }
@@ -122,15 +127,15 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         }
         dateLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 16))
-            $0.leading.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
         }
         feedImageView.snp.makeConstraints {
             $0.top.equalTo(dateLabel.snp.bottom).offset(moderateScale(number: 8))
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 353))
         }
         feedCountView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(moderateScale(number: 16))
+            $0.leading.equalTo(feedImageView).offset(moderateScale(number: 16))
             $0.bottom.equalTo(feedTitleLabel.snp.top).offset(moderateScale(number: -4))
             $0.width.equalTo(moderateScale(number: 42))
             $0.height.equalTo(moderateScale(number: 22))
@@ -145,18 +150,18 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
             $0.leading.equalTo(feedCountImageView.snp.trailing).offset(moderateScale(number: 2))
         }
         feedTitleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(moderateScale(number: 16))
+            $0.leading.equalTo(feedImageView).offset(moderateScale(number: 16))
             $0.trailing.equalToSuperview().offset(moderateScale(number: -77))
             $0.bottom.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: -16))
         }
         feedDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(feedImageView.snp.bottom).offset(moderateScale(number: 8))
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         viewCountImageView.snp.makeConstraints {
             $0.top.equalTo(feedDescriptionLabel.snp.bottom).offset(moderateScale(number: 11))
-            $0.leading.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(moderateScale(number: -19))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.bottom.equalTo(separateView.snp.top).offset(moderateScale(number: -16))
         }
         viewCountLabel.snp.makeConstraints {
             $0.leading.equalTo(viewCountImageView.snp.trailing).offset(moderateScale(number: 4))
@@ -177,6 +182,11 @@ final class MyFeedCell: BaseCollectionViewCell<Feed> {
         likeCountLabel.snp.makeConstraints {
             $0.leading.equalTo(likeImageView.snp.trailing).offset(moderateScale(number: 4))
             $0.centerY.equalTo(viewCountImageView.snp.centerY)
+        }
+        separateView.snp.makeConstraints {
+            $0.bottom.equalToSuperview()
+            $0.height.equalTo(moderateScale(number: 10))
+            $0.leading.trailing.equalToSuperview()
         }
     }
     
