@@ -82,8 +82,6 @@ public final class FeedDetailViewController: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tabBarController?.setTabBarHidden(true)
-        
         if feedID != 0 {
             self.activityIndicatorView.startAnimating()
             self.bind()

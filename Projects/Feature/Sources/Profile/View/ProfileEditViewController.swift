@@ -13,7 +13,7 @@ import AVFoundation
 import Photos
 import Mantis
 
-public final class ProfileEditViewController: BaseViewController {
+public final class ProfileEditViewController: HiddenTabBarBaseViewController {
     
     var coordinator: MoreBaseCoordinator?
     private let viewModel = ProfileEditViewModel()
@@ -100,7 +100,6 @@ public final class ProfileEditViewController: BaseViewController {
     public lazy var nextButton = DefaultButton(title: "완료")
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         addViews()
@@ -222,7 +221,6 @@ public final class ProfileEditViewController: BaseViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.tabBarController?.setTabBarHidden(true)
             self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
                                         selectAlbumCompletion: self?.openAlbum,
                                         baseCompletion: self?.settingBaseImage)

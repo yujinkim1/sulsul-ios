@@ -11,7 +11,7 @@ import DesignSystem
 import Service
 import Combine
 
-public final class ProfileSettingViewController: BaseViewController {
+public final class ProfileSettingViewController: HiddenTabBarBaseViewController {
     var coordinator: Coordinator?
     private var cancelBag = Set<AnyCancellable>()
     private let viewModel = ProfileSettingViewModel()
@@ -61,7 +61,6 @@ public final class ProfileSettingViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         
         addViews()

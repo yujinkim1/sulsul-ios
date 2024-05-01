@@ -10,7 +10,7 @@ import UIKit
 import DesignSystem
 import Service
 
-public final class SetNicknameViewController: BaseViewController {
+public final class SetNicknameViewController: HiddenTabBarBaseViewController {
     // MARK: - Properties
     //
     var coordinator: AuthBaseCoordinator?
@@ -114,7 +114,6 @@ public final class SetNicknameViewController: BaseViewController {
     // MARK: - Life cycle
     //
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         

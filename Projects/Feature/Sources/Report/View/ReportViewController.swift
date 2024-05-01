@@ -14,7 +14,7 @@ protocol ReportViewControllerDelegate: AnyObject {
     func reportIsComplete()
 }
 
-public final class ReportViewController: BaseViewController {
+public final class ReportViewController: HiddenTabBarBaseViewController {
 
     var coordinator: CommonBaseCoordinator?
     var delegate: ReportViewControllerDelegate
@@ -111,7 +111,7 @@ public final class ReportViewController: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
-        self.tabBarController?.setTabBarHidden(true)
+        
         addViews()
         makeConstraints()
         bind()

@@ -10,7 +10,7 @@ import GoogleSignIn
 import UIKit
 import Combine
 
-public final class AuthViewController: BaseViewController {
+public final class AuthViewController: HiddenTabBarBaseViewController {
     var viewModel: AuthViewModel?
     var coordinator: AuthBaseCoordinator?
     private var cancelBag = Set<AnyCancellable>()
@@ -76,9 +76,8 @@ public final class AuthViewController: BaseViewController {
         $0.setAttributedTitle(attributedText, for: .normal)
         $0.addTarget(self, action: #selector(termsButtonDidTap), for: .touchUpInside)
     }
-
+    
     override public func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         

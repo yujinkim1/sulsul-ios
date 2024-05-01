@@ -26,6 +26,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         self.selectTasteCase = selectTasteCase
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)
@@ -76,7 +77,6 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.tabBarController?.setTabBarHidden(true)
         navigationController?.setNavigationBarHidden(true, animated: false)
         addViews()
         makeConstraints()
