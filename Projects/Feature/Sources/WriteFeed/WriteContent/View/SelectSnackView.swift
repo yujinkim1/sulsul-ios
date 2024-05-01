@@ -108,6 +108,8 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
             
         } else if viewModel.selectedSnackCount() < 5 {
             viewModel.changeSelectedState(isSelect: true, indexPath: indexPath)
+        } else {
+            didTabSnack?.selectedValue(["shouldShowErrorAlert": ()])
         }
 
         if isEditView {
