@@ -70,6 +70,7 @@ public final class CommentViewController: BaseHeaderViewController {
         self.viewModel = CommentViewModel(feedId: feedID)
         
         super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)
@@ -81,8 +82,6 @@ public final class CommentViewController: BaseHeaderViewController {
         super.viewDidLoad()
         
         commentTextField.becomeFirstResponder()
-        
-        tabBarController?.setTabBarHidden(true)
         
         setHeaderText("댓글")
         
