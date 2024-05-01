@@ -232,6 +232,10 @@ public final class SelectSnackViewController: BaseViewController {
     @objc private func didTabNextButton() {
         self.viewModel.sendSetUserSnackPreference()
     }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension SelectSnackViewController: SearchSnack {
@@ -254,21 +258,20 @@ extension SelectSnackViewController: SearchSnack {
 
 extension SelectSnackViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        guard let shouldSetCount = value["shouldSetCount"] as? Void else { return }
-        
-        let selectedSnackCount = viewModel.selectedSnackCount()
-
-        let fullText = "\(selectedSnackCount)개 선택됨"
-        let attribtuedString = NSMutableAttributedString(string: fullText)
-        let range = (fullText as NSString).range(of: "\(selectedSnackCount)개")
-        attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
-        
-        selectedCountLabel.attributedText = attribtuedString
-        selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
-        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
-        nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
-        
-        if selectedSnackCount == 5 {
+        if let _ = value["shouldSetCount"] as? Void {
+            let selectedSnackCount = viewModel.selectedSnackCount()
+            
+            let fullText = "\(selectedSnackCount)개 선택됨"
+            let attribtuedString = NSMutableAttributedString(string: fullText)
+            let range = (fullText as NSString).range(of: "\(selectedSnackCount)개")
+            attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
+            
+            selectedCountLabel.attributedText = attribtuedString
+            selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
+            nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
+            nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
+            
+        } else if let _ = value["shouldShowErrorAlert"] {
             self.showAlertView(withType: .oneButton,
                                 title: "선택 불가",
                                 description: "5개 이상 선택할 수 없어요.",
