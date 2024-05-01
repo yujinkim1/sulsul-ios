@@ -527,6 +527,10 @@ extension WriteContentViewController: UITextViewDelegate {
             changeActionColor(DesignSystemAsset.main.color)
         }
     }
+    
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension WriteContentViewController: OnSelectedValue {
