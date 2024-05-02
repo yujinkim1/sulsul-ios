@@ -9,6 +9,8 @@ import UIKit
 import DesignSystem
 
 final class RelatedFeedCell: UICollectionViewCell {
+    // MARK: - Properties
+    //
     static let reuseIdentifier = "RelatedFeedCell"
     
     // MARK: - Components
@@ -24,7 +26,6 @@ final class RelatedFeedCell: UICollectionViewCell {
         $0.setLineHeight(16, font: Font.regular(size: 10))
         $0.numberOfLines = 1
         $0.font = Font.regular(size: 10)
-        $0.text = "잭 다니엘스"
         $0.textColor = DesignSystemAsset.white.color
     }
     
@@ -32,7 +33,6 @@ final class RelatedFeedCell: UICollectionViewCell {
         $0.setLineHeight(24, font: Font.bold(size: 18))
         $0.numberOfLines = 1
         $0.font = Font.bold(size: 18)
-        $0.text = "맛있고 건간한 채식 요리와 함께 마시는 잭 다니엘스"
         $0.textColor = DesignSystemAsset.white.color
     }
     
@@ -43,8 +43,14 @@ final class RelatedFeedCell: UICollectionViewCell {
     private lazy var scoreLabel = UILabel().then {
         $0.setLineHeight(16, font: Font.bold(size: 12))
         $0.font = Font.bold(size: 12)
-        $0.text = "4.8/5"
         $0.textColor = DesignSystemAsset.gray900.color
+    }
+    
+    override func prepareForReuse() {
+        self.titleLabel.text = nil
+        self.drinkLabel.text = nil
+        self.scoreLabel.text = nil
+        self.imageView.image = nil
     }
     
     // MARK: - Initializer
@@ -66,9 +72,9 @@ final class RelatedFeedCell: UICollectionViewCell {
 
 extension RelatedFeedCell {
     public func bind(_ model: RelatedFeed) {
-        let imageURL = model.representImage
-        if let image = URL(string: imageURL) {
-            self.imageView.loadImage(image)
+        let imageURLString = model.representImage
+        if let imageURL = URL(string: imageURLString) {
+            self.imageView.kf.setImage(with: imageURL)
         }
         
         self.scoreLabel.text = "\(model.score)/5"
