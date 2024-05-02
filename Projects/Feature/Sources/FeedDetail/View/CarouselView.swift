@@ -103,7 +103,7 @@ extension CarouselView {
         self.indicatorView.widthRatio = 1.0 / Double(feedImages.count)
         
         self.indicatorView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
             $0.top.equalTo(self.scrollView.snp.bottom).offset(moderateScale(number: 16))
             $0.height.equalTo(moderateScale(number: 2))
         }
@@ -125,7 +125,7 @@ extension CarouselView {
     
     private func makeConstraints() {
         self.scrollView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.top.equalToSuperview()
         }
         
         self.imageStackView.snp.makeConstraints {
