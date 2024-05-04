@@ -68,7 +68,7 @@ open class BaseViewController: UIViewController {
             
             changedKeyboardHeight.send(0)
             
-            self.keyboardHeight = keyboardHeight
+            self.keyboardHeight = 0
         }
     }
     
@@ -107,7 +107,7 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(toastView)
         
         toastView.snp.makeConstraints {
-            let inset: CGFloat = keyboardHeight == 0 ? 100 : 15
+            let inset: CGFloat = keyboardHeight == 0 ? 110 : 15
             
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: inset))

@@ -130,7 +130,7 @@ final class WriteContentViewModel {
             guard let selfRef = self else { return }
 
             switch result {
-            case .success(let response):
+            case .success(_):
                 UserDefaultsUtil.shared.remove(.feedTitle)
                 UserDefaultsUtil.shared.remove(.feedContent)
                 selfRef.completeCreateFeed.send(true)
