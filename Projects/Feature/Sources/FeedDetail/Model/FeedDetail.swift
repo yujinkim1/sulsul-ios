@@ -12,6 +12,7 @@ struct FeedDetail: Decodable {
     let writerInfo: FeedDetail.WriterInfo?
     let title: String
     let content: String
+    let representImage: String
     let images: [String]
     let alcoholPairingIDs: [Int]
     let snackPairingIDs: [Int]
@@ -28,6 +29,7 @@ struct FeedDetail: Decodable {
         case writerInfo = "writer_info"
         case title
         case content
+        case representImage = "represent_image"
         case images
         case alcoholPairingIDs = "alcohol_pairing_ids"
         case snackPairingIDs = "food_pairing_ids"
@@ -47,6 +49,7 @@ struct FeedDetail: Decodable {
         self.writerInfo = try? container.decode(FeedDetail.WriterInfo.self, forKey: FeedDetail.CodingKeys.writerInfo)
         self.title = try container.decode(String.self, forKey: FeedDetail.CodingKeys.title)
         self.content = try container.decode(String.self, forKey: FeedDetail.CodingKeys.content)
+        self.representImage = try container.decode(String.self, forKey: FeedDetail.CodingKeys.representImage)
         self.images = try container.decode([String].self, forKey: FeedDetail.CodingKeys.images)
         self.alcoholPairingIDs = try container.decode([Int].self, forKey: FeedDetail.CodingKeys.alcoholPairingIDs)
         self.snackPairingIDs = try container.decode([Int].self, forKey: FeedDetail.CodingKeys.snackPairingIDs)
