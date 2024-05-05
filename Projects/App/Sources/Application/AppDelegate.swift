@@ -12,7 +12,7 @@ import Service
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -21,9 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         removeKeychainAtFirstLaunch()
         return true
     }
-
+    
     // MARK: UISceneSession Lifecycle
-
+    
     func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UserDefaultsUtil.shared.remove(.feedContent)
         UserDefaultsUtil.shared.remove(.feedTitle)
     }
-
+    
     func application(
         _ application: UIApplication,
         didDiscardSceneSessions sceneSessions: Set<UISceneSession>
@@ -52,6 +52,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return true
             }
             return false
+        }
+    
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        
+        // 세로방향 고정
+        return UIInterfaceOrientationMask.portrait
     }
     
     private func removeKeychainAtFirstLaunch() {
