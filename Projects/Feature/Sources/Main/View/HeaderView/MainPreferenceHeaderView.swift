@@ -52,7 +52,8 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
     
     private func makeConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.bottom.trailing.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
         titleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
