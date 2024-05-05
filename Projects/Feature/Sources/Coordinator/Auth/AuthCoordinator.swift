@@ -38,8 +38,13 @@ final class AuthCoordinator: AuthBaseCoordinator {
         case .login:
             let loginVC = AuthViewController()
             loginVC.coordinator = self
-            currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
-            currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            if userData?["popToRoot"] != nil {
+                currentNavigationViewController?.popToRootViewController(animated: false)
+                currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            } else {
+                currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
+                currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            }
         }
     }
     
