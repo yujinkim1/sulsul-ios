@@ -137,6 +137,11 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     private func bind() {
+        viewModel.userInfoPublisher()
+            .sink { [weak self] _ in
+                self?.viewModel.sendPairingsValue(PairingType.drink)
+            }.store(in: &cancelBag)
+        
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.drinkCollectionView.reloadData()
         }
@@ -172,6 +177,8 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func setupIfNeeded() {
