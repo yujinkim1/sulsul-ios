@@ -106,7 +106,9 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     private func makeConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+//            $0.edges.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         feedImageView.snp.makeConstraints {
             $0.top.trailing.leading.equalToSuperview()
