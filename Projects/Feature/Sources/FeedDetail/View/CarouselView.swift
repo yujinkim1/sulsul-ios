@@ -22,6 +22,7 @@ final class CarouselView: UIView {
     private lazy var imageStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .equalCentering
+        $0.spacing = 20
         $0.alignment = .fill
     }
     
@@ -151,6 +152,16 @@ extension CarouselView {
 // MARK: - UIScrollView Delegate
 
 extension CarouselView: UIScrollViewDelegate {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let scrollViewWidth = scrollView.frame.size.width
+        let currentIndex = Int(scrollView.contentOffset.x / scrollViewWidth)
+        let imageViewWidth = scrollViewWidth + 20
+        let targetContentOffsetX = CGFloat(currentIndex) * imageViewWidth
+        
+        // 스크롤 뷰의 컨텐츠 오프셋을 조정해서 스냅 효과 구현
+        scrollView.setContentOffset(CGPoint(x: targetContentOffsetX, y: 0), animated: true)
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 스크롤 되었을 때마다 이미지 인디케이터가 움직이고 라벨 값을 갱신
         //
