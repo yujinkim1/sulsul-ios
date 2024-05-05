@@ -144,6 +144,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
         super.init(frame: frame)
         
         self.backgroundColor = .clear
+        self.containerView.isHidden = true
         
         self.addViews()
         self.makeConstraints()
@@ -161,7 +162,7 @@ extension FeedDetailMainCell {
     func bind(_ model: FeedDetail) {
         self.carouselView.bind(model)
         
-        updateScore(to: model.score)
+        self.updateScore(to: model.score)
         
         textView.text = model.content
         updateTextViewHeight(textView)
@@ -200,17 +201,26 @@ extension FeedDetailMainCell {
         } else {
             createdAtLabel.text = model.createdAt
         }
+        
+        self.containerView.isHidden = false
     }
     
     private func addViews() {
         self.containerView.addSubviews([
-            self.carouselView, self.indicatorView,
-            self.profileImageView, self.usernameLabel,
-            self.createdAtLabel, self.textView,
-            self.scoreLabel, self.scoreLevelImageView,
-            self.feedViewsStackView, self.feedCommentsStackView,
-            self.feedLikesStackView, self.pairingStackView,
-            self.userTagCollectionView, self.separatorView
+            self.carouselView, 
+            self.indicatorView,
+            self.profileImageView, 
+            self.usernameLabel,
+            self.createdAtLabel, 
+            self.textView,
+            self.scoreLabel, 
+            self.scoreLevelImageView,
+            self.feedViewsStackView, 
+            self.feedCommentsStackView,
+            self.feedLikesStackView, 
+            self.pairingStackView,
+            self.userTagCollectionView,
+            self.separatorView
         ])
         
         self.addSubview(self.containerView)
@@ -228,8 +238,8 @@ extension FeedDetailMainCell {
         }
         
         self.profileImageView.snp.makeConstraints {
-            $0.leading.equalTo(carouselView).inset(moderateScale(number: 20))
-            $0.top.equalTo(carouselView.snp.bottom).offset(moderateScale(number: 26))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.top.equalTo(carouselView.snp.bottom).offset(moderateScale(number: 24))
             $0.size.equalTo(moderateScale(number: 40))
         }
         
@@ -244,12 +254,12 @@ extension FeedDetailMainCell {
         }
         
         self.scoreLevelImageView.snp.makeConstraints {
-            $0.trailing.equalTo(carouselView).inset(moderateScale(number: 20))
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.top.equalTo(scoreLabel)
         }
         
         self.pairingStackView.snp.makeConstraints {
-            $0.trailing.equalTo(carouselView).inset(moderateScale(number: 20))
+            $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.top.equalTo(scoreLabel.snp.bottom).offset(moderateScale(number: 2))
         }
         
@@ -259,20 +269,20 @@ extension FeedDetailMainCell {
         }
         
         self.textView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(carouselView).inset(moderateScale(number: 20))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.top.equalTo(profileImageView.snp.bottom).offset(moderateScale(number: 18))
             $0.height.equalTo(moderateScale(number: 144))
         }
         
         self.userTagCollectionView.snp.makeConstraints {
             $0.leading.trailing.equalTo(textView)
+            $0.top.equalTo(self.textView.snp.bottom).offset(moderateScale(number: 32))
             $0.bottom.equalTo(feedViewsStackView.snp.top).offset(moderateScale(number: -16))
-            $0.height.equalTo(moderateScale(number: 52))
         }
         
         self.feedViewsStackView.snp.makeConstraints {
-            $0.leading.equalTo(carouselView).inset(moderateScale(number: 20))
-            $0.bottom.equalTo(separatorView.snp.top).offset(moderateScale(number: -22))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.bottom.equalTo(separatorView.snp.top).offset(-moderateScale(number: 22))
         }
         
         self.feedCommentsStackView.snp.makeConstraints {
@@ -292,13 +302,30 @@ extension FeedDetailMainCell {
     }
     
     private func updateUserTags(to tags: [String]) {
-        debugPrint("\(#file): \(tags)")
         if !tags.isEmpty {
             self.userTagCollectionView.bind(tags)
         }
         
         if tags.isEmpty {
             self.userTagCollectionView.removeFromSuperview()
+            
+            self.feedViewsStackView.snp.remakeConstraints {
+                $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+                $0.top.equalTo(self.textView.snp.bottom).offset(moderateScale(number: 32))
+                $0.bottom.equalTo(separatorView.snp.top).offset(-moderateScale(number: 22))
+            }
+            
+            self.feedCommentsStackView.snp.remakeConstraints {
+                $0.leading.equalTo(feedViewsStackView.snp.trailing).offset(moderateScale(number: 16))
+                $0.top.equalTo(self.feedViewsStackView)
+                $0.bottom.equalTo(feedViewsStackView)
+            }
+            
+            self.feedLikesStackView.snp.remakeConstraints {
+                $0.leading.equalTo(feedCommentsStackView.snp.trailing).offset(moderateScale(number: 16))
+                $0.top.equalTo(self.feedViewsStackView)
+                $0.bottom.equalTo(feedViewsStackView)
+            }
         }
     }
     
