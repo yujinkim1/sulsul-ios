@@ -16,7 +16,8 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     private lazy var feedImageView = UIImageView().then({
         $0.layer.cornerRadius = 12
-        $0.backgroundColor = .white
+        $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
     })
     
     private lazy var nickNameView = UIView().then({
