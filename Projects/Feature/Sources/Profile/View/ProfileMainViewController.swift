@@ -201,7 +201,8 @@ public final class ProfileMainViewController: BaseViewController {
         }
         likeFeedView.snp.makeConstraints {
             $0.top.equalTo(selectFeedView.snp.bottom)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: -10))
+            $0.trailing.bottom.equalToSuperview()
         }
     }
     

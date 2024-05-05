@@ -54,11 +54,11 @@ final class MainLikeHeaderView: UICollectionReusableView {
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(separatorView.snp.bottom).offset(moderateScale(number: 16))
-            $0.leading.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
         subTitleLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(moderateScale(number: 2))
-            $0.leading.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
     }
     

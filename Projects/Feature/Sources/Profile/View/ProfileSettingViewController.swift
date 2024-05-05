@@ -56,15 +56,23 @@ public final class ProfileSettingViewController: HiddenTabBarBaseViewController 
     private lazy var logoutTouchaleLabel = TouchableLabel().then({
         $0.textColor = DesignSystemAsset.red050.color
         $0.font = Font.bold(size: 16)
-        $0.text = StaticValues.isLoggedIn.value ? "로그아웃" : "로그인"
+        $0.text = "로그아웃"
+    })
+    private lazy var loginDefaultButton = DefaultButton(title: "로그인 해볼까요?").then({
+        $0.setClickable(true)
+        $0.isHidden = true
     })
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
-        
-        addViews()
-        makeConstraints()
+        if StaticValues.isLoggedIn.value {
+            loginDefaultButton.isHidden = true
+            logoutTouchaleLabel.isHidden = false
+        } else {
+            loginDefaultButton.isHidden = false
+            logoutTouchaleLabel.isHidden = true
+        }
         bind()
     }
     
@@ -89,7 +97,8 @@ public final class ProfileSettingViewController: HiddenTabBarBaseViewController 
         scrollView.addSubview(containerView)
         containerView.addSubviews([titleLabel,
                                    settingStackView,
-                                   logoutTouchaleLabel])
+                                   logoutTouchaleLabel,
+                                   loginDefaultButton])
         settingStackView.addArrangedSubviews([managementTitleLabel,
                                               drinkSettingView,
                                               snackSettingView,
@@ -129,6 +138,11 @@ public final class ProfileSettingViewController: HiddenTabBarBaseViewController 
         logoutTouchaleLabel.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(moderateScale(number: getSafeAreaBottom() + 22))
             $0.centerX.equalToSuperview()
+        }
+        loginDefaultButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(moderateScale(number: getSafeAreaBottom() + 8))
+            $0.height.equalTo(moderateScale(number: 52))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
     }
     
@@ -181,6 +195,9 @@ public final class ProfileSettingViewController: HiddenTabBarBaseViewController 
                 self?.navigationController?.popViewController(animated: true)
             },
                                 cancelCompletion: nil)
+        }
+        loginDefaultButton.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: ["popToRoot": true])
         }
     }
 }

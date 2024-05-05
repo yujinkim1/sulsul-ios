@@ -97,7 +97,7 @@ class LikeFeedView: UIView {
             
             let section = NSCollectionLayoutSection(group: group)
             
-            section.interGroupSpacing = 10
+            section.interGroupSpacing = moderateScale(number: 10)
             
             return section
         }

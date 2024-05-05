@@ -34,7 +34,9 @@ final class MainPreferenceCell: UICollectionViewCell {
     
     private func makeConstraints() {
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+//            $0.edges.equalToSuperview()
+            $0.top.bottom.trailing.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
     }
     
