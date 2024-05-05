@@ -13,6 +13,7 @@ final class CarouselView: UIView {
     //
     private lazy var scrollView = UIScrollView().then {
         $0.clipsToBounds = false
+        $0.showsVerticalScrollIndicator = false
         $0.showsHorizontalScrollIndicator = false
         $0.isPagingEnabled = true
         $0.delegate = self
@@ -21,7 +22,7 @@ final class CarouselView: UIView {
     private lazy var imageStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .equalCentering
-        $0.spacing = 20
+        $0.alignment = .fill
     }
     
     private lazy var imageView = UIImageView(frame: .zero).then {
@@ -74,7 +75,6 @@ extension CarouselView {
     func bind(_ model: FeedDetail) {
         var feedImages = model.images
         feedImages.insert(model.representImage, at: 0)
-        print("feedImages >>>> \(feedImages)")
         
         feedImages.forEach { image in
             if let imageURL = URL(string: image) {
@@ -129,17 +129,17 @@ extension CarouselView {
         }
         
         self.imageStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalTo(self.scrollView.contentLayoutGuide)
         }
         
         self.imageIndexLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(moderateScale(number: 18))
+            $0.top.equalToSuperview().offset(moderateScale(number: 239))
             $0.bottom.equalTo(self.titleLabel.snp.top).offset(-moderateScale(number: 4))
         }
         
         self.titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 18))
-            $0.bottom.equalToSuperview().inset(moderateScale(number: 32))
         }
     }
     
@@ -162,14 +162,5 @@ extension CarouselView: UIScrollViewDelegate {
         
         self.updateImageIndexLabel(currentIndex, numberOfImages)
         self.indicatorView.updateLeadingOffsetRatio(ratio)
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        // 스크롤할 때마다 이미지 뷰를 중앙에 위치하도록 콘텐츠 오프셋을 설정
-        //
-        let currentIndex = Int(scrollView.contentOffset.x / scrollView.frame.size.width)
-        let offsetX = CGFloat(currentIndex) * scrollView.frame.size.width
-        
-        scrollView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
     }
 }
