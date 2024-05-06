@@ -16,7 +16,8 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     private lazy var feedImageView = UIImageView().then({
         $0.layer.cornerRadius = 12
-        $0.backgroundColor = .white
+        $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
     })
     
     private lazy var nickNameView = UIView().then({
@@ -106,7 +107,8 @@ final class MainDifferenceCell: UICollectionViewCell {
     
     private func makeConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         feedImageView.snp.makeConstraints {
             $0.top.trailing.leading.equalToSuperview()

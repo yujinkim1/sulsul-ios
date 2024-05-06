@@ -9,7 +9,7 @@ import Combine
 import UIKit
 import DesignSystem
 
-final class DetailDrinkViewController: BaseViewController {
+final class DetailDrinkViewController: HiddenTabBarBaseViewController {
     var coordinator: RankingBaseCoordinator?
     // MARK: - Custom Property
     private var cancelBag = Set<AnyCancellable>()
@@ -98,7 +98,6 @@ final class DetailDrinkViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        tabBarController?.setTabBarHidden(true)
         
         prepareStackViews()
         addViews()

@@ -13,7 +13,7 @@ import AVFoundation
 import Photos
 import Mantis
 
-public final class ProfileEditViewController: BaseViewController {
+public final class ProfileEditViewController: HiddenTabBarBaseViewController {
     
     var coordinator: MoreBaseCoordinator?
     private let viewModel = ProfileEditViewModel()
@@ -38,12 +38,14 @@ public final class ProfileEditViewController: BaseViewController {
     private lazy var modifyProfileButton = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.isHidden = true
     })
     
     private lazy var modifyProfileLabel = TouchableLabel().then({
         $0.text = "사진 변경"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
+        $0.isHidden = true
     })
     
     private lazy var induceUserNameLabel = UILabel().then {
@@ -98,7 +100,6 @@ public final class ProfileEditViewController: BaseViewController {
     public lazy var nextButton = DefaultButton(title: "완료")
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         addViews()
@@ -208,8 +209,9 @@ public final class ProfileEditViewController: BaseViewController {
             $0.centerX.equalToSuperview()
         }
         nextButton.snp.makeConstraints {
-            $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalTo(topHeaderView).inset(moderateScale(number: 20))
+            let offset = getSafeAreaBottom() + moderateScale(number: 12)
+            $0.bottom.equalToSuperview().inset(offset)
             $0.height.equalTo(moderateScale(number: 50))
         }
     }
@@ -219,7 +221,6 @@ public final class ProfileEditViewController: BaseViewController {
             self?.navigationController?.popViewController(animated: true)
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
-            self?.tabBarController?.setTabBarHidden(true)
             self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
                                         selectAlbumCompletion: self?.openAlbum,
                                         baseCompletion: self?.settingBaseImage)

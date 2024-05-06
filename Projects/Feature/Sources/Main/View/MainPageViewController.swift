@@ -24,11 +24,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         $0.tintColor = DesignSystemAsset.gray900.color
     })
     
-    private lazy var settingTouchableImageView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(named: "common_setting")
-        $0.tintColor = DesignSystemAsset.gray900.color
-    })
-    
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(collectionViewIsRefreshed) , for: .valueChanged)
@@ -71,18 +66,13 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         searchTouchableIamgeView.onTapped { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
         }
-        
-        settingTouchableImageView.onTapped { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.setting), userData: nil)
-        }
     }
     
     public override func addViews() {
         view.addSubviews([topHeaderView,
                           mainCollectionView])
         
-        topHeaderView.addSubviews([searchTouchableIamgeView,
-                                   settingTouchableImageView])
+        topHeaderView.addSubviews([searchTouchableIamgeView])
     }
     
     public override func makeConstraints() {
@@ -92,11 +82,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             $0.top.equalTo(view.safeAreaLayoutGuide)
         }
         searchTouchableIamgeView.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(settingTouchableImageView.snp.leading).offset(moderateScale(number: -12))
-            $0.size.equalTo(moderateScale(number: 24))
-        }
-        settingTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
             $0.size.equalTo(moderateScale(number: 24))

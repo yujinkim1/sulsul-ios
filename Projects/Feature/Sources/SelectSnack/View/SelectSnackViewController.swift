@@ -13,7 +13,7 @@ protocol SearchSnack: AnyObject {
     func searchSnackWith(_ searchText: String)
 }
 
-public final class SelectSnackViewController: BaseViewController {
+public final class SelectSnackViewController: HiddenTabBarBaseViewController {
     
     var coordinator: Coordinator?
     private lazy var cancelBag = Set<AnyCancellable>()
@@ -108,7 +108,6 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         

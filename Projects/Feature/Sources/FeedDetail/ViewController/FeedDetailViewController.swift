@@ -259,7 +259,7 @@ public final class FeedDetailViewController: BaseViewController {
         return UICollectionViewCompositionalLayout { sectionIndex, _ in
             switch sectionIndex {
             case 0:
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(747))
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(647))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: itemSize.heightDimension)
@@ -325,14 +325,6 @@ public final class FeedDetailViewController: BaseViewController {
 // MARK: - Custom method
 
 extension FeedDetailViewController {
-    private func editFeed() {
-        // TODO: 피드 수정은 어떻게?
-    }
-    
-    private func deleteFeed() {
-        // TODO: 피드 삭제 구현해야함
-    }
-    
     private func reportFeed() {
         let viewModel = ReportViewModel(reportType: .feed, targetId: feedID)
         let viewController = ReportViewController(viewModel: viewModel,
@@ -340,6 +332,14 @@ extension FeedDetailViewController {
         
         self.navigationController?.pushViewController(viewController, animated: true)
         self.tabBarController?.setTabBarHidden(true)
+    }
+    
+    private func editFeed() {
+        // 피드 수정
+    }
+    
+    private func deleteFeed() {
+        // 피드 삭제
     }
     
     private func showFeedDetailMenuBottomSheet(

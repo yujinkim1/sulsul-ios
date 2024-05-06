@@ -26,6 +26,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         self.selectTasteCase = selectTasteCase
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
     }
     
     @available(*, unavailable)
@@ -76,7 +77,6 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.tabBarController?.setTabBarHidden(true)
         navigationController?.setNavigationBarHidden(true, animated: false)
         addViews()
         makeConstraints()
@@ -137,6 +137,11 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     private func bind() {
+        viewModel.userInfoPublisher()
+            .sink { [weak self] _ in
+                self?.viewModel.sendPairingsValue(PairingType.drink)
+            }.store(in: &cancelBag)
+        
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.drinkCollectionView.reloadData()
         }
@@ -172,6 +177,8 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func setupIfNeeded() {

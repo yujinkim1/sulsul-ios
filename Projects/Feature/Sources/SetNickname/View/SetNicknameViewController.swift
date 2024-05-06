@@ -10,7 +10,7 @@ import UIKit
 import DesignSystem
 import Service
 
-public final class SetNicknameViewController: BaseViewController {
+public final class SetNicknameViewController: HiddenTabBarBaseViewController {
     // MARK: - Properties
     //
     var coordinator: AuthBaseCoordinator?
@@ -114,7 +114,6 @@ public final class SetNicknameViewController: BaseViewController {
     // MARK: - Life cycle
     //
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         
@@ -194,8 +193,9 @@ public final class SetNicknameViewController: BaseViewController {
             $0.centerX.equalTo(nextButton)
         }
         nextButton.snp.makeConstraints {
-            $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalTo(topHeaderView).inset(moderateScale(number: 20))
+            let offset = getSafeAreaBottom() + moderateScale(number: 12)
+            $0.bottom.equalToSuperview().inset(offset)
             $0.height.equalTo(moderateScale(number: 50))
         }
     }

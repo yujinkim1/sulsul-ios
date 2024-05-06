@@ -9,21 +9,26 @@ import UIKit
 import DesignSystem
 
 final class CarouselCell: UICollectionViewCell {
+    // MARK: - Properties
+    //
     static let reuseIdentifier = "CarouselCell"
     
-    private lazy var imageView = UIImageView().then {
-        $0.contentMode = .scaleToFill
+    // MARK: - Components
+    //
+    private lazy var imageView = UIImageView(frame: .zero).then {
+        $0.contentMode = .scaleAspectFill
     }
     
-    private lazy var blendView = UIView().then {
-        $0.frame = .zero
+    private lazy var blendView = UIView(frame: .zero).then {
         $0.layer.backgroundColor = DesignSystemAsset.black.color.cgColor.copy(alpha: 0.2)
     }
     
+    // MARK: - Initializer
+    //
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.layer.cornerRadius = CGFloat(20)
+        self.layer.cornerRadius = 20
         self.layer.borderColor = .none
         self.layer.borderWidth = .zero
         self.layer.masksToBounds = true
@@ -39,12 +44,24 @@ final class CarouselCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind(withURL imageURL: String) {
-        if let image = URL(string: imageURL) {
-            self.imageView.loadImage(image)
+    override func prepareForReuse() {
+        self.imageView.image = nil
+    }
+}
+
+// MARK: - Custom method
+//
+extension CarouselCell {
+    func bind(with imageURLString: String) {
+        if let imageURL = URL(string: imageURLString) {
+            self.imageView.kf.setImage(with: imageURL)
+            
+            debugPrint("\(#fileID) - Image URL is available.")
         } else {
-            self.imageView.image = UIImage()
-            debugPrint("Image URL is not available.")
+            self.imageView.image = nil
+            self.imageView.layer.backgroundColor = DesignSystemAsset.gray900.color.cgColor
+            
+            debugPrint("\(#fileID) - Image URL is not available.")
         }
     }
     
