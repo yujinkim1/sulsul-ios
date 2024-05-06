@@ -63,6 +63,8 @@ final class SelectDrinkBottomSheetViewController: BaseViewController {
                 self?.snackSortTableView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        viewModel.sendPairingsValue(.drink)
     }
     
     override func viewDidAppear(_ animated: Bool) {
