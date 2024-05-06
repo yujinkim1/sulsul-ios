@@ -77,6 +77,11 @@ final class SelectSnackView: UIView {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.bottom.equalToSuperview()
         }
+        
+        resultEmptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBarView.snp.bottom).offset(moderateScale(number: 74))
+            $0.centerX.equalToSuperview()
+        }
     }
 }
 

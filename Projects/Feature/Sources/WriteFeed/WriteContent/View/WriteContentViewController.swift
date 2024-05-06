@@ -223,18 +223,18 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             .sink { [weak self] isSuccessed in
                 if isSuccessed {
                     let rootVC = self?.coordinator?.currentNavigationViewController?.viewControllers.first as? BaseViewController
-                    rootVC?.showToastMessageView(toastType: .success, title: "게시글 작성 완료!")
+                    rootVC?.showToastMessageView(toastType: .success, title: "게시글 작성 완료!", inset: 64)
                     
                     self?.coordinator?.currentNavigationViewController?.popToRootViewController(animated: true)
                 } else {
-                    self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+                    self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.", inset: 64)
                 }
             }
             .store(in: &cancelBag)
         
         viewModel.errorPublisher()
             .sink { [weak self] in
-                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.", inset: 64)
             }
             .store(in: &cancelBag)
     }
@@ -243,9 +243,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         tagAddButton.onTapped { [weak self] in
             guard let selfRef = self else { return }
             
+            self?.tagTextView.becomeFirstResponder()
+            
             if selfRef.tagContainerView.isHidden {
                 self?.tagTextView.text = "#"
-                self?.tagTextView.becomeFirstResponder()
                 self?.tagContainerView.isHidden = false
                 
             } else {
@@ -263,7 +264,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             guard let selfRef = self else { return }
             
             if selfRef.images.count == 5 {
-                selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요")
+                selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요", inset: 64)
             } else {
                 if let galleryVC = selfRef.coordinator?.currentNavigationViewController?.viewControllers[1] {
                     self?.coordinator?.currentNavigationViewController?.popToViewController(galleryVC, animated: true)
@@ -481,7 +482,7 @@ extension WriteContentViewController: UITextViewDelegate {
             let numberOfChars = newText.count
             
             if !(numberOfChars <= 500) {
-                showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.")
+                showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.", inset: 64)
             }
             
             return numberOfChars <= 500

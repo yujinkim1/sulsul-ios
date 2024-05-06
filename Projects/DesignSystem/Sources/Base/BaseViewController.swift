@@ -68,7 +68,7 @@ open class BaseViewController: UIViewController {
             
             changedKeyboardHeight.send(0)
             
-            self.keyboardHeight = keyboardHeight
+            self.keyboardHeight = 0
         }
     }
     
@@ -99,7 +99,7 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(alertView)
     }
     
-    open func showToastMessageView(toastType: ToastType, title: String, completion: (() -> Void)? = nil) {
+    open func showToastMessageView(toastType: ToastType, title: String, inset: CGFloat? = nil, completion: (() -> Void)? = nil) {
         let toastView = ToastMessageView()
         toastView.bind(toastType: toastType, title: title)
         
@@ -107,7 +107,7 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(toastView)
         
         toastView.snp.makeConstraints {
-            let inset: CGFloat = keyboardHeight == 0 ? 100 : 15
+            let inset: CGFloat = keyboardHeight == 0 ? 102 : (inset ?? 16)
             
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: inset))

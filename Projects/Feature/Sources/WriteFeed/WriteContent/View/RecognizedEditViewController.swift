@@ -88,8 +88,10 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         snackBackView.onTapped { [weak self] in
             let vc = SelectRecognizdSnackBottomSheet()
             vc.delegate = self
-            vc.modalPresentationStyle = .overFullScreen
-            self?.present(vc, animated: false)
+            let viewController = UINavigationController(rootViewController: vc)
+            
+            viewController.modalPresentationStyle = .fullScreen
+            self?.present(viewController, animated: true)
         }
         
         saveButton.onTapped { [weak self] in

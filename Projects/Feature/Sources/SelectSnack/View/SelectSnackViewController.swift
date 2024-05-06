@@ -25,7 +25,7 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
     private lazy var topHeaderView = UIView()
     
     private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "common_backArrow"), for: .normal)
+        $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
@@ -128,6 +128,11 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
+        
+        selectSnackView.resultEmptyView.addSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     public override func addViews() {
@@ -214,10 +219,6 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
-    }
-    
-    @objc private func didTabAddSnackButton() {
-        
     }
     
     @objc private func didTabBackButton() {
