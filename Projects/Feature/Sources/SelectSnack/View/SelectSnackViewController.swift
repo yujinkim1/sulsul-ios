@@ -25,7 +25,7 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
     private lazy var topHeaderView = UIView()
     
     private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "common_backArrow"), for: .normal)
+        $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
