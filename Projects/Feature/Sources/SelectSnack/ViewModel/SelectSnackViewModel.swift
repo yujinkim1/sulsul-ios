@@ -11,6 +11,18 @@ import Service
 import Alamofire
 
 final class SelectSnackViewModel {
+    private lazy var foodCategories: [String: String] = [
+        "패스트푸드": "🍕",
+        "육류": "🥩",
+        "탕류": "🍲",
+        "튀김류": "🍤",
+        "과일": "🍎",
+        "과자": "🥨",
+        "밥류": "🍚",
+        "면류": "🍜",
+        "회": "🐟",
+    ]
+    
     private lazy var jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private lazy var mapper = PairingModelMapper()
@@ -98,7 +110,7 @@ final class SelectSnackViewModel {
                 cellModelsOfSameSection.append(snack)
             } else {
                 let beforeCellModel = snackModels[index - 1]
-                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: beforeCellModel.image)
+                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: foodCategories[beforeCellModel.subtype] ?? "")
                 let completedSectionModel: SnackSectionModel = .init(cellModels: cellModelsOfSameSection, headerModel: headerModel)
                 
                 sectionModels.append(completedSectionModel)
