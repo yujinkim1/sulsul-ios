@@ -243,9 +243,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         tagAddButton.onTapped { [weak self] in
             guard let selfRef = self else { return }
             
+            self?.tagTextView.becomeFirstResponder()
+            
             if selfRef.tagContainerView.isHidden {
                 self?.tagTextView.text = "#"
-                self?.tagTextView.becomeFirstResponder()
                 self?.tagContainerView.isHidden = false
                 
             } else {

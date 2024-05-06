@@ -60,6 +60,17 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
                 self?.selectSnackView.snackTableView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        viewModel.searchResultCountDataPublisher().sink { [weak self] searchResultCount in
+            self?.selectSnackView.resultEmptyView.isHidden = !(searchResultCount == 0)
+            self?.selectSnackView.snackTableView.isHidden = searchResultCount == 0
+        }
+        .store(in: &cancelBag)
+        
+        selectSnackView.resultEmptyView.addSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

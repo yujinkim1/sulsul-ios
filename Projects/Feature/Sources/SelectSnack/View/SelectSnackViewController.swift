@@ -128,6 +128,11 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
+        
+        selectSnackView.resultEmptyView.addSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     public override func addViews() {
@@ -214,10 +219,6 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
-    }
-    
-    @objc private func didTabAddSnackButton() {
-        
     }
     
     @objc private func didTabBackButton() {
