@@ -59,8 +59,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        addViews()
-        makeConstraints()
         bind()
         
         searchTouchableIamgeView.onTapped { [weak self] in
