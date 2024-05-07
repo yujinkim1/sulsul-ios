@@ -284,9 +284,9 @@ extension MainPageViewController: UICollectionViewDataSource {
             let popularFeed = viewModel.getPopularFeedsValue()[indexPath.item]
             cell.bind(popularFeed)
             
-//            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-//                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": popularFeed.)
-//            }
+            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.combineFeed), userData: ["popularFeed": popularFeed])
+            }
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }

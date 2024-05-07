@@ -65,6 +65,7 @@ enum CommonScene {
     case search
     case comment
     case detailFeed
+    case combineFeed
     case setting
     case selectSnack
     case selectDrink
