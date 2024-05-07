@@ -65,6 +65,7 @@ public final class CombineFeedViewController: HiddenTabBarBaseViewController {
     }
     
     public override func setupIfNeeded() {
+        topHeaderView.setTitle(popularFeed.title)
         topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
@@ -78,6 +79,8 @@ public final class CombineFeedViewController: HiddenTabBarBaseViewController {
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
             let section = NSCollectionLayoutSection(group: group)
+            section.interGroupSpacing = moderateScale(number: 16)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
             
             return section
         }

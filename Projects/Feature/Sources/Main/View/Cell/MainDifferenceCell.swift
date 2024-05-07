@@ -11,11 +11,13 @@ import DesignSystem
 final class MainDifferenceCell: UICollectionViewCell {
     
     lazy var containerView = TouchableView().then({
-        $0.backgroundColor = .black
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.clipsToBounds = true
     })
     
     private lazy var feedImageView = UIImageView().then({
-        $0.layer.cornerRadius = 12
+        $0.layer.cornerRadius = moderateScale(number: 12)
         $0.contentMode = .scaleAspectFill
         $0.clipsToBounds = true
     })
@@ -23,6 +25,7 @@ final class MainDifferenceCell: UICollectionViewCell {
     private lazy var nickNameView = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.clipsToBounds = true
     })
     
     private lazy var nickNameLabel = UILabel().then({
