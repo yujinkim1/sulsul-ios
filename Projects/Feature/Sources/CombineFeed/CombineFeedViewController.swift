@@ -97,6 +97,11 @@ extension CombineFeedViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
         let popularFeed = popularFeed.feeds[indexPath.row]
         cell.combineFeedBind(popularFeed)
+        
+        cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            print(popularFeed.feedId)
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": popularFeed.feedId])
+        }
         return cell
     }
     

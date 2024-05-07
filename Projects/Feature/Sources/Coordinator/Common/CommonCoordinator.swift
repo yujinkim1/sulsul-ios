@@ -90,6 +90,7 @@ final class CommonCoordinator: CommonBaseCoordinator {
     private func moveToCombineFeed(_ userData: [String: Any]?) {
         guard let popularFeed = userData?["popularFeed"] as? PopularFeed else { return }
         let viewController = CombineFeedViewController(popularFeed: popularFeed)
+        viewController.coordinator = self
         currentNavigationViewController?.pushViewController(viewController, animated: true)
     }
 
