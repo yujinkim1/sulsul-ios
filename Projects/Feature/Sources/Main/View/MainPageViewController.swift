@@ -225,6 +225,9 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                     layoutSize: headerSize,
                     elementKind: UICollectionView.elementKindSectionHeader,
                     alignment: .top)
+                
+                section.interGroupSpacing = moderateScale(number: 16)
+                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
  
                 section.boundarySupplementaryItems = [header]
                 return section
