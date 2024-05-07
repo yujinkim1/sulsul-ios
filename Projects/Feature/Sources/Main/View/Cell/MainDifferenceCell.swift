@@ -176,4 +176,17 @@ final class MainDifferenceCell: UICollectionViewCell {
             foodLabel.text = StaticValues.getSnackPairingById(feed.pairingIds.last ?? 0)?.name
         }
     }
+    
+    func combineFeedBind(_ feed: PopularFeed.PopularDetailFeed) {
+        contentLabel.text = feed.title
+        detailContentLabel.text = feed.content
+        nickNameLabel.text = "@" + feed.userNickname
+        if let url = URL(string: feed.representImage) {
+            feedImageView.kf.setImage(with: url)
+        } else {
+            feedImageView.image = UIImage(systemName: "circle.fill")
+        }
+        drinkLabel.text = StaticValues.getDrinkPairingById(feed.pairingIds.first ?? 0)?.name
+        foodLabel.text = StaticValues.getSnackPairingById(feed.pairingIds.last ?? 0)?.name
+    }
 }

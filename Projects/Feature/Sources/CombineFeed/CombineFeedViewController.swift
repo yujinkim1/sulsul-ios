@@ -17,6 +17,7 @@ public final class CombineFeedViewController: HiddenTabBarBaseViewController {
     
     init(popularFeed: PopularFeed) {
         self.popularFeed = popularFeed
+        print(popularFeed)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -91,7 +92,8 @@ public final class CombineFeedViewController: HiddenTabBarBaseViewController {
 extension CombineFeedViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(MainDifferenceCell.self, indexPath: indexPath) else { return .init() }
-        
+        let popularFeed = popularFeed.feeds[indexPath.row]
+        cell.combineFeedBind(popularFeed)
         return cell
     }
     
