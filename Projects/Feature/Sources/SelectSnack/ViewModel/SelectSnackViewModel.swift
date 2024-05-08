@@ -31,6 +31,7 @@ final class SelectSnackViewModel {
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
     private var userInfo: UserInfoModel?
+    private var selectSnackType: SelectTasteCase
     
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
@@ -41,7 +42,8 @@ final class SelectSnackViewModel {
     private lazy var sectionModels = [SnackSectionModel]()
     private lazy var cellModels = [SnackModel]()
     
-    init() {
+    init(selectSnackType: SelectTasteCase) {
+        self.selectSnackType = selectSnackType
         bind()
     }
     
@@ -50,6 +52,7 @@ final class SelectSnackViewModel {
         print(">.>>>>>>>>안주 쪽 아이디")
         print(userId)
         
+        requestSnackList()
         
         getUserInfo()
         
@@ -106,9 +109,11 @@ final class SelectSnackViewModel {
         let selectedSnackIds = userInfo?.preference.foods
         var snackModelsWithSelectedValue = snackModels
         
-        selectedSnackIds?.forEach { id in
-            if let selectedIndex = snackModelsWithSelectedValue.firstIndex(where: { $0.id == id }) {
-                snackModelsWithSelectedValue[selectedIndex].isSelect = true
+        if selectSnackType != .bottomSheet {
+            selectedSnackIds?.forEach { id in
+                if let selectedIndex = snackModelsWithSelectedValue.firstIndex(where: { $0.id == id }) {
+                    snackModelsWithSelectedValue[selectedIndex].isSelect = true
+                }
             }
         }
         
