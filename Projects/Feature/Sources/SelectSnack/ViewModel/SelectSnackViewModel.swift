@@ -50,7 +50,6 @@ final class SelectSnackViewModel {
         print(">.>>>>>>>>안주 쪽 아이디")
         print(userId)
         
-        requestSnackList()
         
         getUserInfo()
         
@@ -88,6 +87,8 @@ final class SelectSnackViewModel {
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     guard let mappedUserInfo = self?.userMapper.userInfoModel(from: userData) else { return }
                     self?.userInfo = mappedUserInfo
+                    
+                    self?.requestSnackList()
                     print(">>>>안주쪽에서 조회한 회원정보")
                     print(self?.userInfo)
                 } else {
@@ -102,14 +103,25 @@ final class SelectSnackViewModel {
     private func makeSectionModelsWith(_ snackModels: [SnackModel]) -> [SnackSectionModel] {
         guard var currentSection = snackModels.first?.subtype else { return [] }
         
+        let selectedSnackIds = userInfo?.preference.foods
+        var snackModelsWithSelectedValue = snackModels
+        
+        selectedSnackIds?.forEach { id in
+            if let selectedIndex = snackModelsWithSelectedValue.firstIndex(where: { $0.id == id }) {
+                snackModelsWithSelectedValue[selectedIndex].isSelect = true
+            }
+        }
+        
+        self.cellModels = snackModelsWithSelectedValue
+        
         var sectionModels: [SnackSectionModel] = []
         var cellModelsOfSameSection: [SnackModel] = []
         
-        snackModels.enumerated().forEach { index, snack in
+        snackModelsWithSelectedValue.enumerated().forEach { index, snack in
             if snack.subtype == currentSection {
                 cellModelsOfSameSection.append(snack)
             } else {
-                let beforeCellModel = snackModels[index - 1]
+                let beforeCellModel = snackModelsWithSelectedValue[index - 1]
                 let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: foodCategories[beforeCellModel.subtype] ?? "")
                 let completedSectionModel: SnackSectionModel = .init(cellModels: cellModelsOfSameSection, headerModel: headerModel)
                 
@@ -237,7 +249,6 @@ extension SelectSnackViewModel {
                         selfRef.initSectionModels = selfRef.makeSectionModelsWith(snackModels)
                         selfRef.sectionModels = selfRef.initSectionModels
                         selfRef.setCompletedSnackData.send(())
-                        selfRef.cellModels = snackModels
                     } else {
                         print("[/pairings] Fail Decode")
                     }
