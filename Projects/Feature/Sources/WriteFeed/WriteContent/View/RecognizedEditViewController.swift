@@ -95,17 +95,8 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         }
         
         saveButton.onTapped { [weak self] in
-            var selectedValue: [SnackModel] = []
-            
-            if let selectedDrink = self?.selectedDrink {
-                selectedValue.append(selectedDrink)
-            }
-            
-            if let selectedSnack = self?.selectedSnack {
-                selectedValue.append(selectedSnack)
-            }
-            
-            self?.delegate?.selectedValue(["selectedValue": selectedValue])
+            self?.delegate?.selectedValue(["selectedDrink": self?.selectedDrink,
+                                           "selectedSnack": self?.selectedSnack])
             self?.navigationController?.popViewController(animated: true)
         }
         
