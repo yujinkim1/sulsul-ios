@@ -60,10 +60,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     public override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        
-        searchTouchableIamgeView.onTapped { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
-        }
     }
     
     public override func addViews() {
@@ -88,6 +84,12 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             $0.top.equalTo(topHeaderView.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
+        }
+    }
+    
+    public override func setupIfNeeded() {
+        searchTouchableIamgeView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
         }
     }
     

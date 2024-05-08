@@ -47,17 +47,11 @@ final class MainPageViewModel {
     }
     
     func getFeedsByAlcohol() {
-//        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
-//        
-//        var headers: HTTPHeaders = [
-//            "Content-Type": "application/json",
-//            "Authorization": "Bearer " + accessToken,
-//        ]
-        
         NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-alcohols") { result in
             switch result {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
+                    print(">>>>>> 술 피드 : \(alcoholFeedList)")
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
                     var selectableAlcohols: [SelectableAlcohol] = mappedAlcoholFeedList.subtypes.map { SelectableAlcohol(title: $0, isSelected: false) }
                     if let firstIndex = selectableAlcohols.indices.first {
@@ -71,7 +65,7 @@ final class MainPageViewModel {
                     print("디코딩 에러")
                 }
             case .failure(let error):
-                print(error)
+                print(">>>>2 \(error)")
             }
         }
     }
@@ -135,7 +129,7 @@ final class MainPageViewModel {
                     print("디코딩 에러")
                 }
             case .failure(let error):
-                print(error)
+                print(">>>> \(error)")
             }
         }
     }
