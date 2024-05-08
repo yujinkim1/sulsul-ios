@@ -15,7 +15,7 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
     
     weak var delegate: OnSelectedValue?
     
-    private lazy var viewModel = SelectSnackViewModel()
+    private lazy var viewModel = SelectSnackViewModel(selectSnackType: .bottomSheet)
     
     private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 68
 

@@ -18,7 +18,9 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
     
-    private lazy var selectedSnackDrink: [SnackModel] = []
+    private var selectedDrink: SnackModel?
+    private var selectedSnack: SnackModel?
+    
     private lazy var viewModel = WriteContentViewModel()
     private lazy var images: [UIImage] = []
     private lazy var imageScrollView = UIScrollView().then {
@@ -536,33 +538,46 @@ extension WriteContentViewController: UITextViewDelegate {
 
 extension WriteContentViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        if let selectedValue = value["selectedValue"] as? [SnackModel] {
-            selectedSnackDrink = selectedValue
+        if let selectedDrink = value["selectedDrink"] as? SnackModel {
+            self.selectedDrink = selectedDrink
             
-            if selectedValue.count == 2 {
-                recognizedContentLabel.isHidden = true
-                drinkSnackStackView.isHidden = false
-                recognizedDrinkLabel.text = "\(selectedValue[0].name)"
-                recognizedSnackLabel.text = "\(selectedValue[1].name)"
-                
-            } else if selectedValue.count == 1 {
-                recognizedContentLabel.isHidden = false
-                drinkSnackStackView.isHidden = true
-                recognizedContentLabel.text = "\(selectedValue[0].name)"
-            }
+            recognizedContentLabel.isHidden = false
+            drinkSnackStackView.isHidden = true
+            recognizedContentLabel.text = "\(selectedDrink.name)"
+        }
+        
+        if let selectedSnack = value["selectedSnack"] as? SnackModel {
+            self.selectedSnack = selectedSnack
+            
+            recognizedContentLabel.isHidden = false
+            drinkSnackStackView.isHidden = true
+            recognizedContentLabel.text = "\(selectedSnack.name)"
+        }
+        
+        if let selectedDrink = value["selectedDrink"] as? SnackModel,
+           let selectedSnack = value["selectedSnack"] as? SnackModel {
+            
+            recognizedContentLabel.isHidden = true
+            drinkSnackStackView.isHidden = false
+            recognizedDrinkLabel.text = "\(selectedDrink.name)"
+            recognizedSnackLabel.text = "\(selectedSnack.name)"
         }
         
         if let _ = value["shouldGoMain"] as? Void,
            let score = value["score"] as? Int {
             
             if let title = UserDefaultsUtil.shared.getFeedTitle(),
-               let thumnailImage = viewModel.imageServerURLOfThumnail{
+               let thumnailImage = viewModel.imageServerURLOfThumnail {
+                
+                let drinkId: [Int]? = (selectedDrink == nil) ? nil : [selectedDrink!.id]
+                let snackId: [Int]? = (selectedSnack == nil) ? nil : [selectedSnack!.id]
+
                 viewModel.requestModel = .init(title: title,
                                                content: contentTextView.text,
                                                represent_image: thumnailImage,
                                                images: viewModel.imageServerURLArrOfFeed,
-                                               alcohol_pairing_ids: [selectedSnackDrink[1].id],
-                                               food_pairing_ids: [selectedSnackDrink[0].id],
+                                               alcohol_pairing_ids: drinkId,
+                                               food_pairing_ids: snackId,
                                                user_tags_raw_string: tagTextView.text,
                                                score: score)
                 

@@ -67,7 +67,7 @@ final class CommonCoordinator: CommonBaseCoordinator {
     }
     
     private func moveToSelectSnackScene() {
-        let viewModel = SelectSnackViewModel()
+        let viewModel = SelectSnackViewModel(selectSnackType: .store)
         let selectSnackVC = SelectSnackViewController(viewModel: viewModel, selectTasteCase: .store)
         selectSnackVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
