@@ -17,7 +17,6 @@ public final class CombineFeedViewController: HiddenTabBarBaseViewController {
     
     init(popularFeed: PopularFeed) {
         self.popularFeed = popularFeed
-        print(popularFeed)
         super.init(nibName: nil, bundle: nil)
     }
     

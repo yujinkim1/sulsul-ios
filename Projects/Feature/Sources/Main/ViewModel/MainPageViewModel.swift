@@ -17,12 +17,12 @@ final class MainPageViewModel {
     private let mainPageMapper = MainPageMapper()
     private let popularFeeds = CurrentValueSubject<[PopularFeed], Never>([])
     private let differenceFeeds = CurrentValueSubject<[PopularFeed], Never>([])
-//    private let byAlcoholFeeds = CurrentValueSubject<[ByAlcoholFeed], Never> ([])
     // MARK: - (비로그인) 술 종류
     private let kindOfAlcohol = CurrentValueSubject<[SelectableAlcohol], Never>([])
     private let alcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcoholFeeds = CurrentValueSubject<[AlcoholFeed.Feed], Never>([])
     private let selectedAlcohol = CurrentValueSubject<String, Never>("")
+    private let errorSubject = CurrentValueSubject<String, Never>("")
     
     private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
                                                                            uid: "",
@@ -47,11 +47,11 @@ final class MainPageViewModel {
     }
     
     func getFeedsByAlcohol() {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-alcohols") { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/by-alcohols") { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
-                    print(">>>>>> 술 피드 : \(alcoholFeedList)")
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
                     var selectableAlcohols: [SelectableAlcohol] = mappedAlcoholFeedList.subtypes.map { SelectableAlcohol(title: $0, isSelected: false) }
                     if let firstIndex = selectableAlcohols.indices.first {
@@ -62,30 +62,31 @@ final class MainPageViewModel {
                     self.sendSelectedAlcoholFeed(mappedAlcoholFeedList.subtypes.first ?? "")
                     self.selectedAlcohol.send(mappedAlcoholFeedList.subtypes.first ?? "")
                 } else {
-                    print("디코딩 에러")
+                    self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(">>>>2 \(error)")
+                self.errorSubject.send(error.localizedDescription)
             }
         }
     }
     
     func getPopularFeeds() {
-        var headers: HTTPHeaders = [
+        let headers: HTTPHeaders = [
             "order_by_popular": "true"
         ]
         
-        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/popular", header: headers) { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/popular", header: headers) { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let response):
                 if let popularFeedList = try? self.jsonDecoder.decode([RemotePopularFeedsItem].self, from: response) {
                     let mappedPopularFeeds = self.mainPageMapper.popularFeeds(from: popularFeedList)
                     self.popularFeeds.send(mappedPopularFeeds)
                 } else {
-                    print("디코딩 에러")
+                    self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                self.errorSubject.send(error.localizedDescription)
             }
         }
     }
@@ -95,25 +96,25 @@ final class MainPageViewModel {
             "order_by_popular": "false"
         ]
         
-        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/popular", header: headers) { result in
+        NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/popular", header: headers) { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let response):
                 if let differenceFeedList = try? self.jsonDecoder.decode([RemotePopularFeedsItem].self, from: response) {
                     let mappedDifferenceFeeds = self.mainPageMapper.popularFeeds(from: differenceFeedList)
                     self.differenceFeeds.send(mappedDifferenceFeeds)
-
                 } else {
-                    print("디코딩 에러")
+                    self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                self.errorSubject.send(error.localizedDescription)
             }
         }
     }
     
     func getPreferenceFeeds() {
         guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
-        var headers: HTTPHeaders = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
         ]
@@ -123,13 +124,12 @@ final class MainPageViewModel {
             case .success(let response):
                 if let alcoholFeedList = try? self.jsonDecoder.decode(RemoteFeedsByAlcoholItem.self, from: response) {
                     let mappedAlcoholFeedList = self.mainPageMapper.remoteToAlcoholFeeds(from: alcoholFeedList)
-                    print("성공 \(mappedAlcoholFeedList)")
                     self.selectedAlcoholFeeds.send(mappedAlcoholFeedList.feeds)
                 } else {
-                    print("디코딩 에러")
+                    self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(">>>> \(error)")
+                self.errorSubject.send(error.localizedDescription)
             }
         }
     }
@@ -145,7 +145,7 @@ final class MainPageViewModel {
                                         status: UserInfoStatus.notLogin.rawValue))
             return
         }
-        var headers: HTTPHeaders = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
         ]
@@ -157,10 +157,10 @@ final class MainPageViewModel {
                     let mappedUserInfo = self.userMapper.userInfoModel(from: userData)
                     self.userInfo.send(mappedUserInfo)
                 } else {
-                    print("디코딩 모델 에러5")
+                    self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
-                print(error)
+                self.errorSubject.send(error.localizedDescription)
             }
         }
     }
@@ -188,14 +188,7 @@ final class MainPageViewModel {
     func getUserInfoValue() -> UserInfoModel {
         return userInfo.value
     }
-//    func alcoholFeedsPublisher() -> AnyPublisher<[AlcoholFeed.Feed], Never> {
-//        return alcoholFeeds.eraseToAnyPublisher()
-//    }
-//    
-//    func getAlcoholFeedsValue() -> [AlcoholFeed.Feed] {
-//        return alcoholFeeds.value
-//    }
-    
+
     func selectedAlcoholFeedPublisher() -> AnyPublisher<[AlcoholFeed.Feed], Never> {
         return selectedAlcoholFeeds.eraseToAnyPublisher()
     }
@@ -228,5 +221,9 @@ final class MainPageViewModel {
     
     func completeAllFeedPublisher() -> AnyPublisher<Void, Never> {
         return completeAllFeed.eraseToAnyPublisher()
+    }
+    
+    func getErrorSubject() -> AnyPublisher<String, Never> {
+        return errorSubject.eraseToAnyPublisher()
     }
 }

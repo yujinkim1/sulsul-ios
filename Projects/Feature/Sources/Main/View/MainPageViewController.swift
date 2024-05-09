@@ -94,6 +94,17 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     }
     
     private func bind() {
+        viewModel.getErrorSubject()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
+            }.store(in: &cancelBag)
+        
         StaticValues.isLoggedInPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
