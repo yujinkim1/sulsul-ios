@@ -77,7 +77,7 @@ extension AuthCoordinator {
         currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
     }
     private func moveToSelectSnackScene(_ userData: [String: Any]?) {
-        let viewModel = SelectSnackViewModel()
+        let viewModel = SelectSnackViewModel(selectSnackType: .next)
         let selectSnackVC = SelectSnackViewController(viewModel: viewModel,
                                                       selectTasteCase: .next)
         selectSnackVC.coordinator = self

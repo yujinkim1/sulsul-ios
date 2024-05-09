@@ -12,6 +12,7 @@ import Combine
 enum SelectTasteCase {
     case next
     case store
+    case bottomSheet
 }
 
 public class SelectDrinkViewController: SelectTasteBaseViewController {
@@ -85,7 +86,7 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
         switch selectTasteCase {
         case .next:
             submitTouchableLabel.text = "다음"
-        case .store:
+        case .store, .bottomSheet:
             submitTouchableLabel.text = "저장"
         }
     }

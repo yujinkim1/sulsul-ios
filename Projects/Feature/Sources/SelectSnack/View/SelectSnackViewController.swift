@@ -120,7 +120,7 @@ public final class SelectSnackViewController: HiddenTabBarBaseViewController {
         switch selectTasteCase {
         case .next:
             nextButton.setTitle("다음", for: .normal)
-        case .store:
+        case .store, .bottomSheet:
             nextButton.setTitle("저장", for: .normal)
         }
         
