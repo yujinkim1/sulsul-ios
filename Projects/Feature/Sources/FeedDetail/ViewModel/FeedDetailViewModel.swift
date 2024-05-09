@@ -37,6 +37,8 @@ public final class FeedDetailViewModel {
     var relatedFeeds: [RelatedFeed] = []
     /// 현재 피드와 관련된 다른 피드 개수
     private var numberOfRelatedFeed = CurrentValueSubject<Int, Never>(0)
+    /// 피드 삭제 처리 여부
+    private var isDeleted = CurrentValueSubject<Bool, Never>(false)
     
     public init(feedID: Int) {
         self.feedID = feedID
@@ -44,17 +46,17 @@ public final class FeedDetailViewModel {
         requestFeedDetail()
         requestRelatedFeeds()
         
-        pairingDrinkID
-            .sink { [weak self] value in
-                self?.requestPairingDrink(value)
-            }
-            .store(in: &cancelBag)
-        
-        pairingSnackID
-            .sink { [weak self] value in
-                self?.requestPairingSnack(value)
-            }
-            .store(in: &cancelBag)
+//        pairingDrinkID
+//            .sink { [weak self] value in
+//                self?.requestPairingDrink(value)
+//            }
+//            .store(in: &cancelBag)
+//        
+//        pairingSnackID
+//            .sink { [weak self] value in
+//                self?.requestPairingSnack(value)
+//            }
+//            .store(in: &cancelBag)
     }
     
     func displayHashtags(withTags: [String]) {
@@ -83,7 +85,7 @@ public final class FeedDetailViewModel {
             
             headers = [
                 "Content-Type": "application/json",
-                "Authorization": "Baerer " + accessToken
+                "Authorization": "Bearer " + accessToken
             ]
         }
         
@@ -190,6 +192,40 @@ public final class FeedDetailViewModel {
         }
     }
     
+    public func requestDelete() {
+        var headers: HTTPHeaders? = nil
+        
+        if UserDefaultsUtil.shared.isLogin() {
+            guard let accessToken = KeychainStore.shared.read(label: "accessToken")
+            else { return }
+            debugPrint("\(#function): User accessToken is \(accessToken)")
+            
+            headers = [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + accessToken
+            ]
+        }
+        
+        networkWrapper.deleteBasicTask(stringURL: "/feeds/\(feedID)", header: headers) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let response):
+                do {
+                    let data = try self.jsonDecoder.decode(DeleteFeedResponse.self, from: response)
+                    
+                    self.isDeleted.send(data.isDeleted)
+                    
+                    debugPrint("\(#function): Decoding succeed, \(data)")
+                } catch {
+                    debugPrint("\(#function): Decoding failed, Reason is: \(error.localizedDescription)")
+                }
+            case .failure(let error):
+                debugPrint("\(#function): Request failed, Reason is: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     public func fetchCommentCount() -> Int {
         return numberOfComments.value
     }
@@ -216,6 +252,10 @@ public final class FeedDetailViewModel {
     
     var feedImagePublisher: AnyPublisher<[String], Never> {
         return feedImages.eraseToAnyPublisher()
+    }
+    
+    var isDeletedPublisher: AnyPublisher<Bool, Never> {
+        return isDeleted.eraseToAnyPublisher()
     }
 }
 
