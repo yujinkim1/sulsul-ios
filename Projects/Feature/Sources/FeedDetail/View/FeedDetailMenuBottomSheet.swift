@@ -9,9 +9,9 @@ import UIKit
 import DesignSystem
 
 protocol FeedDetailMenuBottomSheetDelegate: AnyObject {
-    func editFeedViewDidTap()
-    func deleteFeedViewDidTap()
-    func reportFeedViewDidTap()
+    func didTapEditFeedView()
+    func didTapDeleteFeedView()
+    func didTapReportFeedView()
 }
 
 final class FeedDetailMenuBottomSheet: UIView {
@@ -66,6 +66,12 @@ final class FeedDetailMenuBottomSheet: UIView {
         $0.font = Font.medium(size: 16)
     }
     
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        
+        self.animate()
+    }
+    
     // MARK: - Initializer
     //
     init(sheetType: SheetType) {
@@ -89,9 +95,9 @@ extension FeedDetailMenuBottomSheet {
     private func addViews(for sheetType: SheetType) {
         let sheet = self.createSheet(for: sheetType)
         
-//        self.containerView.addSubview(sheet)
+        self.dimmedView.addSubview(sheet)
         
-        self.addSubview(sheet)
+        self.addSubview(self.dimmedView)
     }
     
     private func makeConstraints(withType sheetType: SheetType) {
@@ -106,37 +112,51 @@ extension FeedDetailMenuBottomSheet {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
-        stackView.spacing = moderateScale(number: 12)
+        stackView.spacing = 12
         
         switch sheetType {
         case .mine:
             let editFeedView = createOptionView(imageView: self.editFeedImageView, label: self.editFeedLabel) { [weak self] in
-                self?.delegate?.editFeedViewDidTap()
+                self?.delegate?.didTapEditFeedView()
+                self?.removeFromSuperview()
             }
             let deleteFeedView = createOptionView(imageView: self.deleteFeedImageView, label: self.deleteFeedLabel) { [weak self] in
-                self?.delegate?.deleteFeedViewDidTap()
+                self?.delegate?.didTapDeleteFeedView()
+                self?.removeFromSuperview()
             }
-            stackView.addArrangedSubview(editFeedView)
-            stackView.addArrangedSubview(deleteFeedView)
             
+            stackView.addArrangedSubviews([
+                editFeedView,
+                deleteFeedView
+            ])
         case .someone:
             let reportFeedView = createOptionView(imageView: self.reportFeedImageView, label: self.reportFeedLabel) { [weak self] in
-                self?.delegate?.reportFeedViewDidTap()
+                self?.delegate?.didTapReportFeedView()
+                self?.removeFromSuperview()
             }
+            
             stackView.addArrangedSubview(reportFeedView)
         }
         
-        containerView.addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(moderateScale(number: 12))
+        self.dimmedView.onTapped { [weak self] in
+            self?.removeFromSuperview()
         }
         
-        return containerView
+        self.containerView.addSubview(stackView)
+        
+        stackView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(moderateScale(number: 12))
+        }
+        
+        return self.containerView
     }
-    
-    private func createOptionView(imageView: UIImageView, label: UILabel, onTap: @escaping () -> Void) -> UIView {
+
+    private func createOptionView(imageView: UIImageView, label: UILabel, completion: @escaping () -> Void) -> UIView {
         let optionView = UIView(frame: .zero)
-        optionView.addSubviews([imageView, label])
+        optionView.addSubviews([
+            imageView,
+            label
+        ])
         
         imageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(moderateScale(number: 24))
@@ -149,8 +169,18 @@ extension FeedDetailMenuBottomSheet {
             $0.centerY.equalToSuperview()
         }
         
-        optionView.onTapped { onTap() }
+        optionView.onTapped { completion() }
         
         return optionView
+    }
+    
+    private func animate() {
+        guard let superview = self.superview else { return }
+        
+        self.containerView.transform = CGAffineTransform(translationX: 0, y: superview.frame.height)
+        
+        UIView.animate(withDuration: 0.3) {
+            self.containerView.transform = .identity
+        }
     }
 }
