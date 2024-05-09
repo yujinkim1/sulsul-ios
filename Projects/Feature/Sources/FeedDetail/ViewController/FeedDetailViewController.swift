@@ -180,9 +180,7 @@ public final class FeedDetailViewController: BaseViewController {
         
         self.menuTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.tabBarController?.setTabBarHidden(true)
-            self?.showFeedDetailMenuBottomSheet(editHandler: self?.editFeed,
-                                                deleteHandler: self?.deleteFeed,
-                                                reportHandler: self?.reportFeed)
+            self?.showFeedDetailMenuBottomSheet()
         }
         
         // 다음 작업 시 코디네이터로 관리할 수 있는 방법을 찾아 수정해보기
@@ -323,7 +321,7 @@ public final class FeedDetailViewController: BaseViewController {
 }
 
 // MARK: - Custom method
-
+//
 extension FeedDetailViewController {
     private func reportFeed() {
         let viewModel = ReportViewModel(reportType: .feed, targetId: feedID)
@@ -342,26 +340,21 @@ extension FeedDetailViewController {
         // 피드 삭제
     }
     
-    private func showFeedDetailMenuBottomSheet(
-        editHandler: (() -> Void)?,
-        deleteHandler: (() -> Void)?,
-        reportHandler: (() -> Void)?
-    ) {
+    private func showFeedDetailMenuBottomSheet() {
+        let isLogin = UserDefaultsUtil.shared.isLogin()
         let userID = UserDefaultsUtil.shared.getInstallationId()
         
-        if UserDefaultsUtil.shared.isLogin(), feedUserID == userID {
-            let menuBottomSheet = FeedDetailMenuBottomSheet(type: .mine)
-            menuBottomSheet.bind(editHandler: editHandler,
-                                 deleteHandler: deleteHandler, 
-                                 reportHandler: nil)
+        if isLogin, feedUserID == userID {
+            let menuBottomSheet = FeedDetailMenuBottomSheet(sheetType: .mine)
+            menuBottomSheet.delegate = self
+            menuBottomSheet.frame = view.bounds
             
             self.view.addSubview(menuBottomSheet)
             self.view.bringSubviewToFront(menuBottomSheet)
-        } else if UserDefaultsUtil.shared.isLogin(), feedUserID != userID {
-            let menuBottomSheet = FeedDetailMenuBottomSheet(type: .someone)
-            menuBottomSheet.bind(editHandler: nil,
-                                 deleteHandler: nil,
-                                 reportHandler: reportHandler)
+        } else if isLogin, feedUserID != userID {
+            let menuBottomSheet = FeedDetailMenuBottomSheet(sheetType: .someone)
+            menuBottomSheet.delegate = self
+            menuBottomSheet.frame = view.bounds
             
             self.view.addSubview(menuBottomSheet)
             self.view.bringSubviewToFront(menuBottomSheet)
@@ -501,6 +494,22 @@ extension FeedDetailViewController: UICollectionViewDelegate {
             
             self.navigationController?.pushViewController(viewController, animated: true)
         }
+    }
+}
+
+// MARK: - FeedDetailMenuBottomSheet Delegate
+//
+extension FeedDetailViewController: FeedDetailMenuBottomSheetDelegate {
+    func editFeedViewDidTap() {
+        self.editFeed()
+    }
+    
+    func deleteFeedViewDidTap() {
+        self.deleteFeed()
+    }
+    
+    func reportFeedViewDidTap() {
+        self.reportFeed()
     }
 }
 
