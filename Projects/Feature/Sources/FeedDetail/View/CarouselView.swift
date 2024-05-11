@@ -76,7 +76,6 @@ extension CarouselView {
     func bind(_ model: FeedDetail) {
         var feedImages = model.images
         feedImages.insert(model.representImage, at: 0)
-        
         feedImages.forEach { image in
             if let imageURL = URL(string: image) {
                 let imageView = UIImageView(frame: .zero)
@@ -111,7 +110,7 @@ extension CarouselView {
     }
     
     private func addViews() {
-        self.scrollView.addSubview(imageStackView)
+        self.scrollView.addSubview(self.imageStackView)
         
         self.addSubviews([
             self.scrollView,
@@ -150,7 +149,7 @@ extension CarouselView {
 }
 
 // MARK: - UIScrollView Delegate
-
+//
 extension CarouselView: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let scrollViewWidth = scrollView.frame.size.width
@@ -164,7 +163,6 @@ extension CarouselView: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 스크롤 되었을 때마다 이미지 인디케이터가 움직이고 라벨 값을 갱신
-        //
         let scrollViewWidth = scrollView.frame.size.width
         let contentOffsetX = scrollView.contentOffset.x
         let currentIndex = Int(scrollView.contentOffset.x / scrollViewWidth) + 1
