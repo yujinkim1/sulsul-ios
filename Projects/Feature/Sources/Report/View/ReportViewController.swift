@@ -56,6 +56,13 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
         $0.textColor = DesignSystemAsset.white.color
     })
     
+    private lazy var contentScrollView = UIScrollView().then {
+        $0.showsVerticalScrollIndicator = false
+        $0.delegate = self
+    }
+    
+    private lazy var containerView = UIView()
+    
     private lazy var reportCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.registerCell(ReportCell.self)
@@ -120,16 +127,15 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
     public override func addViews() {
         super.addViews()
         view.addSubviews([topHeaderView,
-                          titleLabel,
-                          subTitleLabel,
-                          reportCollectionView,
-                          etcReportTextView,
-                          etcReportLabel,
+                          contentScrollView,
                           submitTouchableLabel])
+        contentScrollView.addSubview(containerView)
+        containerView.addSubviews([titleLabel,
+                                   subTitleLabel,
+                                   reportCollectionView,
+                                   etcReportTextView,
+                                   etcReportLabel])
         topHeaderView.addSubview(backButton)
-        // TODO: - 이 로직 없애도 되는지 확인 필요
-        view.bringSubviewToFront(etcReportTextView)
-        view.bringSubviewToFront(etcReportLabel)
     }
     
     public override func makeConstraints() {
@@ -145,8 +151,20 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
             $0.size.equalTo(moderateScale(number: 24))
             $0.leading.equalToSuperview().inset(superViewInset)
         }
-        titleLabel.snp.makeConstraints {
+        
+        contentScrollView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(submitTouchableLabel.snp.top)
+        }
+        
+        containerView.snp.makeConstraints {
+            $0.top.leading.trailing.bottom.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(superViewInset)
         }
         subTitleLabel.snp.makeConstraints {
@@ -166,7 +184,7 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
         etcReportLabel.snp.makeConstraints {
             $0.top.equalTo(etcReportTextView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(superViewInset)
-            $0.bottom.equalTo(submitTouchableLabel.snp.top)
+            $0.bottom.equalToSuperview()
         }
         submitTouchableLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))

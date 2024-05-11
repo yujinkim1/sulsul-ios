@@ -60,10 +60,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     public override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        
-        searchTouchableIamgeView.onTapped { [weak self] in
-            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
-        }
     }
     
     public override func addViews() {
@@ -91,7 +87,24 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         }
     }
     
+    public override func setupIfNeeded() {
+        searchTouchableIamgeView.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
+        }
+    }
+    
     private func bind() {
+        viewModel.getErrorSubject()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
+            }.store(in: &cancelBag)
+        
         StaticValues.isLoggedInPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
