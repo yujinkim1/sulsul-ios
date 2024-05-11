@@ -81,15 +81,22 @@ extension CarouselView {
         feedImages.insert(model.representImage, at: 0)
         feedImages.forEach { image in
             if let imageURL = URL(string: image) {
-                let imageView = UIImageView(frame: .zero)
-                imageView.backgroundColor = DesignSystemAsset.black.color.withAlphaComponent(0.2)
-                imageView.contentMode = .scaleAspectFill
-                imageView.layer.backgroundColor = DesignSystemAsset.black.color.cgColor.copy(alpha: 0.2)
-                imageView.layer.cornerRadius = 20
-                imageView.layer.masksToBounds = true
-                imageView.kf.setImage(with: imageURL)
+                let blendView = UIView(frame: .zero).then {
+                    $0.backgroundColor = DesignSystemAsset.black.color.withAlphaComponent(0.2)
+                }
+                let imageView = UIImageView(frame: .zero).then {
+                    $0.contentMode = .scaleAspectFill
+                    $0.layer.cornerRadius = 20
+                    $0.layer.masksToBounds = true
+                    $0.kf.setImage(with: imageURL)
+                    $0.addSubview(blendView)
+                }
                 
                 self.imageStackView.addArrangedSubview(imageView)
+                
+                blendView.snp.makeConstraints {
+                    $0.edges.equalToSuperview()
+                }
                 
                 imageView.snp.makeConstraints {
                     $0.width.equalTo(self.scrollView.snp.width)
