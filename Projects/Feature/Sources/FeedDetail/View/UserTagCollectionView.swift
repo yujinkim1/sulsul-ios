@@ -15,11 +15,19 @@ final class UserTagCollectionView: UICollectionView {
     
     // MARK: - Initializer
     //
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(frame: frame, collectionViewLayout: layout)
+    init(frame: CGRect) {
+        let flowLayout = UICollectionViewFlowLayout().then {
+            $0.scrollDirection = .horizontal
+            $0.minimumLineSpacing = 8
+            $0.minimumInteritemSpacing = 8
+            $0.sectionInset = .zero
+            $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        }
+        
+        super.init(frame: frame, collectionViewLayout: flowLayout)
         
         self.register(UserTagCell.self, forCellWithReuseIdentifier: UserTagCell.reuseIdentifier)
-        self.collectionViewLayout = createFlowLayout()
+        self.contentInsetAdjustmentBehavior = .always
         self.backgroundColor = .clear
         self.isScrollEnabled = false
         self.dataSource = self
@@ -39,22 +47,10 @@ extension UserTagCollectionView {
         self.userTags = tags
         self.reloadData()
     }
-    
-    private func createFlowLayout() -> UICollectionViewFlowLayout {
-        let flowLayout = UICollectionViewFlowLayout().then {
-            $0.scrollDirection = .horizontal
-            $0.minimumLineSpacing = 8
-            $0.minimumInteritemSpacing = 8
-            $0.sectionInset = .zero
-            $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        }
-        
-        return flowLayout
-    }
 }
 
 // MARK: - UICollectionView DataSource
-
+//
 extension UserTagCollectionView: UICollectionViewDataSource {
     func collectionView(
         _ collectionView: UICollectionView,
@@ -71,7 +67,8 @@ extension UserTagCollectionView: UICollectionViewDataSource {
         else { return .init() }
         
         let item = userTags[indexPath.item]
-        debugPrint("\(#file): userTags[indexPath.item] >>>> \(userTags[indexPath.item])")
+        
+        debugPrint("\(#fileID) >>>> 사용자 해시태그: \(userTags[indexPath.item])")
         
         cell.bind(withUserTag: item)
         
