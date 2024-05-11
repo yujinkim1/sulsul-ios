@@ -77,25 +77,28 @@ class MyFeedView: UIView {
     
     private func layout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] _, _ in
-            guard let self = self else { return nil }
-            
             let itemWidth: CGFloat = 1
             let itemHeight: CGFloat
-            switch myFeedState {
+            
+            switch self?.myFeedState {
             case .loginFeedExist:
                 itemHeight = 611
-            case .loginFeedNotExist:
-                itemHeight = 400
-            case .notLogin:
+            case .loginFeedNotExist, .notLogin:
                 itemHeight = 400
             case nil:
-                return nil
+                itemHeight = 0
             }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
                                                   heightDimension: .estimated(moderateScale(number: itemHeight)))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+            
+            switch self?.myFeedState {
+            case .loginFeedExist, .loginFeedNotExist:
+                item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+            case .notLogin, .none:
+                break
+            }
         
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                    heightDimension: .estimated(moderateScale(number: itemHeight)))
