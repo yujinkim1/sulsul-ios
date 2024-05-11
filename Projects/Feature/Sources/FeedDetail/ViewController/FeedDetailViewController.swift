@@ -170,7 +170,7 @@ public final class FeedDetailViewController: BaseViewController {
             self.feedDetailViewModel.requestLikeFeed(self.feedID)
             
             feedDetailViewModel
-                .isLikedPublisher
+                .isLikedPublisher()
                 .receive(on: DispatchQueue.main)
                 .sink { value in
                     self.updateLikeTouchableImage(with: value)
@@ -197,9 +197,8 @@ public final class FeedDetailViewController: BaseViewController {
 //
 extension FeedDetailViewController {
     private func bind() {
-        self.feedDetailViewModel.displayHashtags(withTags: [])
         self.feedDetailViewModel
-            .detailFeedPublisher
+            .detailPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 self?.commentCount = value.commentCount
@@ -214,7 +213,7 @@ extension FeedDetailViewController {
             .store(in: &cancelBag)
         
         self.feedDetailViewModel
-            .isLikedPublisher
+            .isLikedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { value in
                 self.updateLikeTouchableImage(with: value)
@@ -327,7 +326,7 @@ extension FeedDetailViewController {
                 
                 self.feedDetailViewModel.requestDelete()
                 
-                self.feedDetailViewModel.isDeletedPublisher
+                self.feedDetailViewModel.isDeletedPublisher()
                     .receive(on: DispatchQueue.main)
                     .sink { isDeleted in
                         if isDeleted {
@@ -416,17 +415,17 @@ extension FeedDetailViewController: UICollectionViewDataSource {
             else { return .init() }
             
             feedDetailViewModel
-                .detailFeedPublisher
+                .detailPublisher()
                 .sink { model in cell.bind(model) }
                 .store(in: &cancelBag)
             
             feedDetailViewModel
-                .pairingDrinkPublisher
+                .pairingDrinkPublisher()
                 .sink { value in cell.pairingStackView.drinkLabel.text = value }
                 .store(in: &cancelBag)
             
             feedDetailViewModel
-                .pairingSnackPublisher
+                .pairingSnackPublisher()
                 .sink { value in cell.pairingStackView.snackLabel.text = value }
                 .store(in: &cancelBag)
             
