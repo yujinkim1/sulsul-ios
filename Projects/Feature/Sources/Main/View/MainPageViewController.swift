@@ -292,6 +292,7 @@ extension MainPageViewController: UICollectionViewDataSource {
                 }
             } else {
                 guard let cell = collectionView.dequeueReusableCell(MainPreferenceCell.self, indexPath: indexPath) else { return .init() }
+                cell.delegate = self
                 cell.alcoholBind(viewModel.getSelectedAlcoholFeedsValue())
                 return cell
             }
@@ -349,5 +350,12 @@ extension MainPageViewController: UICollectionViewDataSource {
             }
         }
         return UICollectionReusableView()
+    }
+}
+
+extension MainPageViewController: MainPreferenceCellDelegate {
+    func cellIsSelected(_ cell: MainPreferenceCell, feedId: Int) {
+        self.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed),
+                                  userData: ["feedId": feedId])
     }
 }
