@@ -37,12 +37,7 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private lazy var topHeaderView = UIView()
-    
-    private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "common_backArrow"), for: .normal)
-        $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
-    }
+    private lazy var topHeaderView = BaseTopView()
     
     private let titleLabel = UILabel().then {
         $0.font = Font.bold(size: 32)
@@ -135,7 +130,6 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
                                    reportCollectionView,
                                    etcReportTextView,
                                    etcReportLabel])
-        topHeaderView.addSubview(backButton)
     }
     
     public override func makeConstraints() {
@@ -146,23 +140,15 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
             $0.width.centerX.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide)
         }
-        backButton.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.size.equalTo(moderateScale(number: 24))
-            $0.leading.equalToSuperview().inset(superViewInset)
-        }
-        
         contentScrollView.snp.makeConstraints {
             $0.top.equalTo(topHeaderView.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(submitTouchableLabel.snp.top)
         }
-        
         containerView.snp.makeConstraints {
             $0.top.leading.trailing.bottom.equalToSuperview()
             $0.width.equalToSuperview()
         }
-        
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(superViewInset)
@@ -242,6 +228,10 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
             viewModel.sendReportContent()
         }
         
+        topHeaderView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow(_:)),
                                                name: UIResponder.keyboardWillShowNotification,
@@ -255,10 +245,6 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
         view.addGestureRecognizer(tapGestureRecognizer)
     }
     
-    @objc private func didTabBackButton() {
-        self.navigationController?.popViewController(animated: true)
-    }
-    
     public override func deinitialize() {
         NotificationCenter.default.removeObserver(self,
                                                   name: UIResponder.keyboardWillShowNotification,
@@ -270,6 +256,7 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
     
     @objc
     private func keyboardWillShow(_ notification: NSNotification) {
+        topHeaderView.setTitle("신고하기")
         animateWithKeyboard(notification: notification) { [weak self] keyboardFrame in
             self?.buttonBottomConstraint?.update(inset: keyboardFrame.height + 10)
         }
@@ -277,6 +264,7 @@ public final class ReportViewController: HiddenTabBarBaseViewController {
     
     @objc
     private func keyboardWillHide(_ notification: NSNotification) {
+        topHeaderView.setTitle("")
         animateWithKeyboard(notification: notification) { [weak self] _ in
             self?.buttonBottomConstraint?.update(inset: getSafeAreaBottom() + moderateScale(number: 12))
         }
