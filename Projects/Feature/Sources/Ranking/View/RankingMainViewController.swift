@@ -23,19 +23,14 @@ public final class RankingMainViewController: BaseViewController, RankingBaseCoo
         $0.delegate = self
     }
     
-    private lazy var topHeaderView = UIView().then {
-        $0.frame = .zero
-    }
+    private lazy var topHeaderView = UIView()
+    
+    private lazy var logoImageView = LogoImageView()
     
     private lazy var searchTouchableImageView = TouchableImageView(frame: .zero).then {
         $0.image = UIImage(named: "common_search")
         $0.tintColor = DesignSystemAsset.gray900.color
     }
-    
-//    private lazy var alarmTouchableImageView = TouchableImageView(frame: .zero).then {
-//        $0.image = UIImage(named: "common_alarm")
-//        $0.tintColor = DesignSystemAsset.gray900.color
-//    }
     
     private lazy var titleLabel = UILabel().then {
         $0.text = "이번 주 랭킹"
@@ -91,8 +86,8 @@ public final class RankingMainViewController: BaseViewController, RankingBaseCoo
         pageTabBarContainerView.addSubview(pageTabBarView)
         
         topHeaderView.addSubviews([
-            searchTouchableImageView
-//            alarmTouchableImageView
+            self.logoImageView,
+            self.searchTouchableImageView
         ])
         
         view.addSubviews([
@@ -117,11 +112,12 @@ public final class RankingMainViewController: BaseViewController, RankingBaseCoo
             $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.size.equalTo(moderateScale(number: 24))
         }
-//        alarmTouchableImageView.snp.makeConstraints {
-//            $0.centerY.equalToSuperview()
-//            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
-//            $0.size.equalTo(moderateScale(number: 24))
-//        }
+        self.logoImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.width.equalTo(moderateScale(number: 96))
+            $0.height.equalTo(moderateScale(number: 14))
+        }
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(moderateScale(number: 20))
             $0.top.equalTo(topHeaderView.snp.bottom)
