@@ -96,14 +96,14 @@ final class NoChangeRankingCombinationCell: BaseCollectionViewCell<RankingItem> 
             }
             
             if let drinkImageURLString = pairings[0].image, let drinkImageURL = URL(string: drinkImageURLString) {
-                self.drinkImageView.loadImage(drinkImageURL)
+                self.drinkImageView.kf.setImage(with: drinkImageURL)
             } else {
                 self.drinkImageView.image = nil
                 debugPrint("\(#fileID) >>>> Drink Image URL is not available.")
             }
             
             if let snackImageURLString = pairings[1].image, let snackImageURL = URL(string: snackImageURLString) {
-                self.snackImageView.loadImage(snackImageURL)
+                self.snackImageView.kf.setImage(with: snackImageURL)
             } else {
                 self.snackImageView.image = nil
                 debugPrint("\(#fileID) >>>> Snack Image URL is not available.")
@@ -173,20 +173,12 @@ extension NoChangeRankingCombinationCell {
         }
         
         self.imageStackView.snp.makeConstraints {
-            $0.leading.equalTo(rankLabel.snp.trailing).offset(moderateScale(number: 8))
+            $0.leading.equalTo(self.rankLabel.snp.trailing).offset(moderateScale(number: 8))
             $0.top.bottom.equalToSuperview().inset(moderateScale(number: 13))
         }
-        
-//        self.drinkNameLabel.snp.makeConstraints {
-//            $0.leading.equalToSuperview().inset(moderateScale(number: 10))
-//        }
-//        
-//        self.snackNameLabel.snp.makeConstraints {
-//            $0.leading.equalTo(drinkNameLabel)
-//        }
-        
+
         self.nameStackView.snp.makeConstraints {
-            $0.leading.equalTo(imageStackView.snp.trailing).offset(moderateScale(number: 8))
+            $0.leading.equalTo(self.imageStackView.snp.trailing).offset(moderateScale(number: 8))
             $0.top.equalToSuperview().offset(moderateScale(number: 15))
             $0.bottom.equalToSuperview().offset(-moderateScale(number: 15))
         }
