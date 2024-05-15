@@ -19,6 +19,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     private lazy var topHeaderView = UIView()
     
+    private lazy var logoImageView = LogoImageView()
+    
     private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
         $0.image = UIImage(named: "common_search")
         $0.tintColor = DesignSystemAsset.gray900.color
@@ -66,7 +68,9 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
         view.addSubviews([topHeaderView,
                           mainCollectionView])
         
-        topHeaderView.addSubviews([searchTouchableIamgeView])
+        topHeaderView.addSubviews([
+            logoImageView,
+            searchTouchableIamgeView])
     }
     
     public override func makeConstraints() {
@@ -74,6 +78,12 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             $0.height.equalTo(moderateScale(number: 52))
             $0.width.centerX.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        logoImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.width.equalTo(moderateScale(number: 96))
+            $0.height.equalTo(moderateScale(number: 14))
         }
         searchTouchableIamgeView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
