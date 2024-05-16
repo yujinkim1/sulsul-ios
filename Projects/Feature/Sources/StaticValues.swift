@@ -10,7 +10,7 @@ import Combine
 
 struct StaticValues {
     static var isLoggedIn = CurrentValueSubject<Bool, Never>(false)
-    static var isFirstLaunch: Bool = true
+    static var isFirstLaunch = CurrentValueSubject<Bool, Never>(true)
     static var drinkPairings: [SnackModel] = []
     static var snackPairings: [SnackModel] = []
     

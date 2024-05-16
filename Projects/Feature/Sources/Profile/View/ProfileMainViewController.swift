@@ -233,13 +233,10 @@ public final class ProfileMainViewController: BaseViewController {
             self.likeFeedView.isHidden = false
         }
         
-//        searchTouchableIamgeView.onTapped { [weak self] in
-//            self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.search), userData: nil)
-//        }
-        
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
         }
+        
         profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
