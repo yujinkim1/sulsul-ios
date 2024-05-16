@@ -80,7 +80,6 @@ public final class ProfileSettingViewController: HiddenTabBarBaseViewController 
         viewModel.deleteUserIsCompletedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
-
                 if result {
                     KeychainStore.shared.delete(label: "accessToken")
                     UserDefaultsUtil.shared.remove(.userId)

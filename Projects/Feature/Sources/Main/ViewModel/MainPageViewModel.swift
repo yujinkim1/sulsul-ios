@@ -29,7 +29,7 @@ final class MainPageViewModel {
                                                                            nickname: "",
                                                                            image: "",
                                                                            preference: .init(alcohols: [0], foods: [0]),
-                                                                           status: ""))
+                                                                           status: UserInfoStatus.notLogin.rawValue))
     
     private let completeAllFeed = PassthroughSubject<Void, Never>()
     
@@ -113,7 +113,9 @@ final class MainPageViewModel {
     }
     
     func getPreferenceFeeds() {
+        print("호출1")
         guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        print("호출2")
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
@@ -129,6 +131,8 @@ final class MainPageViewModel {
                     self.errorSubject.send("엡에서 에러가 발생했습니다")
                 }
             case .failure(let error):
+                print(">>>>>")
+                print(error)
                 self.errorSubject.send(error.localizedDescription)
             }
         }

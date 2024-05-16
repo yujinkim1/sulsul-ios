@@ -123,14 +123,18 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             }.store(in: &cancelBag)
         
         viewModel.userInfoPublisher()
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
+                print(">>$")
+                print(result)
                 if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
                     viewModel.getFeedsByAlcohol()
-                    if StaticValues.isFirstLaunch.value {
+                    print(StaticValues.isFirstLaunch)
+                    if StaticValues.isFirstLaunch {
                         self.tabBarController?.setTabBarHidden(true, animated: false)
                         self.showBottomSheetAlertView(bottomSheetAlertType: .verticalTwoButton,
                                                       title: "취향을 알려주지 않을래?",
@@ -139,13 +143,12 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                                                       description: "아...이게 정말 좋은데... 뭐라 설명할 방법이 없네... 하면 진짜 도움이 많이 될텐데... 쩝.. 하려면 버튼을 눌러줘바",
                                                       submitCompletion: { self.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)},
                                                       cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
-                        StaticValues.isFirstLaunch.send(false)
-                    } else {
-                        StaticValues.isFirstLaunch.send(false)
+                        StaticValues.isFirstLaunch = false
                     }
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
-                    
+                    StaticValues.isFirstLaunch = false
                 } else { // MARK: - 로그인한 유저
+                    StaticValues.isFirstLaunch = false
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
                     viewModel.getPreferenceFeeds()
@@ -163,8 +166,6 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             .sink { [weak self] _ in
                 self?.mainCollectionView.reloadData()
             }.store(in: &cancelBag)
-        
-        viewModel.getUserInfo()
     }
     
     @objc
