@@ -145,7 +145,8 @@ extension FeedDetailMenuBottomSheet {
         self.containerView.addSubview(stackView)
         
         stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(moderateScale(number: 12))
+            $0.leading.trailing.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(moderateScale(number: 12))
         }
         
         return self.containerView

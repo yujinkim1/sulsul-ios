@@ -11,6 +11,8 @@ import DesignSystem
 import Service
 
 final class FeedDetailCommentCell: UICollectionViewCell {
+    // MARK: - Properties
+    //
     static let reuseIdentifier = "FeedDetailCommentCell"
     
     private let numberOfSection = 1
@@ -29,6 +31,8 @@ final class FeedDetailCommentCell: UICollectionViewCell {
         $0.separatorStyle = .none
     }
     
+    // MARK: - Initializer
+    //
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -43,9 +47,13 @@ final class FeedDetailCommentCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+}
+
+// MARK: - Custom method
+//
+extension FeedDetailCommentCell {
     private func addViews() {
-        self.contentView.addSubview(self.commentTableView)
+        self.addSubview(self.commentTableView)
     }
     
     private func makeConstraints() {
@@ -61,7 +69,7 @@ final class FeedDetailCommentCell: UICollectionViewCell {
             .sink { [weak self] in
                 guard let self = self else { return }
                 
-                if let comments = viewModel?.comments {
+                if let comments = viewModel?.commentsWithoutChildren {
                     self.numberOfItems = comments.count
                 }
                 
@@ -73,7 +81,7 @@ final class FeedDetailCommentCell: UICollectionViewCell {
 }
 
 // MARK: - UITableView DataSource
-
+//
 extension FeedDetailCommentCell: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return self.numberOfSection
@@ -96,7 +104,7 @@ extension FeedDetailCommentCell: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentCell.id, for: indexPath) as? CommentCell 
         else { return .init() }
         
-        if let comment = viewModel?.comments[indexPath.row] {
+        if let comment = viewModel?.commentsWithoutChildren[indexPath.row] {
             cell.selectionStyle = .none
             cell.bind(comment)
             
@@ -128,7 +136,7 @@ extension FeedDetailCommentCell: UITableViewDataSource {
 }
 
 // MARK: - UITableView Delegate
-
+//
 extension FeedDetailCommentCell: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
