@@ -25,9 +25,9 @@ final class UserTagCollectionView: UICollectionView {
         }
         
         super.init(frame: frame, collectionViewLayout: flowLayout)
-        
         self.register(UserTagCell.self, forCellWithReuseIdentifier: UserTagCell.reuseIdentifier)
         self.contentInsetAdjustmentBehavior = .always
+        self.contentInset = .zero
         self.backgroundColor = .clear
         self.isScrollEnabled = false
         self.dataSource = self
@@ -66,11 +66,9 @@ extension UserTagCollectionView: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserTagCell.reuseIdentifier, for: indexPath) as? UserTagCell
         else { return .init() }
         
-        let item = userTags[indexPath.item]
+        let tag = userTags[indexPath.item]
         
-        debugPrint("\(#fileID) >>>> 사용자 해시태그: \(userTags[indexPath.item])")
-        
-        cell.bind(withUserTag: item)
+        cell.bind(withUserTag: tag)
         
         return cell
     }

@@ -271,15 +271,15 @@ extension FeedDetailMainCell {
         
         self.textView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
-            $0.top.equalTo(self.profileImageView.snp.bottom).offset(moderateScale(number: 18))
+            $0.top.equalTo(self.profileImageView.snp.bottom).offset(moderateScale(number: 20))
             $0.height.equalTo(moderateScale(number: 144))
         }
         
         self.userTagCollectionView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(textView)
+            $0.leading.trailing.equalTo(self.textView)
             $0.top.equalTo(self.textView.snp.bottom).offset(moderateScale(number: 32))
             $0.bottom.equalTo(self.feedViewsStackView.snp.top).offset(-moderateScale(number: 16))
-            $0.height.lessThanOrEqualTo(moderateScale(number: 52))
+            $0.height.greaterThanOrEqualTo(moderateScale(number: 48))
         }
         
         self.feedViewsStackView.snp.makeConstraints {
