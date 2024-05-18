@@ -257,7 +257,23 @@ extension FeedDetailViewController {
                 
                 return section
             case 1:
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(1))
+                var estimatedHeight: CGFloat = 0
+                
+                if self.commentCount > 1 {
+                    let count = self.commentCount
+                    let splitedAbsoluteHeight: CGFloat = 80
+                    
+                    for _ in 1...count {
+                        estimatedHeight += splitedAbsoluteHeight
+                    }
+                    estimatedHeight = min(estimatedHeight, 428)
+                } else if self.commentCount == 1 {
+                    estimatedHeight = 80
+                } else {
+                    estimatedHeight = 0
+                }
+                
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(estimatedHeight))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: itemSize.heightDimension)
@@ -309,6 +325,9 @@ extension FeedDetailViewController {
     
     private func editFeed() {
         // 피드 수정은 피드 작성 화면을 재활용하는 쪽으로 작업할 것
+        let writeTitleViewController = WriteTitleViewController()
+        
+        self.navigationController?.pushViewController(writeTitleViewController, animated: true)
     }
     
     /// 현재 로그인한 사용자와 피드를 작성한 사용자가 같은 경우 피드를 삭제할 수 있습니다.

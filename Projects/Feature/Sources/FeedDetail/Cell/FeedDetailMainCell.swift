@@ -191,7 +191,8 @@ extension FeedDetailMainCell {
         }
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        // 기존 yyyy-MM-dd'T'HH:mm:ss 형식이 아닌 초의 소수점까지 서버에서 전달하고 있음
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         
         if let createdAtDate = dateFormatter.date(from: model.createdAt) {
             let displayDateFormat = DateFormatter()
