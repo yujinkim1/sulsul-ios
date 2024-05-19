@@ -1,5 +1,5 @@
 //
-//  FeedDetailCommentCell.swift
+//  DetailCommentCell.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-03-14.
@@ -10,7 +10,7 @@ import UIKit
 import DesignSystem
 import Service
 
-final class FeedDetailCommentCell: UICollectionViewCell {
+final class DetailCommentCell: UICollectionViewCell {
     // MARK: - Properties
     //
     static let reuseIdentifier = "FeedDetailCommentCell"
@@ -19,8 +19,21 @@ final class FeedDetailCommentCell: UICollectionViewCell {
     
     private var numberOfItems = 0
     private var parentID = 0
-    private var viewModel: CommentViewModel?
+    private var viewModel: DetailCommentViewModel?
     private var cancelBag = Set<AnyCancellable>()
+    
+    var parentViewController: UIViewController? {
+        weak var parentResponder: UIResponder? = self
+        while parentResponder != nil {
+            parentResponder = parentResponder!.next
+            
+            if let viewController = parentResponder as? UIViewController {
+                return viewController
+            }
+        }
+        
+        return nil
+    }
     
     private lazy var commentTableView = UITableView().then {
         $0.backgroundColor = .clear
@@ -51,7 +64,7 @@ final class FeedDetailCommentCell: UICollectionViewCell {
 
 // MARK: - Custom method
 //
-extension FeedDetailCommentCell {
+extension DetailCommentCell {
     private func addViews() {
         self.addSubview(self.commentTableView)
     }
@@ -63,18 +76,18 @@ extension FeedDetailCommentCell {
     }
     
     public func bind(withID feedID: Int) {
-        self.viewModel = CommentViewModel(feedId: feedID)
+        self.viewModel = DetailCommentViewModel(feedID: feedID)
+        self.parentID = feedID
         
         self.viewModel?.reloadData
             .sink { [weak self] in
                 guard let self = self else { return }
                 
-                if let comments = viewModel?.commentsWithoutChildren {
+                if let comments = viewModel?.commentsWithoutChildrens {
                     self.numberOfItems = comments.count
                 }
                 
                 self.commentTableView.reloadData()
-                debugPrint("\(#file) >>>> numberOfItems: \(self.numberOfItems)")
             }
             .store(in: &cancelBag)
     }
@@ -82,7 +95,7 @@ extension FeedDetailCommentCell {
 
 // MARK: - UITableView DataSource
 //
-extension FeedDetailCommentCell: UITableViewDataSource {
+extension DetailCommentCell: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return self.numberOfSection
     }
@@ -101,33 +114,32 @@ extension FeedDetailCommentCell: UITableViewDataSource {
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentCell.id, for: indexPath) as? CommentCell 
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentCell.id, for: indexPath) as? CommentCell
         else { return .init() }
         
-        if let comment = viewModel?.commentsWithoutChildren[indexPath.row] {
+        if let comment = viewModel?.commentsWithoutChildrens[indexPath.row] {
             cell.selectionStyle = .none
             cell.bind(comment)
             
-            cell.replayLabel.onTapped { [weak self] in
-                guard let self = self else { return }
-                self.parentID = comment.comment_id
-            }
+            cell.replayLabel.isHidden = true
             
             cell.moreButton.onTapped { [weak self] in
-                let userId = UserDefaultsUtil.shared.getInstallationId()
-                if userId == comment.user_info.user_id {
-                    let vc = CommentMoreBottomSheet()
-                    vc.viewModel = self?.viewModel
-                    vc.requestModel = .init(feed_id: 1, comment_id: comment.comment_id)
-                    vc.modalPresentationStyle = .overFullScreen
-    //                self?.present(vc, animated: false)
-                    
+                guard let self = self else { return }
+                
+                let userID = UserDefaultsUtil.shared.getInstallationId()
+                let viewController: UIViewController
+                
+                if userID == comment.user_info.user_id {
+                    let commentMoreBottomSheet = CommentMoreBottomSheet()
+                    commentMoreBottomSheet.viewModel = CommentViewModel(feedId: self.parentID)
+                    viewController = commentMoreBottomSheet
                 } else {
-                    let vc = SpamBottomSheet()
-                    vc.viewModel = self?.viewModel
-                    vc.modalPresentationStyle = .overFullScreen
-    //                self?.present(vc, animated: false)
+                    let spamBottomSheet = SpamBottomSheet()
+                    spamBottomSheet.viewModel = CommentViewModel(feedId: self.parentID)
+                    viewController = spamBottomSheet
                 }
+                
+                self.parentViewController?.present(viewController, animated: true, completion: nil)
             }
         }
         
@@ -137,7 +149,7 @@ extension FeedDetailCommentCell: UITableViewDataSource {
 
 // MARK: - UITableView Delegate
 //
-extension FeedDetailCommentCell: UITableViewDelegate {
+extension DetailCommentCell: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath

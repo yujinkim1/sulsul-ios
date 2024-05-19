@@ -19,6 +19,7 @@ public final class FeedDetailViewController: HiddenTabBarBaseViewController {
     private var feedUserID = 0
     private var selectedFeedID = 0
     private var feedDetailViewModel: FeedDetailViewModel
+    private var detailCommentViewModel: DetailCommentViewModel
     private var detail: FeedDetail?
     private var cancelBag = Set<AnyCancellable>()
     
@@ -66,8 +67,8 @@ public final class FeedDetailViewController: HiddenTabBarBaseViewController {
         $0.showsVerticalScrollIndicator = false
         $0.dataSource = self
         $0.delegate = self
-        $0.register(FeedDetailMainCell.self, forCellWithReuseIdentifier: FeedDetailMainCell.reuseIdentifier)
-        $0.register(FeedDetailCommentCell.self, forCellWithReuseIdentifier: FeedDetailCommentCell.reuseIdentifier)
+        $0.register(DetailMainCell.self, forCellWithReuseIdentifier: DetailMainCell.reuseIdentifier)
+        $0.register(DetailCommentCell.self, forCellWithReuseIdentifier: DetailCommentCell.reuseIdentifier)
         $0.register(RelatedFeedCell.self, forCellWithReuseIdentifier: RelatedFeedCell.reuseIdentifier)
         $0.registerSupplimentaryView(CommentHeaderView.self, supplementaryViewOfKind: .header)
         $0.registerSupplimentaryView(RelatedFeedHeaderView.self, supplementaryViewOfKind: .header)
@@ -199,6 +200,7 @@ public final class FeedDetailViewController: HiddenTabBarBaseViewController {
     public init(feedID: Int = 0) {
         self.feedID = feedID
         self.feedDetailViewModel = FeedDetailViewModel(feedID: feedID)
+        self.detailCommentViewModel = DetailCommentViewModel(feedID: feedID)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -217,8 +219,6 @@ extension FeedDetailViewController {
             .detailPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                self?.commentCount = value.commentCount
-                
                 if let userID = value.writerInfo?.userID {
                     self?.feedUserID = userID
                 }
@@ -227,6 +227,16 @@ extension FeedDetailViewController {
                 
                 self?.detailCollectionView.reloadData()
                 self?.activityIndicatorView.stopAnimating()
+            }
+            .store(in: &cancelBag)
+        
+        self.detailCommentViewModel
+            .reloadData
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                if let count = self?.detailCommentViewModel.commentsWithoutChildrens.count {
+                    self?.commentCount = count
+                }
             }
             .store(in: &cancelBag)
         
@@ -455,7 +465,7 @@ extension FeedDetailViewController: UICollectionViewDataSource {
         switch indexPath.section {
         // 피드의 상세 콘텐츠를 보여주는 DetailFeedMainCell
         case 0:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedDetailMainCell.reuseIdentifier, for: indexPath) as? FeedDetailMainCell 
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailMainCell.reuseIdentifier, for: indexPath) as? DetailMainCell 
             else { return .init() }
             
             feedDetailViewModel
@@ -476,7 +486,7 @@ extension FeedDetailViewController: UICollectionViewDataSource {
             return cell
         // 피드의 댓글 중 5개까지만 보여주는 DetailFeedCommentCell
         case 1:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedDetailCommentCell.reuseIdentifier, for: indexPath) as? FeedDetailCommentCell 
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailCommentCell.reuseIdentifier, for: indexPath) as? DetailCommentCell 
             else { return .init() }
             
             cell.bind(withID: self.feedID)

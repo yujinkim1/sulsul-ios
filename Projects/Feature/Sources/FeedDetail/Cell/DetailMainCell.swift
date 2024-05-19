@@ -1,5 +1,5 @@
 //
-//  FeedDetailMainCell.swift
+//  DetailMainCell.swift
 //  Feature
 //
 //  Created by Yujin Kim on 2024-03-14.
@@ -8,7 +8,7 @@
 import UIKit
 import DesignSystem
 
-final class FeedDetailMainCell: UICollectionViewCell {
+final class DetailMainCell: UICollectionViewCell {
     // MARK: - Properties
     //
     static let reuseIdentifier: String = "FeedDetailMainCell"
@@ -158,7 +158,7 @@ final class FeedDetailMainCell: UICollectionViewCell {
 
 // MARK: - Custom method
 //
-extension FeedDetailMainCell {
+extension DetailMainCell {
     func bind(_ model: FeedDetail) {
         self.carouselView.bind(model)
         
