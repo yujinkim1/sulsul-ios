@@ -10,21 +10,27 @@ import UIKit
 import DesignSystem
 import Service
 
-public final class FeedDetailViewController: BaseViewController {
+public final class FeedDetailViewController: HiddenTabBarBaseViewController {
+    // MARK: - Properties
+    //
     var feedID: Int
     
     private var commentCount = 0
     private var feedUserID = 0
     private var selectedFeedID = 0
     private var feedDetailViewModel: FeedDetailViewModel
+    private var detail: FeedDetail?
     private var cancelBag = Set<AnyCancellable>()
     
     private let isLogin: Bool = UserDefaultsUtil.shared.isLogin()
     
+    // MARK: - Components
+    //
     private lazy var baseTopView = BaseTopView()
+    
     private lazy var commentTextFieldView = CommentTextFieldView()
+    
     private lazy var bottomView = UIView().then {
-        $0.frame = .zero
         $0.backgroundColor = DesignSystemAsset.black.color
         $0.layer.shadowOpacity = 1
         $0.layer.shadowOffset = CGSize(width: 0, height: -18)
@@ -68,18 +74,8 @@ public final class FeedDetailViewController: BaseViewController {
         $0.registerSupplimentaryView(CommentFooterView.self, supplementaryViewOfKind: .footer)
     }
     
-    public init(feedID: Int = 0) {
-        self.feedID = feedID
-        self.feedDetailViewModel = FeedDetailViewModel(feedID: feedID)
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    @available(*, unavailable)
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+    // MARK: - ViewController Life-cycle
+    //
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -94,6 +90,12 @@ public final class FeedDetailViewController: BaseViewController {
         
         self.addViews()
         self.makeConstraints()
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        self.cancelBag.removeAll()
     }
     
     public override func addViews() {
@@ -159,7 +161,7 @@ public final class FeedDetailViewController: BaseViewController {
         }
     }
     
-    override public func setupIfNeeded() {
+    public override func setupIfNeeded() {
         self.baseTopView.backTouchableView.onTapped { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
@@ -191,6 +193,20 @@ public final class FeedDetailViewController: BaseViewController {
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
+    
+    // MARK: - Initializer
+    //
+    public init(feedID: Int = 0) {
+        self.feedID = feedID
+        self.feedDetailViewModel = FeedDetailViewModel(feedID: feedID)
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 // MARK: - Custom method
@@ -206,6 +222,8 @@ extension FeedDetailViewController {
                 if let userID = value.writerInfo?.userID {
                     self?.feedUserID = userID
                 }
+                
+                self?.detail = value
                 
                 self?.detailCollectionView.reloadData()
                 self?.activityIndicatorView.stopAnimating()
@@ -325,9 +343,16 @@ extension FeedDetailViewController {
     
     private func editFeed() {
         // 피드 수정은 피드 작성 화면을 재활용하는 쪽으로 작업할 것
-        let writeTitleViewController = WriteTitleViewController()
+        let rewriteContentViewController = RewriteContentViewController(
+            feedID: feedID,
+            title: detail?.title ?? "",
+            content: detail?.content ?? "", 
+            representImage: detail?.representImage ?? "",
+            images: detail?.images ?? [],
+            userTags: detail?.userTags ?? []
+        )
         
-        self.navigationController?.pushViewController(writeTitleViewController, animated: true)
+        self.navigationController?.pushViewController(rewriteContentViewController, animated: true)
     }
     
     /// 현재 로그인한 사용자와 피드를 작성한 사용자가 같은 경우 피드를 삭제할 수 있습니다.
