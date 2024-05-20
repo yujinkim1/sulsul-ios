@@ -61,6 +61,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        CommonUtil.showLoadingView()
         bind()
     }
     
@@ -165,6 +166,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.mainCollectionView.reloadData()
+                CommonUtil.hideLoadingView()
             }.store(in: &cancelBag)
     }
     
