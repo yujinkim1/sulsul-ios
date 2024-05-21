@@ -104,7 +104,8 @@ extension FeedDetailMenuBottomSheet {
         self.containerView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 10))
             $0.bottom.equalToSuperview().inset(moderateScale(number: 28))
-            $0.height.equalTo(sheetType == .mine ? moderateScale(number: 116) : moderateScale(number: 68))
+//            $0.height.equalTo(sheetType == .mine ? moderateScale(number: 116) : moderateScale(number: 68))
+            $0.height.equalTo(moderateScale(number: 68))
         }
     }
     
@@ -116,17 +117,17 @@ extension FeedDetailMenuBottomSheet {
         
         switch sheetType {
         case .mine:
-            let editFeedView = createOptionView(imageView: self.editFeedImageView, label: self.editFeedLabel) { [weak self] in
-                self?.delegate?.didTapEditFeedView()
-                self?.removeFromSuperview()
-            }
+//            let editFeedView = createOptionView(imageView: self.editFeedImageView, label: self.editFeedLabel) { [weak self] in
+//                self?.delegate?.didTapEditFeedView()
+//                self?.removeFromSuperview()
+//            }
             let deleteFeedView = createOptionView(imageView: self.deleteFeedImageView, label: self.deleteFeedLabel) { [weak self] in
                 self?.delegate?.didTapDeleteFeedView()
                 self?.removeFromSuperview()
             }
             
             stackView.addArrangedSubviews([
-                editFeedView,
+//                editFeedView,
                 deleteFeedView
             ])
         case .someone:

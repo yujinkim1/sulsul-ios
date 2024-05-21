@@ -22,6 +22,7 @@ final class RewriteContentViewController: BaseHeaderViewController {
     
     private var cancelBag = Set<AnyCancellable>()
     private var imagePickerController: ImagePickerProtocol?
+    private var viewModel: RewriteContentViewModel
 
     // MARK: - UI Components
     //
@@ -51,15 +52,43 @@ final class RewriteContentViewController: BaseHeaderViewController {
         $0.isLayoutMarginsRelativeArrangement = true
     }
     
-    private let contentTextView = UITextView().then {
+    private lazy var contentStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.distribution = .equalSpacing
+        $0.spacing = moderateScale(number: 16)
+    }
+    
+    private lazy var contentTextView = UITextView().then {
         $0.layer.borderColor = UIColor.gray.cgColor
         $0.layer.borderWidth = 1.0
         $0.layer.cornerRadius = 8.0
     }
     
-    private lazy var imagesTextField = UITextField().then {
-        $0.placeholder = "Image URLs (comma separated)"
-        $0.borderStyle = .roundedRect
+    private lazy var tagContainerView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.isHidden = true
+    }
+    
+    private lazy var tagTextView = UITextView().then {
+        $0.text = "#"
+        $0.isScrollEnabled = false
+        $0.font = Font.medium(size: 14)
+        $0.backgroundColor = .clear
+        $0.delegate = self
+        $0.textColor = DesignSystemAsset.gray900.color
+    }
+    
+    private lazy var imageAddButton = UIView()
+    
+    private lazy var imageAddImageView = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addImage")
+    }
+    
+    private lazy var tagAddButton = UIView()
+    
+    private lazy var tagAddImageView = UIImageView().then {
+        $0.image = UIImage(named: "writeFeed_addTag")
     }
     
     private lazy var userTagsTextField = UITextField().then {
@@ -68,7 +97,7 @@ final class RewriteContentViewController: BaseHeaderViewController {
     }
     
     private lazy var saveButton = UIButton(type: .system).then {
-        $0.setTitle("수정", for: .normal)
+        $0.setTitle("피드 수정하기", for: .normal)
         $0.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     }
 
@@ -89,6 +118,8 @@ final class RewriteContentViewController: BaseHeaderViewController {
         self.originImages = images
         self.originUserTags = userTags
         
+        self.viewModel = RewriteContentViewModel()
+        
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -96,7 +127,8 @@ final class RewriteContentViewController: BaseHeaderViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
+    // MARK: - ViewController Life-cycle
+    //
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -106,30 +138,30 @@ final class RewriteContentViewController: BaseHeaderViewController {
         print("originImages: \(originImages)")
     }
     
-    // MARK: - Setup UI
-    //
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+
     override func addViews() {
-        // TODO:
-        // 1. representImageView & titleTextView
-        // 2.
-        super.addViews()
+        self.imageScrollView.addSubview(self.imageStackView)
+        self.tagContainerView.addSubview(self.tagTextView)
         
-        self.view.addSubviews([
-            representImageView,
-            titleTextView
+        self.contentStackView.addArrangedSubviews([
+            self.contentTextView,
+            self.userTagsTextField
         ])
         
-        self.view.addSubview(contentTextView)
-        self.view.addSubview(imageScrollView)
-        self.view.addSubview(userTagsTextField)
-        self.view.addSubview(saveButton)
-        
-        imageScrollView.addSubview(imageStackView)
+        self.view.addSubviews([
+            self.representImageView,
+            self.titleTextView,
+            self.imageScrollView,
+            self.contentTextView,
+            self.userTagsTextField,
+            self.saveButton
+        ])
     }
     
     override func makeConstraints() {
-        super.makeConstraints()
-        
         self.representImageView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.top.equalToSuperview().inset(20)
@@ -142,38 +174,39 @@ final class RewriteContentViewController: BaseHeaderViewController {
             $0.height.equalTo(moderateScale(number: 36))
         }
         
-        imageScrollView.snp.makeConstraints {
+        self.imageScrollView.snp.makeConstraints {
             $0.top.equalTo(self.representImageView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(moderateScale(number: 98))
         }
         
-        imageStackView.snp.makeConstraints {
+        self.imageStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
             $0.height.equalToSuperview()
         }
         
-        contentTextView.snp.makeConstraints {
-            $0.top.equalTo(self.imageScrollView.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(200)
+        self.contentStackView.snp.makeConstraints {
+            $0.top.equalTo(self.imageScrollView.snp.bottom).offset(moderateScale(number: 16))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         
-        userTagsTextField.snp.makeConstraints {
+        self.userTagsTextField.snp.makeConstraints {
             $0.top.equalTo(imageScrollView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(40)
         }
         
-        saveButton.snp.makeConstraints {
+        self.saveButton.snp.makeConstraints {
             $0.top.equalTo(userTagsTextField.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(50)
         }
     }
-    
-    // MARK: - Bind Data
-    //
+}
+
+// MARK: - Custom method
+//
+extension RewriteContentViewController {
     private func bind() {
         guard let representImageURLString = URL(string: self.originRepresentImage)
         else {
@@ -205,55 +238,27 @@ final class RewriteContentViewController: BaseHeaderViewController {
     // MARK: - Actions
     //
     @objc private func saveButtonTapped() {
-        guard let title = titleTextView.text, !title.isEmpty,
-              let content = contentTextView.text, !content.isEmpty,
-              let imagesText = imagesTextField.text, !imagesText.isEmpty,
-              let userTagsText = userTagsTextField.text else {
-            return
+        if let title = titleTextView.text, !title.isEmpty,
+           let content = contentTextView.text, !content.isEmpty {
+            self.viewModel.updateFeed(
+                feedID: self.feedID,
+                title: title,
+                content: content,
+                images: self.originImages,
+                userTags: self.originUserTags
+            )
         }
-        
-        let images = imagesText.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
-        let userTags = userTagsText.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
-        
-        let parameters: [String: Any] = [
-            "title": title,
-            "content": content,
-            "images": images,
-            "user_tags": userTags
-        ]
-        
-        updateFeed(feedID: feedID, parameters: parameters)
-    }
-    
-    // MARK: - API Request
-    //
-    private func updateFeed(feedID: Int, parameters: [String: Any]) {
-        guard let url = URL(string: "https://api.example.com/feeds/\(feedID)") else { return }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
-        
-        URLSession.shared.dataTaskPublisher(for: request)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("Feed updated successfully")
-                case .failure(let error):
-                    print("Failed to update feed: \(error.localizedDescription)")
-                }
-            }, receiveValue: { _ in
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true, completion: nil)
-                }
-            })
-            .store(in: &cancelBag)
     }
 }
 
-extension RewriteContentViewController: UITextViewDelegate {}
+// MARK: - UITextView Delegate
+//
+extension RewriteContentViewController: UITextViewDelegate {
+    
+}
 
+// MARK: - BSImagePicker Delegate
+//
 extension RewriteContentViewController: ImagePickerDelegate {
     func didSelect(assets: [PHAsset]?, deletedAssets: [PHAsset]?) {}
 }
