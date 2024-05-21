@@ -61,6 +61,7 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        CommonUtil.showLoadingView()
         bind()
     }
     
@@ -123,13 +124,17 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             }.store(in: &cancelBag)
         
         viewModel.userInfoPublisher()
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
+                print(">>$")
+                print(result)
                 if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
                     viewModel.getFeedsByAlcohol()
+                    print(StaticValues.isFirstLaunch)
                     if StaticValues.isFirstLaunch {
                         self.tabBarController?.setTabBarHidden(true, animated: false)
                         self.showBottomSheetAlertView(bottomSheetAlertType: .verticalTwoButton,
@@ -140,12 +145,11 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
                                                       submitCompletion: { self.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: nil)},
                                                       cancelCompletion: { self.tabBarController?.setTabBarHidden(false) })
                         StaticValues.isFirstLaunch = false
-                    } else {
-                        StaticValues.isFirstLaunch = false
                     }
                 } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
-                    
+                    StaticValues.isFirstLaunch = false
                 } else { // MARK: - 로그인한 유저
+                    StaticValues.isFirstLaunch = false
                     viewModel.getPopularFeeds()
                     viewModel.getDifferenceFeeds()
                     viewModel.getPreferenceFeeds()
@@ -162,9 +166,8 @@ public final class MainPageViewController: BaseViewController, HomeBaseCoordinat
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.mainCollectionView.reloadData()
+                CommonUtil.hideLoadingView()
             }.store(in: &cancelBag)
-        
-        viewModel.getUserInfo()
     }
     
     @objc
