@@ -9,10 +9,12 @@ import UIKit
 import Then
 import DesignSystem
 import Service
+import Combine
 
-public final class ProfileSettingViewController: BaseViewController {
-    var coordinator: MoreBaseCoordinator?
-    
+public final class ProfileSettingViewController: HiddenTabBarBaseViewController {
+    var coordinator: Coordinator?
+    private var cancelBag = Set<AnyCancellable>()
+    private let viewModel = ProfileSettingViewModel()
     private lazy var topHeaderView = BaseTopView()
     private lazy var scrollView = UIScrollView()
     private lazy var containerView = UIView()
@@ -48,18 +50,43 @@ public final class ProfileSettingViewController: BaseViewController {
     private lazy var personalSettingView = SettingView(settingType: .arrow,
                                                        title: "개인정보 처리방침")
     private lazy var signOutSettingView = SettingView(settingType: .arrow,
-                                                      title: "회원탈퇴")
+                                                      title: "회원탈퇴").then({
+        $0.isHidden = !StaticValues.isLoggedIn.value
+    })
     private lazy var logoutTouchaleLabel = TouchableLabel().then({
-        $0.text = "로그아웃"
         $0.textColor = DesignSystemAsset.red050.color
         $0.font = Font.bold(size: 16)
+        $0.text = "로그아웃"
+    })
+    private lazy var loginDefaultButton = DefaultButton(title: "로그인 해볼까요?").then({
+        $0.setClickable(true)
+        $0.isHidden = true
     })
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = DesignSystemAsset.black.color
-        addViews()
-        makeConstraints()
+        if StaticValues.isLoggedIn.value {
+            loginDefaultButton.isHidden = true
+            logoutTouchaleLabel.isHidden = false
+        } else {
+            loginDefaultButton.isHidden = false
+            logoutTouchaleLabel.isHidden = true
+        }
+        bind()
+    }
+    
+    private func bind() {
+        viewModel.deleteUserIsCompletedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                if result {
+                    KeychainStore.shared.delete(label: "accessToken")
+                    UserDefaultsUtil.shared.remove(.userId)
+                    StaticValues.isLoggedIn.send(false)
+                    self?.navigationController?.popViewController(animated: true)
+                }
+            }.store(in: &cancelBag)
     }
     
     public override func addViews() {
@@ -69,7 +96,8 @@ public final class ProfileSettingViewController: BaseViewController {
         scrollView.addSubview(containerView)
         containerView.addSubviews([titleLabel,
                                    settingStackView,
-                                   logoutTouchaleLabel])
+                                   logoutTouchaleLabel,
+                                   loginDefaultButton])
         settingStackView.addArrangedSubviews([managementTitleLabel,
                                               drinkSettingView,
                                               snackSettingView,
@@ -107,8 +135,13 @@ public final class ProfileSettingViewController: BaseViewController {
             $0.height.equalTo(moderateScale(number: 378))
         }
         logoutTouchaleLabel.snp.makeConstraints {
-            $0.top.equalTo(settingStackView.snp.bottom).offset(moderateScale(number: 67))
+            $0.bottom.equalToSuperview().inset(moderateScale(number: getSafeAreaBottom() + 22))
             $0.centerX.equalToSuperview()
+        }
+        loginDefaultButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(moderateScale(number: getSafeAreaBottom() + 8))
+            $0.height.equalTo(moderateScale(number: 52))
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
     }
     
@@ -118,20 +151,37 @@ public final class ProfileSettingViewController: BaseViewController {
         }
         drinkSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            if StaticValues.isLoggedIn.value {
+                self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectDrink), userData: nil)
+            } else {
+                self.showAlertView(withType: .oneButton, title: "로그인", description: "해라", submitCompletion: nil, cancelCompletion: nil)
+            }
         }
         snackSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            if StaticValues.isLoggedIn.value {
+                self.coordinator?.moveTo(appFlow: TabBarFlow.more(.selectSnack), userData: nil)
+            } else {
+                self.showAlertView(withType: .oneButton, title: "로그인", description: "해라", submitCompletion: nil, cancelCompletion: nil)
+            }
+        }
+        termsSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://mopil1102.notion.site/51b45ca9663843f89174798fb6f725e2?pvs=4")])
+        }
+        personalSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+            guard let self = self else { return }
+            self.coordinator?.moveTo(appFlow: TabBarFlow.common(.web), userData: ["url": URL(string: "https://mopil1102.notion.site/eadb2ee65a114940bae603e898dd21f0?pvs=4")])
         }
         signOutSettingView.containerView.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
-            self.tabBarController?.setTabBarHidden(true)
             self.showBottomSheetAlertView(bottomSheetAlertType: .twoButton,
                                           title: "회원탈퇴",
+                                          submitLabel: nil,
+                                          cancelLabel: nil,
                                           description: "지금 탈퇴를 진행하면 7일동안 재가입이 불가능하며,\n기존에 작성했던 모든 피드와 취향 정보가 삭제돼요.",
-                                          submitCompletion: nil,
-                                          cancelCompletion: {self.tabBarController?.setTabBarHidden(false)})
+                                          submitCompletion: { self.viewModel.deleteUser() },
+                                          cancelCompletion: nil)
         }
         logoutTouchaleLabel.setOpaqueTapGestureRecognizer { [weak self] in
             self?.showAlertView(withType: .twoButton,
@@ -140,8 +190,13 @@ public final class ProfileSettingViewController: BaseViewController {
                                 submitCompletion: {
                 KeychainStore.shared.delete(label: "accessToken")
                 UserDefaultsUtil.shared.remove(.userId)
+                StaticValues.isLoggedIn.send(false)
+                self?.navigationController?.popViewController(animated: true)
             },
                                 cancelCompletion: nil)
+        }
+        loginDefaultButton.onTapped { [weak self] in
+            self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.login), userData: ["popToRoot": true])
         }
     }
 }

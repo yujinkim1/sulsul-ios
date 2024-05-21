@@ -22,6 +22,7 @@ open class BaseHeaderViewController: BaseViewController {
     open lazy var actionButton = UILabel().then {
         $0.textColor = DesignSystemAsset.main.color
         $0.font = Font.semiBold(size: 14)
+        $0.textAlignment = .right
     }
     
     open override func viewDidLoad() {
@@ -81,6 +82,8 @@ open class BaseHeaderViewController: BaseViewController {
         
         actionButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
+            $0.height.equalToSuperview()
+            $0.width.equalTo(moderateScale(number: 60))
             $0.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
     }

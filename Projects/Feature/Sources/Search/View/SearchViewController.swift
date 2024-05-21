@@ -79,7 +79,7 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
     
     public init() {
         super.init(nibName: nil, bundle: nil)
-        
+        hidesBottomBarWhenPushed = true
         titleLabel.text = "검색"
 
         bind()
@@ -93,7 +93,7 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tabBarController?.setTabBarHidden(true)
+        self.searchTextField.becomeFirstResponder()
     }
     
     private func bind() {
@@ -132,6 +132,12 @@ public final class SearchViewController: BaseHeaderViewController, CommonBaseCoo
                     self?.emptyLabel.asColor(targetString: "\"\(self?.searchTextField.text ?? "")\"",
                                              color: DesignSystemAsset.main.color)
                 }
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.error
+            .sink { [weak self] in
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.")
             }
             .store(in: &cancelBag)
     }
@@ -288,6 +294,10 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
                 
         return cell
     }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        view.endEditing(true)
+    }
 }
 
 extension SearchViewController {
@@ -320,7 +330,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.onTapped { [weak self] in
             if let feedId = self?.viewModel.feedSearchResults[indexPath.row].feed_id {
-                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.feedDetail),
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed),
                                           userData: ["feedId": feedId])
             }
         }

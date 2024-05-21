@@ -7,15 +7,16 @@
 
 import UIKit
 import DesignSystem
+import Combine
 
 final class MainPreferenceHeaderView: UICollectionReusableView {
     
     var viewModel: MainPageViewModel?
+    private var cancelBag = Set<AnyCancellable>()
     
     private lazy var containerView = UIView()
     
     private lazy var titleLabel = UILabel().then({
-        $0.text = "소주랑 어울리는\n안주로 골라봤어요"
         $0.font = Font.bold(size: 28)
         $0.textColor = DesignSystemAsset.gray900.color
         $0.numberOfLines = 0
@@ -51,7 +52,8 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
     
     private func makeConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.bottom.trailing.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
         }
         titleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
@@ -79,13 +81,34 @@ final class MainPreferenceHeaderView: UICollectionReusableView {
              return section
          }
     }
-    
-    func updateUI(_ temp: Int) {
-        if temp == 0 {
-            preferecneCollectionView.isHidden = false
-        } else {
+
+    func updateUI() {
+        if StaticValues.isLoggedIn.value {
             preferecneCollectionView.isHidden = true
+            guard let nickname = viewModel?.getUserInfoValue().nickname else { return }
+            let attributedString = NSMutableAttributedString(string: nickname + "님이 선택한\n취향으로 골라봤어요.")
+            attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: nickname.count)) // 닉네임의 색상 변경
+            titleLabel.attributedText = attributedString
+        } else {
+            preferecneCollectionView.isHidden = false
+            guard let title = viewModel?.getSelectedAlcoholValue() else { return }
+            
+            let attributedString = NSMutableAttributedString(string: postPositionText(title) + " 어울리는\n안주로 골라봤어요!")
+            attributedString.addAttribute(.foregroundColor, value: DesignSystemAsset.main.color, range: NSRange(location: 0, length: title.count)) // 타이틀의 색상 변경
+            titleLabel.attributedText = attributedString
         }
+        preferecneCollectionView.reloadData()
+    }
+    
+    private func postPositionText(_ word: String) -> String {
+        guard let lastText = word.last else { return word }
+        let unicodeVal = UnicodeScalar(String(lastText))?.value
+        guard let value = unicodeVal else { return word }
+        if (value < 0xAC00 || value > 0xD7A3) { return word }
+        let last = (value - 0xAC00) % 28
+        let str = last > 0 ? "이랑" : "랑"
+        
+        return word + str
     }
 }
 
@@ -102,9 +125,8 @@ extension MainPreferenceHeaderView: UICollectionViewDataSource {
         cell.bind(alcohol)
         
         cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
-//            cell.updateView()
             guard let self = self else { return }
-            viewModel?.sendSelectedAlcoholFeed(alcohol)
+            viewModel?.sendSelectedAlcoholFeed(alcohol.title)
         }
         
         return cell

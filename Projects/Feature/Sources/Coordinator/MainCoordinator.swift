@@ -19,8 +19,8 @@ public final class MainCoordinator: MainBaseCoordinator {
     public func start() -> UIViewController {
         tabBarCoordinator.parentCoordinator = self
         mainTabBar = tabBarCoordinator.start() as? UITabBarController
-        
-        let splashVC = SplashViewController()
+        let viewModel = SplashViewModel()
+        let splashVC = SplashViewController(viewModel: viewModel)
         splashVC.coordinator = self
         rootViewController = UINavigationController(rootViewController: splashVC)
         rootViewController.hidesBottomBarWhenPushed = true

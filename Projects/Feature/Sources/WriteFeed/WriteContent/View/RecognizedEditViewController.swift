@@ -11,8 +11,8 @@ import DesignSystem
 final class RecognizedEditViewController: BaseHeaderViewController {
     weak var delegate: OnSelectedValue?
     
-    var selectedDrink: String?
-    var selectedSnack: String?
+    var selectedDrink: SnackModel?
+    var selectedSnack: SnackModel?
     
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "인식된 술, 안주 정보를 수정할 수 있어요."
@@ -76,7 +76,7 @@ final class RecognizedEditViewController: BaseHeaderViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        titleLabel.text = "술&안주 정보 수정"
+        setHeaderText("술&안주 정보 수정", actionText: "초기화")
         
         drinkBackView.onTapped { [weak self] in
             let vc = SelectDrinkBottomSheetViewController()
@@ -88,16 +88,30 @@ final class RecognizedEditViewController: BaseHeaderViewController {
         snackBackView.onTapped { [weak self] in
             let vc = SelectRecognizdSnackBottomSheet()
             vc.delegate = self
-            vc.modalPresentationStyle = .overFullScreen
-            self?.present(vc, animated: false)
+            let viewController = UINavigationController(rootViewController: vc)
+            
+            viewController.modalPresentationStyle = .fullScreen
+            self?.present(viewController, animated: true)
         }
         
         saveButton.onTapped { [weak self] in
-            let texts = [self?.selectedDrink ?? "",
-                         self?.selectedSnack ?? ""]
-            
-            self?.delegate?.selectedValue(["writtenText": texts.filter({ $0 != "" })])
+            self?.delegate?.selectedValue(["selectedDrink": self?.selectedDrink,
+                                           "selectedSnack": self?.selectedSnack])
             self?.navigationController?.popViewController(animated: true)
+        }
+        
+        actionButton.onTapped { [weak self] in
+            self?.selectedDrink = nil
+            self?.selectedSnack = nil
+       
+            self?.placeholderLabel.text = "안주이름을 검색해보세요"
+            self?.placeholderLabel.textColor = DesignSystemAsset.gray400.color
+      
+            self?.snackPlaceholderLabel.text = "안주이름을 검색해보세요"
+            self?.snackPlaceholderLabel.textColor = DesignSystemAsset.gray400.color
+
+            self?.saveButton.textColor = DesignSystemAsset.gray300.color
+            self?.saveButton.backgroundColor = DesignSystemAsset.gray100.color
         }
     }
     
@@ -201,20 +215,19 @@ final class RecognizedEditViewController: BaseHeaderViewController {
 
 extension RecognizedEditViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        if let selectedDrink = value["selectedDrink"] as? String {
-            placeholderLabel.text = selectedDrink
+        if let selectedDrink = value["selectedDrink"] as? SnackModel {
+            placeholderLabel.text = selectedDrink.name
             placeholderLabel.textColor = DesignSystemAsset.gray900.color
             self.selectedDrink = selectedDrink
         }
         
-        if let selectedSnack = value["selectedSnack"] as? String {
-            snackPlaceholderLabel.text = selectedSnack
+        if let selectedSnack = value["selectedSnack"] as? SnackModel {
+            snackPlaceholderLabel.text = selectedSnack.name
             snackPlaceholderLabel.textColor = DesignSystemAsset.gray900.color
             self.selectedSnack = selectedSnack
         }
         
-        if placeholderLabel.text != "술 종류를 선택해주세요",
-           snackPlaceholderLabel.text != "안주이름을 검색해보세요" {
+        if self.selectedSnack != nil || self.selectedDrink != nil {
             
             saveButton.textColor = DesignSystemAsset.gray050.color
             saveButton.backgroundColor = DesignSystemAsset.main.color

@@ -17,10 +17,9 @@ public final class ProfileMainViewController: BaseViewController {
     private let viewModel: ProfileMainViewModel
     
     private lazy var topHeaderView = UIView()
-    private lazy var searchTouchableIamgeView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(named: "common_search")
-        $0.tintColor = DesignSystemAsset.gray900.color
-    })
+    
+    private lazy var logoImageView = LogoImageView()
+    
     private lazy var settingTouchableImageView = TouchableImageView(frame: .zero).then({
         $0.image = UIImage(named: "common_setting")
         $0.tintColor = DesignSystemAsset.gray900.color
@@ -45,8 +44,9 @@ public final class ProfileMainViewController: BaseViewController {
         $0.textColor = DesignSystemAsset.gray300.color
     })
     
-    private lazy var profileTouchableImageView = TouchableImageView(frame: .zero).then({
+    private lazy var profileTouchableImageView = UIImageView().then({
         $0.image = UIImage(named: "profile_notUser")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var selectFeedView = UIStackView().then({
@@ -79,34 +79,39 @@ public final class ProfileMainViewController: BaseViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(profileIsChanged), name: NSNotification.Name("ProfileIsChanged"), object: nil)
-        view.backgroundColor = DesignSystemAsset.black.color
+
         addViews()
         makeConstraints()
         bind()
-        viewModel.getFeedsByMe()
-        viewModel.getFeedsLikeByMe()
+    }
+    
+    override public func viewWillAppear(_ animated: Bool) {
+        viewModel.getUserInfo()
     }
     
     private func bind() {
         viewModel.userInfoPublisher()
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
-                if result.id == 0 {
+                if result.status == UserInfoStatus.notLogin.rawValue { // MARK: - 로그인 하지 않은 유저
                     self.profileLabel.text = "로그인 해주세요!"
                     self.profileEditTouchableLabel.isHidden = true
                     self.myFeedView.updateState(.notLogin)
-                } else {
+                    self.likeFeedView.updateState(.notLogin)
+                } else if result.status == UserInfoStatus.banned.rawValue { // MARK: - 밴된 유저
+                    // MARK: - 밴된 유저
+                } else { // MARK: - 로그인한 유저
                     self.profileLabel.text = result.nickname
                     self.profileEditTouchableLabel.isHidden = false
                     if let imageURL = URL(string: result.image ?? "") {
                         self.profileTouchableImageView.kf.setImage(with: imageURL)
                     }
+                    viewModel.getFeedsByMe()
+                    viewModel.getFeedsLikeByMe()
                 }
             }.store(in: &cancelBag)
-        
-        viewModel.getUserInfo()
         
         viewModel.loginButtonIsTappedPublisher()
               .receive(on: DispatchQueue.main)
@@ -119,13 +124,30 @@ public final class ProfileMainViewController: BaseViewController {
               .sink { [weak self] _ in
                   self?.coordinator?.moveTo(appFlow: TabBarFlow.home(.main), userData: nil)
               }.store(in: &cancelBag)
+        
+        viewModel.detailFeedPublisher()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] response in
+                self?.coordinator?.moveTo(appFlow: TabBarFlow.common(.detailFeed), userData: ["feedId": response])
+            }.store(in: &cancelBag)
+        
+        StaticValues.isLoggedInPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] loginStatus in
+                guard let self = self else { return }
+                viewModel.getUserInfo()
+            }.store(in: &cancelBag)
+    
     }
     
     public override func addViews() {
         view.addSubviews([topHeaderView,
                           containerView])
-        topHeaderView.addSubviews([searchTouchableIamgeView,
-                                   settingTouchableImageView])
+        topHeaderView.addSubviews([
+            logoImageView,
+            settingTouchableImageView
+        ])
         containerView.addSubviews([profileView,
                                    selectFeedView,
                                    myFeedView,
@@ -148,10 +170,11 @@ public final class ProfileMainViewController: BaseViewController {
             $0.top.equalTo(topHeaderView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
-        searchTouchableIamgeView.snp.makeConstraints {
+        logoImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalTo(settingTouchableImageView.snp.leading).offset(moderateScale(number: -12))
-            $0.size.equalTo(moderateScale(number: 24))
+            $0.leading.equalToSuperview().inset(moderateScale(number: 20))
+            $0.width.equalTo(moderateScale(number: 96))
+            $0.height.equalTo(moderateScale(number: 14))
         }
         settingTouchableImageView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -189,7 +212,8 @@ public final class ProfileMainViewController: BaseViewController {
         }
         likeFeedView.snp.makeConstraints {
             $0.top.equalTo(selectFeedView.snp.bottom)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.equalToSuperview().offset(moderateScale(number: -10))
+            $0.trailing.bottom.equalToSuperview()
         }
     }
     
@@ -208,13 +232,11 @@ public final class ProfileMainViewController: BaseViewController {
             self.myFeedView.isHidden = true
             self.likeFeedView.isHidden = false
         }
+        
         settingTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileSetting), userData: nil)
         }
-        profileTouchableImageView.setOpaqueTapGestureRecognizer { [weak self] in
-            guard let self = self else { return }
-            self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])
-        }
+        
         profileEditTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.coordinator?.moveTo(appFlow: TabBarFlow.more(.profileEdit), userData: ["delegate": self])

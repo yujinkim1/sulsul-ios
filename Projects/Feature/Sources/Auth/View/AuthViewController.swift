@@ -10,7 +10,7 @@ import GoogleSignIn
 import UIKit
 import Combine
 
-public final class AuthViewController: BaseViewController {
+public final class AuthViewController: HiddenTabBarBaseViewController {
     var viewModel: AuthViewModel?
     var coordinator: AuthBaseCoordinator?
     private var cancelBag = Set<AnyCancellable>()
@@ -20,9 +20,8 @@ public final class AuthViewController: BaseViewController {
     }
 
     private lazy var titleLabel = UILabel().then {
-        $0.setLineHeight(40, font: Font.bold(size: 32))
+        $0.setLineHeight(40, text: "만나서\n반가워요! :)", font: Font.bold(size: 32))
         $0.numberOfLines = 2
-        $0.text = "만나서\n반가워요! :)"
         $0.textColor = DesignSystemAsset.gray900.color
     }
 
@@ -77,9 +76,8 @@ public final class AuthViewController: BaseViewController {
         $0.setAttributedTitle(attributedText, for: .normal)
         $0.addTarget(self, action: #selector(termsButtonDidTap), for: .touchUpInside)
     }
-
+    
     override public func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         
@@ -94,11 +92,20 @@ public final class AuthViewController: BaseViewController {
     private func bind() {
         guard let viewModel = viewModel else { return }
         
-        // TODO: - 이미 사용자 입력을 마친 사용자라면 해당 플로우 건너뛰고 바로 홈으로 이동하도록 수정해야됨
-        viewModel.loginSuccessPublisher()
+        viewModel.userSettingTypePublisher()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
-                if state {
-                    self?.coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
+                guard let self = self else { return }
+                switch state {
+                case .initSettingUser:
+                    coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.setUserName)), userData: nil)
+                case .nickNameSettingUser:
+                    coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectDrink)), userData: nil)
+                case .drinkSettingUser:
+                    coordinator?.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
+                case .allSettingUSer:
+                    StaticValues.isLoggedIn.send(true)
+                    self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
         
@@ -106,18 +113,27 @@ public final class AuthViewController: BaseViewController {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-//                self?.showAlertView(withType: .oneButton,
-//                                    title: error,
-//                                    description: error,
-//                                    submitCompletion: nil,
-//                                    cancelCompletion: nil)
-                print(error)
+                guard self?.topViewController() is Self else { return }
+                self?.showAlertView(withType: .oneButton,
+                                    title: error,
+                                    description: error,
+                                    submitCompletion: nil,
+                                    cancelCompletion: nil)
             }.store(in: &cancelBag)
     }
 
     override public func addViews() {
-        view.addSubviews([topView, continueWithKakao, continueWithGoogle, continueWithApple, termsButton])
-        topView.addSubviews([backButton, titleLabel])
+        view.addSubviews([
+            topView,
+            continueWithKakao,
+            continueWithGoogle,
+            continueWithApple,
+            termsButton
+        ])
+        topView.addSubviews([
+            backButton,
+            titleLabel
+        ])
     }
 
     override public func makeConstraints() {
@@ -147,8 +163,7 @@ public final class AuthViewController: BaseViewController {
         continueWithGoogle.snp.makeConstraints {
             $0.top.equalTo(continueWithKakao.snp.bottom).offset(moderateScale(number: 16))
             $0.centerX.equalTo(continueWithKakao)
-            $0.width.equalTo(continueWithKakao)
-            $0.height.equalTo(continueWithKakao)
+            $0.width.height.equalTo(continueWithKakao)
         }
         googleImage.snp.makeConstraints {
             $0.leading.trailing.top.bottom.equalToSuperview()
@@ -156,8 +171,7 @@ public final class AuthViewController: BaseViewController {
         continueWithApple.snp.makeConstraints {
             $0.top.equalTo(continueWithGoogle.snp.bottom).offset(moderateScale(number: 16))
             $0.centerX.equalTo(continueWithGoogle)
-            $0.width.equalTo(continueWithGoogle)
-            $0.height.equalTo(continueWithGoogle)
+            $0.width.height.equalTo(continueWithKakao)
         }
         appleImage.snp.makeConstraints {
             $0.leading.trailing.top.bottom.equalToSuperview()

@@ -10,12 +10,12 @@ import Combine
 import Service
 import DesignSystem
 
-// MARK: VC 생성할 때 FeedId 전달받을 수 있도록 처리
 public final class CommentViewController: BaseHeaderViewController {
+    var feedID: Int
     
     private var cancelBag = Set<AnyCancellable>()
     
-    private lazy var viewModel = CommentViewModel(feedId: 1)
+    private var viewModel: CommentViewModel
     
     private lazy var commentCountView = UIView()
     
@@ -65,10 +65,23 @@ public final class CommentViewController: BaseHeaderViewController {
     
     private lazy var inputShadowView = UIView()
     
+    public init(feedID: Int = 0) {
+        self.feedID = feedID
+        self.viewModel = CommentViewModel(feedId: feedID)
+        
+        super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        tabBarController?.setTabBarHidden(true)
+        commentTextField.becomeFirstResponder()
         
         setHeaderText("댓글")
         
@@ -108,9 +121,10 @@ public final class CommentViewController: BaseHeaderViewController {
                 self?.commentTextFieldView.layer.borderColor = DesignSystemAsset.gray900.color.cgColor
                 self?.submitButton.textColor = DesignSystemAsset.gray500.color
                 self?.commentTextField.text = ""
-                self?.viewModel.didTabWriteComment(1,
+                self?.viewModel.didTabWriteComment(selfRef.feedID,
                                                    content: text,
                                                    parentId: selfRef.parentId)
+                self?.parentId = 0
             }
         }
     }

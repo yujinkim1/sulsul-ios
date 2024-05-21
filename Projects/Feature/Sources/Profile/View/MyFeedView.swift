@@ -9,13 +9,13 @@ import UIKit
 import Combine
 import DesignSystem
 
+enum MyFeedState {
+    case loginFeedExist
+    case loginFeedNotExist
+    case notLogin
+}
+
 class MyFeedView: UIView {
-    
-    enum MyFeedState {
-        case loginFeedExist
-        case loginFeedNotExist
-        case notLogin
-    }
     
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
@@ -26,7 +26,7 @@ class MyFeedView: UIView {
         $0.registerCell(NoDataCell.self)
         $0.registerCell(MyFeedCell.self)
         $0.showsVerticalScrollIndicator = false
-        $0.backgroundColor = DesignSystemAsset.gray100.color
+        $0.backgroundColor = .clear
         $0.dataSource = self
     })
     
@@ -65,40 +65,43 @@ class MyFeedView: UIView {
     private func makeConstraints() {
         collectionView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(moderateScale(number: 18))
-            $0.leading.equalToSuperview().offset(moderateScale(number: 20))
-            $0.trailing.equalToSuperview().offset(moderateScale(number: -20))
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
     }
     
     func updateState(_ myFeedState: MyFeedState) {
         self.myFeedState = myFeedState
+        collectionView.reloadData()
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] _, _ in
-            guard let self = self else { return nil }
-            
             let itemWidth: CGFloat = 1
             let itemHeight: CGFloat
-            switch myFeedState {
+            
+            switch self?.myFeedState {
             case .loginFeedExist:
                 itemHeight = 611
-            case .loginFeedNotExist:
-                itemHeight = 213
-            case .notLogin:
-                itemHeight = 213
+            case .loginFeedNotExist, .notLogin:
+                itemHeight = 400
             case nil:
                 itemHeight = 0
             }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
-                                                  heightDimension: .absolute(moderateScale(number: itemHeight)))
+                                                  heightDimension: .estimated(moderateScale(number: itemHeight)))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+            
+            switch self?.myFeedState {
+            case .loginFeedExist, .loginFeedNotExist:
+                item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+            case .notLogin, .none:
+                break
+            }
         
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
+                                                   heightDimension: .estimated(moderateScale(number: itemHeight)))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             let section = NSCollectionLayoutSection(group: group)
@@ -112,14 +115,6 @@ class MyFeedView: UIView {
 
 extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
-//        if viewModel.getMyFeedsValue().count == 0 {
-//            // MARK: - 빈 셀일때
-//            return 1
-//        } else {
-//            return viewModel.getMyFeedsValue().count
-//        }
-        
         switch myFeedState {
         case .loginFeedExist:
             return viewModel.getMyFeedsValue().count
@@ -133,24 +128,16 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        if viewModel.getMyFeedsValue().count == 0 {
-//            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
-//            cell.updateView(withType: .logInMyFeed)
-//            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
-//                print("로그인하러가기")
-//            }
-//            return cell
-//        } else {
-//            guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
-//            let model = viewModel.getMyFeedsValue()[indexPath.row]
-//            cell.bind(model)
-//            return cell
-//        }
         switch myFeedState {
         case .loginFeedExist:
             guard let cell = collectionView.dequeueReusableCell(MyFeedCell.self, indexPath: indexPath) else { return .init() }
             let model = viewModel.getMyFeedsValue()[indexPath.row]
             cell.bind(model)
+            
+            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                guard let self = self else { return }
+                self.viewModel.sendDetailFeed(model.feedId)
+            }
             
             return cell
         case .loginFeedNotExist:

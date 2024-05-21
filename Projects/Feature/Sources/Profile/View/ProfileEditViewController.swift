@@ -10,14 +10,17 @@ import UIKit
 import DesignSystem
 import MobileCoreServices
 import AVFoundation
+import Photos
+import Mantis
 
-public final class ProfileEditViewController: DisappearKeyBoardBaseViewController {
+public final class ProfileEditViewController: HiddenTabBarBaseViewController {
     
     var coordinator: MoreBaseCoordinator?
     private let viewModel = ProfileEditViewModel()
     
     private var cancelBag = Set<AnyCancellable>()
     private var randomNickname = ""
+    private let imagePickerController = UIImagePickerController()
     
     private lazy var topHeaderView = BaseTopView()
     
@@ -27,19 +30,22 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.font = Font.bold(size: 18)
     })
     
-    private lazy var profileTouchableImageView = TouchableImageView(frame: .zero).then({
-        $0.image = UIImage(systemName: "circle.fill")
+    private lazy var profileTouchableImageView = UIImageView().then({
+        $0.image = UIImage(named: "profile_notUser")
+        $0.contentMode = .scaleAspectFit
     })
     
     private lazy var modifyProfileButton = UIView().then({
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 16)
+        $0.isHidden = true
     })
     
     private lazy var modifyProfileLabel = TouchableLabel().then({
         $0.text = "사진 변경"
         $0.font = Font.bold(size: 16)
         $0.textColor = DesignSystemAsset.gray700.color
+        $0.isHidden = true
     })
     
     private lazy var induceUserNameLabel = UILabel().then {
@@ -91,23 +97,16 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         $0.textColor = DesignSystemAsset.gray700.color
     })
     
-    public lazy var nextButton = IndicatorTouchableView().then {
-        $0.text = "다음"
-        $0.textColor = DesignSystemAsset.gray300.color
-        $0.backgroundColor = DesignSystemAsset.gray100.color
-        $0.layer.cornerRadius = moderateScale(number: 12)
-        $0.clipsToBounds = true
-        $0.isUserInteractionEnabled = false
-    }
+    public lazy var nextButton = DefaultButton(title: "완료")
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
         addViews()
         makeConstraints()
         setupIfNeeded()
         bind()
+        imagePickerController.delegate = self
     }
     
     private func bind() {
@@ -120,9 +119,7 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                 countGuideImageView.image = UIImage(named: "checkmark")
                 countGuideLabel.textColor = UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
                 
-                self.nextButton.textColor = DesignSystemAsset.gray200.color
-                self.nextButton.backgroundColor = DesignSystemAsset.main.color
-                self.nextButton.isUserInteractionEnabled = true
+                self.nextButton.setClickable(true)
             }.store(in: &cancelBag)
         
         viewModel.setUserNamePublisher()
@@ -131,6 +128,8 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
                 NotificationCenter.default.post(name: NSNotification.Name("ProfileIsChanged"), object: nil)
                 self.navigationController?.popViewController(animated: true)
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func addViews() {
@@ -210,8 +209,9 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
             $0.centerX.equalToSuperview()
         }
         nextButton.snp.makeConstraints {
-            $0.leading.trailing.equalTo(topHeaderView)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalTo(topHeaderView).inset(moderateScale(number: 20))
+            let offset = getSafeAreaBottom() + moderateScale(number: 12)
+            $0.bottom.equalToSuperview().inset(offset)
             $0.height.equalTo(moderateScale(number: 50))
         }
     }
@@ -222,64 +222,95 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
         }
         modifyProfileLabel.setOpaqueTapGestureRecognizer { [weak self] in
             self?.showCameraBottomSheet(selectCameraCompletion: self?.openCamera,
-                                        selectAlbumCompletion: nil,
-                                        baseCompletion: nil)
+                                        selectAlbumCompletion: self?.openAlbum,
+                                        baseCompletion: self?.settingBaseImage)
         }
         resetTouchableLabel.setOpaqueTapGestureRecognizer { [weak self] in
             guard let self = self else { return }
             self.viewModel.getRandomNickname()
         }
-        nextButton.setOpaqueTapGestureRecognizer { [weak self] in
+        nextButton.onTapped { [weak self] in
             guard let self = self else { return }
-            // TODO: - validation 검증로직 추가 통과 안되면 nextButton 비활성화
             self.viewModel.setNickname(userNameTextField.text!)
         }
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        view.addGestureRecognizer(tapGestureRecognizer)
     }
     
     @objc private func clearButtonDidTap() {
         userNameTextField.text = ""
+        nicknameValidate(text: userNameTextField.text ?? "")
     }
     
     @objc private func textFieldDidChange(_ sender: UITextField) {
         guard let text = sender.text else { return }
+        nicknameValidate(text: text)
+    }
+    
+    @objc
+    private func handleTapGesture(_ gesture: UITapGestureRecognizer) {
+        view.endEditing(true)
+    }
+    
+    private func nicknameValidate(text: String) {
         let containsSpecialCharacters = text.range(of: "[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9\\s]", options: .regularExpression) != nil
         let hasValidLength = (1...10).contains(text.count)
-        
-        specializeGuideImageView.image = containsSpecialCharacters ? UIImage(named: "common_checkmark") : UIImage(named: "checkmark")
-        specializeGuidLabel.textColor = containsSpecialCharacters ? DesignSystemAsset.gray700.color : UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
-        countGuideImageView.image = hasValidLength ? UIImage(named: "checkmark") : UIImage(named: "common_checkmark")
-        countGuideLabel.textColor = hasValidLength ? UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1) :  DesignSystemAsset.gray700.color
-        
-        if !containsSpecialCharacters && hasValidLength {
-            nextButton.textColor = DesignSystemAsset.gray200.color
-            nextButton.backgroundColor = DesignSystemAsset.main.color
-            nextButton.isUserInteractionEnabled = true
+        if text.isEmpty {
+            specializeGuidLabel.textColor = DesignSystemAsset.gray700.color
+            countGuideLabel.textColor = DesignSystemAsset.gray700.color
+            specializeGuideImageView.image = UIImage(named: "common_checkmark")
+            countGuideImageView.image = UIImage(named: "common_checkmark")
         } else {
-            nextButton.textColor = DesignSystemAsset.gray300.color
-            nextButton.backgroundColor = DesignSystemAsset.gray100.color
-            nextButton.isUserInteractionEnabled = false
+            specializeGuideImageView.image = containsSpecialCharacters ? UIImage(named: "xmark") : UIImage(named: "checkmark")
+            specializeGuidLabel.textColor = containsSpecialCharacters ? DesignSystemAsset.red050.color : UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1)
+            specializeGuidLabel.text = containsSpecialCharacters ? "특수문자가 포함되어 있어요." : "입력된 특수문자가 없어요."
+            countGuideImageView.image = hasValidLength ? UIImage(named: "checkmark") : UIImage(named: "xmark")
+            countGuideLabel.textColor = hasValidLength ? UIColor(red: 127/255, green: 239/255, blue: 118/255, alpha: 1) :  DesignSystemAsset.red050.color
+            countGuideLabel.text = hasValidLength ? "적절한 글자수의 닉네임이에요." : "한글/영문, 숫자 포함 1~10자 이내로 설정해주세요."
         }
-        
+        if !containsSpecialCharacters && hasValidLength {
+            nextButton.setClickable(true)
+        } else {
+            nextButton.setClickable(false)
+        }
+    }
+    
+    private func settingBaseImage() {
+        profileTouchableImageView.image = UIImage(named: "profile_notUser")
     }
     
     private func openCamera() {
-#if targetEnvironment(simulator)
-        fatalError()
-#endif
+//#if targetEnvironment(simulator)
+//        fatalError()
+//#endif
         // Privacy - Camera Usage Description
         AVCaptureDevice.requestAccess(for: .video) { [weak self] isAuthorized in
+            guard let self = self else { return }
             guard isAuthorized else {
-                self?.showAlertGoToSetting()
+                showAlertGoToSetting()
                 return
             }
             
             DispatchQueue.main.async {
-                let pickerController = UIImagePickerController()
-                pickerController.sourceType = .camera
-                pickerController.allowsEditing = false
-                pickerController.mediaTypes = ["public.image"]
-                pickerController.delegate = self
-                self?.present(pickerController, animated: true)
+                self.imagePickerController.sourceType = .camera
+                self.present(self.imagePickerController, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func openAlbum() {
+        
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] isAuthorized in
+            guard let self = self else { return }
+            guard isAuthorized else {
+                showAlertGoToSetting()
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.imagePickerController.sourceType = .photoLibrary
+                self.present(self.imagePickerController, animated: true, completion: nil)
             }
         }
     }
@@ -313,15 +344,35 @@ public final class ProfileEditViewController: DisappearKeyBoardBaseViewControlle
     }
 }
 extension ProfileEditViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    public func imagePickerController(
-        _ picker: UIImagePickerController,
-        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]
-    ) {
-        guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
-            picker.dismiss(animated: true)
-            return
-        }
-        self.profileTouchableImageView.image = image
-        picker.dismiss(animated: true, completion: nil)
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+         if let image = info[.originalImage] as? UIImage {
+             
+             dismiss(animated: true) {
+                 self.openCropVC(image: image)
+             }
+         }
+         dismiss(animated: true, completion: nil)
+     }
+}
+
+extension ProfileEditViewController: CropViewControllerDelegate {
+    public func cropViewControllerDidCrop(_ cropViewController: CropViewController, cropped: UIImage, transformation: Transformation, cropInfo: CropInfo) {
+        // 이미지 크롭 후 할 작업 추가
+        profileTouchableImageView.image = cropped
+        
+        cropViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    public func cropViewControllerDidCancel(_ cropViewController: CropViewController, original: UIImage) {
+        
+        cropViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    private func openCropVC(image: UIImage) {
+        
+        let cropViewController = Mantis.cropViewController(image: image)
+        cropViewController.delegate = self
+        cropViewController.modalPresentationStyle = .fullScreen
+        self.present(cropViewController, animated: true)
     }
 }

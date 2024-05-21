@@ -7,11 +7,12 @@
 
 import UIKit
 import DesignSystem
+import Service
 
 enum TabType: Int {
     case home
     case ranking
-    case transfer
+    case writeFeed
     case transferHistory
     case more
 }
@@ -25,7 +26,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
     var authCoordinator: AuthBaseCoordinator = AuthCoordinator()
     var homeCoordinator: HomeBaseCoordinator = HomeCoordinator()
     var rankingCoordinator: RankingBaseCoordinator = RankingCoordinator()
-    var transferCoordinator: TransferBaseCoordinator = TransferCoordinator()
+    var writeFeedCoordinator: WriteFeedBaseCoordinator = WriteFeedCoordinator()
     var transferHistoryCoordinator: TransferHistoryBaseCoordinator = TransferHistoryCoordinator()
     var moreCoordinator: MoreBaseCoordinator = MoreCoordinator()
     
@@ -38,7 +39,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         rankingCoordinator.parentCoordinator = self
         rankingVC.tabBarItem = UITabBarItem(title: "랭킹", image: UIImage(named: "tabBar_ranking"), selectedImage: UIImage(named: "tabBar_selectRanking"))
         
-        let transferVC = transferCoordinator.start()
+        let transferVC = writeFeedCoordinator.start()
         transferVC.tabBarItem = UITabBarItem(title: "새 피드 작성", image: UIImage(named: "tabBar_newFeed"), selectedImage: nil)
         
         let transferHistoryVC = transferHistoryCoordinator.start()
@@ -70,7 +71,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         
         rankingCoordinator.currentFlowManager = currentFlowManager
         
-        transferCoordinator.currentFlowManager = currentFlowManager
+        writeFeedCoordinator.currentFlowManager = currentFlowManager
         
         transferHistoryCoordinator.currentFlowManager = currentFlowManager
 
@@ -92,8 +93,8 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         case .home:
             startHomeFlow(tabBarFlow, userData: userData)
         case .ranking:
-            startBenefitFlow(tabBarFlow, userData: userData)
-        case .transfer:
+            startRankingFlow(tabBarFlow, userData: userData)
+        case .writeFeed:
             startCommonFlow(tabBarFlow, userData: userData)
         case .transferHistory:
             startTransferHistoryFlow(tabBarFlow, userData: userData)
@@ -112,7 +113,7 @@ final class TabBarCoordinator: NSObject, TabBarBaseCoordinator {
         homeCoordinator.moveTo(appFlow: flow, userData: userData)
     }
     
-    private func startBenefitFlow(_ flow: Flow, userData: [String: Any]?) {
+    private func startRankingFlow(_ flow: Flow, userData: [String: Any]?) {
         currentFlowManager?.currentCoordinator = rankingCoordinator
         (rootViewController as? UITabBarController)?.selectedIndex = TabType.ranking.rawValue
         rankingCoordinator.moveTo(appFlow: flow, userData: userData)
@@ -157,8 +158,8 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
             currentFlowManager?.currentCoordinator = moreCoordinator
         case .ranking:
             currentFlowManager?.currentCoordinator = rankingCoordinator
-        case .transfer:
-            currentFlowManager?.currentCoordinator = transferCoordinator
+        case .writeFeed:
+            currentFlowManager?.currentCoordinator = writeFeedCoordinator
         case .transferHistory:
             currentFlowManager?.currentCoordinator = transferHistoryCoordinator
         }
@@ -171,15 +172,17 @@ extension TabBarCoordinator: UITabBarControllerDelegate {
         }
         
         switch tabType {
-//<<<<<<< HEAD
         case .home, .ranking, .transferHistory, .more:
-//=======
-//        case .home, .benefit, .transferHistory, .more:
-//>>>>>>> feature/1.0.0
             return true
 
-        case .transfer:
-            startCommonFlow(TabBarFlow.common(.selectPhoto), userData: nil)
+        case .writeFeed:
+            if UserDefaultsUtil.shared.isLogin() {
+                startCommonFlow(TabBarFlow.common(.selectPhoto), userData: nil)
+                
+            } else {
+                startCommonFlow(TabBarFlow.auth(.login), userData: nil)
+            }
+            
             return false
         }
     }

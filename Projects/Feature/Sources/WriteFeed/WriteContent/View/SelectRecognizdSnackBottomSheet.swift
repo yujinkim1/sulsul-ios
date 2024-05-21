@@ -15,9 +15,9 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
     
     weak var delegate: OnSelectedValue?
     
-    private lazy var viewModel = SelectSnackViewModel()
+    private lazy var viewModel = SelectSnackViewModel(selectSnackType: .bottomSheet)
     
-    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 150
+    private let bottomHeight: CGFloat = UIScreen.main.bounds.height - 68
 
     private var bottomSheetViewTopConstraint: NSLayoutConstraint!
     
@@ -42,7 +42,7 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var selectSnackView = SelectSnackView(delegate: nil,
+    private lazy var selectSnackView = SelectSnackView(delegate: self,
                                                        viewModel: viewModel,
                                                        isEditView: true)
     
@@ -60,6 +60,17 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
                 self?.selectSnackView.snackTableView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        viewModel.searchResultCountDataPublisher().sink { [weak self] searchResultCount in
+            self?.selectSnackView.resultEmptyView.isHidden = !(searchResultCount == 0)
+            self?.selectSnackView.snackTableView.isHidden = searchResultCount == 0
+        }
+        .store(in: &cancelBag)
+        
+        selectSnackView.resultEmptyView.addSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -86,11 +97,10 @@ final class SelectRecognizdSnackBottomSheet: BaseViewController {
         }
         
         bottomSheetView.translatesAutoresizingMaskIntoConstraints = false
-        let topConstant = view.safeAreaInsets.bottom + view.safeAreaLayoutGuide.layoutFrame.height
-        bottomSheetViewTopConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstant)
+        bottomSheetViewTopConstraint = bottomSheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         NSLayoutConstraint.activate([
-            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: moderateScale(number: 18)),
-            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: moderateScale(number: -18)),
+            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0),
+            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0),
             bottomSheetView.heightAnchor.constraint(equalToConstant: bottomHeight),
             bottomSheetViewTopConstraint
         ])
@@ -122,7 +132,7 @@ extension SelectRecognizdSnackBottomSheet {
         let bottomPadding: CGFloat = view.safeAreaInsets.bottom
         let bottomSheetBottomInset = moderateScale(number: 42)
         
-        bottomSheetViewTopConstraint.constant = (safeAreaHeight + bottomPadding) - bottomHeight - bottomSheetBottomInset
+        bottomSheetViewTopConstraint.constant = 0
         
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
             self.dimmedBackView.alpha = 0.5
@@ -177,9 +187,27 @@ extension SelectRecognizdSnackBottomSheet {
 
 extension SelectRecognizdSnackBottomSheet: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        guard let selectedValue = value["selectedValue"] as? String else { return }
+        guard let selectedValue = value["selectedValue"] as? SnackModel else { return }
         
         delegate?.selectedValue(["selectedSnack": selectedValue])
         hideBottomSheetAndGoBack()
+    }
+}
+
+extension SelectRecognizdSnackBottomSheet: SearchSnack {
+    func searchSnackWith(_ searchText: String) {
+        if searchText == "" {
+            self.selectSnackView.resultEmptyView.isHidden = true
+            self.selectSnackView.snackTableView.isHidden = false
+            
+            viewModel.setWithInitSnackData()
+        } else {
+            viewModel.setWithSearchResult(searchText)
+        }
+
+        UIView.transition(with: selectSnackView.snackTableView,
+                          duration: 0.2,
+                          options: .transitionCrossDissolve,
+                          animations: { self.selectSnackView.snackTableView.reloadData() })
     }
 }

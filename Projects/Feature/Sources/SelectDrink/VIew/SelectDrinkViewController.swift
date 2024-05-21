@@ -9,13 +9,22 @@ import UIKit
 import DesignSystem
 import Combine
 
+enum SelectTasteCase {
+    case next
+    case store
+    case bottomSheet
+}
+
 public class SelectDrinkViewController: SelectTasteBaseViewController {
     
     var coordinator: Coordinator?
     var cancelBag = Set<AnyCancellable>()
-    private let viewModel: SelectDrinkViewModel
     
-    init(viewModel: SelectDrinkViewModel) {
+    private let viewModel: SelectDrinkViewModel
+    private let selectTasteCase: SelectTasteCase
+    
+    init(viewModel: SelectDrinkViewModel, selectTasteCase: SelectTasteCase) {
+        self.selectTasteCase = selectTasteCase
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
@@ -68,12 +77,18 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }()
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         super.viewDidLoad()
-        view.backgroundColor = DesignSystemAsset.black.color
+        navigationController?.setNavigationBarHidden(true, animated: false)
         addViews()
         makeConstraints()
         bind()
+        
+        switch selectTasteCase {
+        case .next:
+            submitTouchableLabel.text = "다음"
+        case .store, .bottomSheet:
+            submitTouchableLabel.text = "저장"
+        }
     }
     
     public override func addViews() {
@@ -123,6 +138,11 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
     }
     
     private func bind() {
+        viewModel.userInfoPublisher()
+            .sink { [weak self] _ in
+                self?.viewModel.sendPairingsValue(PairingType.drink)
+            }.store(in: &cancelBag)
+        
         viewModel.setCompletedSnackDataPublisher().sink { [weak self] _ in
             self?.drinkCollectionView.reloadData()
         }
@@ -134,12 +154,16 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                     self?.showAlertView(withType: .oneButton,
                                         title: "선택 불가",
                                         description: "3개 이상 선택할 수 없어요.",
+                                        isSubmitColorYellow: true,
                                         submitCompletion: nil,
                                         cancelCompletion: nil)
                 } else {
                     self?.countLabel.text = String(result)
                     self?.countLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
                     self?.selectLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.main.color
+                    self?.submitTouchableLabel.backgroundColor = result == 0 ? DesignSystemAsset.gray100.color : DesignSystemAsset.main.color
+                    self?.submitTouchableLabel.isUserInteractionEnabled = result == 0 ? false : true
+                    self?.submitTouchableLabel.textColor = result == 0 ? DesignSystemAsset.gray300.color : DesignSystemAsset.gray050.color
                 }
             }
             .store(in: &cancelBag)
@@ -150,12 +174,16 @@ public class SelectDrinkViewController: SelectTasteBaseViewController {
                 if let authCoordinator = self.coordinator as? AuthCoordinator {
                     authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectSnack)), userData: nil)
                 } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
+                    StaticValues.isLoggedIn.send(true)
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
+        
+        viewModel.getUserInfo()
     }
     
     public override func setupIfNeeded() {
+        selectLimitView.updateView("3개까지 고를 수 있어요!")
         topView.backTouchableView.setOpaqueTapGestureRecognizer { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }

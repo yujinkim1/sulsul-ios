@@ -10,11 +10,15 @@ import Combine
 import Service
 import Alamofire
 
+enum PairingType: String {
+    case drink = "술"
+    case snack = "안주"
+}
+
 final class SelectDrinkViewModel {
     
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
-    private var userInfo: UserInfoModel?
     
     private let jsonDecoder = JSONDecoder()
     private let mapper = PairingModelMapper()
@@ -28,30 +32,34 @@ final class SelectDrinkViewModel {
     private var setUserDrinkPreference = PassthroughSubject<Void, Never>()
     private var completeDrinkPreference = PassthroughSubject<Void, Never>()
     
+    private let userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
+                                                                           uid: "",
+                                                                           nickname: "",
+                                                                           image: "",
+                                                                           preference: .init(alcohols: [],
+                                                                                             foods: []),
+                                                                           status: ""))
+    
     init() {
         bind()
     }
     
     func bind() {
-        getUserInfo()
-        
-        sendPairingsValue()
-        
         setUserDrinkPreference
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 let selectedIds = dataSource.filter { $0.isSelect }.map { $0.id }
                 let params: [String: Any] = ["alcohols": selectedIds,
-                                             "foods": userInfo?.preference.foods]
+                                             "foods": userInfo.value.preference.foods]
                 var headers: HTTPHeaders = [
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + accessToken!
                 ]
-                
                 NetworkWrapper.shared.putBasicTask(stringURL: "/users/\(userId)/preference", parameters: params, header: headers) { [weak self] result in
                     switch result {
                     case .success(let response):
                         if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
+                            self?.getUserInfo()
                             self?.completeDrinkPreference.send(())
                         } else {
                             print("Decoding failed.")
@@ -63,14 +71,19 @@ final class SelectDrinkViewModel {
             }.store(in: &cancelBag)
     }
     // 술 목록 가져오기
-    func sendPairingsValue() {
-        if let encodedURL = "/pairings?type=술".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+    func sendPairingsValue(_ pairingType: PairingType) {
+        if let encodedURL = "/pairings?type=\(pairingType.rawValue)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             NetworkWrapper.shared.getBasicTask(stringURL: encodedURL) { result in
                 switch result {
                 case .success(let responseData):
                     if let pairingsData = try? self.jsonDecoder.decode(PairingModel.self, from: responseData) {
                         let mappedData = self.mapper.snackModel(from: pairingsData.pairings ?? [])
                         self.dataSource = mappedData
+                        for id in self.userInfo.value.preference.alcohols {
+                            if let index = self.dataSource.firstIndex(where: { $0.id == id }) {
+                                self.selectDataSource(index)
+                            }
+                        }
                         self.setCompletedDrinkData.send(())
                     } else {
                         print("디코딩 모델 에러8")
@@ -81,14 +94,14 @@ final class SelectDrinkViewModel {
             }
         }
     }
-    
-    private func getUserInfo() {
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)") { [weak self] result in
+
+    func getUserInfo() {
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())") { [weak self] result in
             switch result {
             case .success(let response):
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
-                    let mappedUserInfo = self?.userMapper.userInfoModel(from: userData)
-                    self?.userInfo = mappedUserInfo
+                    guard let mappedUserInfo = self?.userMapper.userInfoModel(from: userData) else { return }
+                    self?.userInfo.send(mappedUserInfo)
                 } else {
                     print("디코딩 모델 에러 9")
                 }
@@ -138,5 +151,9 @@ final class SelectDrinkViewModel {
     
     func completeDrinkPreferencePublisher() -> AnyPublisher<Void, Never> {
         return completeDrinkPreference.eraseToAnyPublisher()
+    }
+    
+    func userInfoPublisher() -> AnyPublisher<UserInfoModel, Never> {
+        return userInfo.eraseToAnyPublisher()
     }
 }

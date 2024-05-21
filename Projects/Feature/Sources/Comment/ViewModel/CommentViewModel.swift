@@ -15,6 +15,7 @@ final class CommentViewModel {
     
     // MARK: Datasource
     var comments: [Comment] = []
+    var commentsWithoutChildren: [Comment] = []
     
     // MARK: Trigger
     private lazy var writeComment = CurrentValueSubject<WriteCommentRequest, Never>(.init(feed_id: 0, content: "", parent_comment_id: 0))
@@ -28,6 +29,13 @@ final class CommentViewModel {
         getComments(feedId)
             .sink { [weak self] comments in
                 self?.comments = comments
+                self?.reloadData.send(())
+            }
+            .store(in: &cancelBag)
+        
+        getCommentsWithoutChildrenComments(feedId)
+            .sink { [weak self] comments in
+                self?.commentsWithoutChildren = comments
                 self?.reloadData.send(())
             }
             .store(in: &cancelBag)
@@ -50,8 +58,8 @@ final class CommentViewModel {
                     commentWithParentId.parent_comment_id = parentId
                     commentWithParentId.isChildren = true
                     
-                    if let parentIndex = self?.comments.firstIndex(where: { $0.comment_id == parentId }),
-                       let originChildrenCount = selfRef.comments[parentIndex].children_comments?.count {
+                    if let parentIndex = self?.comments.firstIndex(where: { $0.comment_id == parentId }) {
+                        let originChildrenCount = selfRef.comments[parentIndex].children_comments?.count ?? 0
                         self?.comments.insert(commentWithParentId, at: parentIndex + originChildrenCount + 1)
                         self?.comments[parentIndex].children_comments?.append(commentWithParentId)
                     }
@@ -120,7 +128,7 @@ extension CommentViewModel {
             
             let parameters: Parameters = [
                 "content": request.content,
-                "parent_comment_id": request.parent_comment_id
+                "parent_comment_id": request.parent_comment_id == 0 ? nil : request.parent_comment_id
             ]
             
             NetworkWrapper.shared.postBasicTask(stringURL: "/feeds/\(request.feed_id)/comments", parameters: parameters, needToken: true) { [weak self] result in
@@ -169,6 +177,38 @@ extension CommentViewModel {
                         }
                         
                         return promise(.success(dataWithChildren))
+                    } else {
+                        print("[/comments] fail Decoding")
+                        return selfRef.errorSubject.send(.init(message: "[/comments] fail Decoding"))
+                    }
+                case .failure(let failure):
+                    print("[/comments] fail API : \(failure)")
+                    return selfRef.errorSubject.send(.init(message: "[/comments] fail API"))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    private func getCommentsWithoutChildrenComments(_ feedId: Int) -> AnyPublisher<[Comment], Never> {
+        return Future<[Comment], Never> { promise in
+            NetworkWrapper.shared.getBasicTask(stringURL: "/feeds/\(feedId)/comments") { [weak self] result in
+                guard let selfRef = self else { return }
+                
+                switch result {
+                case .success(let success):
+                    let decoder = JSONDecoder()
+                    
+                    if let data = try? decoder.decode(CommentModel.self, from: success) {
+                        
+                        let dataWithoutChildren = data.comments.map { cData -> Comment in
+                            var comment = cData
+                            comment.children_comments = []
+                            
+                            return comment
+                        }
+                        
+                        return promise(.success(dataWithoutChildren.reversed()))
                     } else {
                         print("[/comments] fail Decoding")
                         return selfRef.errorSubject.send(.init(message: "[/comments] fail Decoding"))

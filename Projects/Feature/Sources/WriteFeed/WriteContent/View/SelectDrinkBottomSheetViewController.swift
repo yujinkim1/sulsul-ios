@@ -63,6 +63,8 @@ final class SelectDrinkBottomSheetViewController: BaseViewController {
                 self?.snackSortTableView.reloadData()
             }
             .store(in: &cancelBag)
+        
+        viewModel.sendPairingsValue(.drink)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -92,8 +94,8 @@ final class SelectDrinkBottomSheetViewController: BaseViewController {
         let topConstant = view.safeAreaInsets.bottom + view.safeAreaLayoutGuide.layoutFrame.height
         bottomSheetViewTopConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstant)
         NSLayoutConstraint.activate([
-            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: moderateScale(number: 18)),
-            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: moderateScale(number: -18)),
+            bottomSheetView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            bottomSheetView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             bottomSheetView.heightAnchor.constraint(equalToConstant: bottomHeight),
             bottomSheetViewTopConstraint
         ])
@@ -131,7 +133,7 @@ extension SelectDrinkBottomSheetViewController: UITableViewDelegate, UITableView
         cell.cellBackButton.setOpaqueTapGestureRecognizer { [weak self] in
             guard let selfRef = self else { return }
             
-            let selectedDrink = selfRef.viewModel.getDataSource(indexPath.row).name
+            let selectedDrink = selfRef.viewModel.getDataSource(indexPath.row)
             selfRef.delegate?.selectedValue(["selectedDrink": selectedDrink])
             
             selfRef.hideBottomSheetAndGoBack()
@@ -146,9 +148,8 @@ extension SelectDrinkBottomSheetViewController {
     private func showBottomSheet() {
         let safeAreaHeight: CGFloat = view.safeAreaLayoutGuide.layoutFrame.height
         let bottomPadding: CGFloat = view.safeAreaInsets.bottom
-        let bottomSheetBottomInset = moderateScale(number: 42)
         
-        bottomSheetViewTopConstraint.constant = (safeAreaHeight + bottomPadding) - bottomHeight - bottomSheetBottomInset
+        bottomSheetViewTopConstraint.constant = (safeAreaHeight + bottomPadding) - bottomHeight
         
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
             self.dimmedBackView.alpha = 0.5

@@ -10,9 +10,14 @@ import Combine
 import Service
 import Alamofire
 
+enum UserInfoStatus: String {
+    case notLogin = "notLogin"
+    case banned = "banned"
+    case active = "active"
+}
+
 struct ProfileMainViewModel {
 
-    private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private let userMapper = UserMapper()
@@ -20,6 +25,7 @@ struct ProfileMainViewModel {
     
     private let goFeedButtonIsTapped = PassthroughSubject<Void, Never>()
     private let loginButtonIsTapped = PassthroughSubject<Void, Never>()
+    private var detailFeed = CurrentValueSubject<Int, Never>(0)
     private var myFeeds = CurrentValueSubject<[Feed], Never>([])
     private var likeFeeds = CurrentValueSubject<[Feed], Never>([])
     private var userInfo = CurrentValueSubject<UserInfoModel, Never>(.init(id: 0,
@@ -33,13 +39,23 @@ struct ProfileMainViewModel {
     }
     
     func getUserInfo() {
-        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else {
+            userInfo.send(UserInfoModel(id: 0,
+                                        uid: "",
+                                        nickname: "",
+                                        image: "",
+                                        preference: .init(alcohols: [0],
+                                                          foods: [0]),
+                                        status: UserInfoStatus.notLogin.rawValue))
+            return
+        }
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
         ]
         
-        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(userId)", header: headers) { result in
+        
+        NetworkWrapper.shared.getBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())", header: headers) { result in
             switch result {
             case .success(let response):
                 if let userData = try? self.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
@@ -82,7 +98,7 @@ struct ProfileMainViewModel {
     
     func loginButtonIsTappedPublisher() -> AnyPublisher<Void, Never> {
         return loginButtonIsTapped.eraseToAnyPublisher()
-    }    
+    }
     
     func sendGoFeedButtonIsTapped() {
         goFeedButtonIsTapped.send(())
@@ -90,6 +106,14 @@ struct ProfileMainViewModel {
     
     func goFeedButtonIsTappedPublisher() -> AnyPublisher<Void, Never> {
         return goFeedButtonIsTapped.eraseToAnyPublisher()
+    }
+    
+    func sendDetailFeed(_ id: Int) {
+        detailFeed.send(id)
+    }
+    
+    func detailFeedPublisher() -> AnyPublisher<Int, Never> {
+        return detailFeed.eraseToAnyPublisher()
     }
     
     func getFeedsLikeByMe() {
@@ -151,7 +175,7 @@ struct ProfileMainViewModel {
 
 //        // 키체인 테스트
 //        if KeychainStore.shared.read(label: "accessToken") != nil {
-//            let viewController = SetUserNameViewController()
+//            let viewController = SetNicknameViewController()
 //            window?.rootViewController = viewController
 //        } else {
 //            let viewController = SignInViewController()SettingViewController

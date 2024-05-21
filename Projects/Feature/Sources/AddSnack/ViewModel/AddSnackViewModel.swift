@@ -12,10 +12,12 @@ import Service
 final class AddSnackViewModel {
     private lazy var jsonDecoder = JSONDecoder()
     private let userMapper = UserMapper()
+    
     // MARK: Output
-    private lazy var goNextPage = PassthroughSubject<Void, Never>()
+    private lazy var shouldPop = PassthroughSubject<Void, Never>()
     private lazy var updateSelectedSnackSort = PassthroughSubject<String, Never>()
-    private lazy var userNickName = CurrentValueSubject<String, Never>("000")
+    private lazy var userNickName = CurrentValueSubject<String, Never>("")
+    private lazy var error = CurrentValueSubject<Void, Never>(())
     private lazy var snackSortModels: [SnackSortModel] = [.init(name: "패스트푸드", isSelect: false),
                                                           .init(name: "고기류", isSelect: false),
                                                           .init(name: "생선류", isSelect: false),
@@ -38,7 +40,7 @@ final class AddSnackViewModel {
     }
     
     func submitAddedSnack(_ name: String, _ sort: String?) {
-        requestPOSTaddSnack(.init(type: "술", subtype: sort ?? "", name: name))
+        requestPOSTaddSnack(.init(type: "안주", subtype: sort ?? "", name: name))
     }
     
     func sendUpdateSelectedSnackSort() {
@@ -55,12 +57,20 @@ final class AddSnackViewModel {
         return snackSortModels[index.row]
     }
     
-    func goNextPagePublisher() -> AnyPublisher<Void, Never> {
-        return goNextPage.eraseToAnyPublisher()
+    func shouldPopVC() -> AnyPublisher<Void, Never> {
+        return shouldPop.eraseToAnyPublisher()
     }
     
     func updateSelectedSnackSortPublisher() -> AnyPublisher<String, Never> {
         return updateSelectedSnackSort.eraseToAnyPublisher()
+    }
+    
+    func userName() -> AnyPublisher<String, Never> {
+        return userNickName.dropFirst().eraseToAnyPublisher()
+    }
+    
+    func errorPublisher() -> AnyPublisher<Void, Never> {
+        return error.dropFirst().eraseToAnyPublisher()
     }
 }
 
@@ -74,9 +84,10 @@ extension AddSnackViewModel {
         NetworkWrapper.shared.postBasicTask(stringURL: "/pairings/requests", parameters: parameters) { [weak self] result in
             switch result {
             case .success(let responseData):
-                self?.goNextPage.send(())
-            case .failure(let error):
-                print("[/pairings/requests] Fail : \(error)")
+                self?.shouldPop.send(())
+            case .failure(_):
+                self?.error.send(())
+                print("[/pairings/requests] Fail")
             }
         }
     }
@@ -91,9 +102,11 @@ extension AddSnackViewModel {
                     guard let nickname = userData.nickname else { return }
                     self.userNickName.send(nickname)
                 } else {
+                    self.error.send(())
                     print("[/users/id] Fail Decode")
                 }
             case .failure(let error):
+                self.error.send(())
                 print("[/users/id] Fail : \(error)")
             }
         }

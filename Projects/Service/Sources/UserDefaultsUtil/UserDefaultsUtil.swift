@@ -22,8 +22,8 @@ public struct UserDefaultsUtil {
     }
     
     public func isLogin() -> Bool {
-        let accessToke = KeychainStore.shared.read(label: "accessToken")
-        return getInstallationId() != 0 && accessToke != nil
+        let accessToken = KeychainStore.shared.read(label: "accessToken")
+        return getInstallationId() != 0 && accessToken != nil
     }
     
     public func setRecentKeywordList(_ dataList: [String]) {
@@ -60,5 +60,15 @@ public struct UserDefaultsUtil {
     
     public func remove(_ key: UserDefaultKey) {
         defaults.removeObject(forKey: key.rawValue)
+    }
+    
+    public static func isFirstLaunch() -> Bool {
+        let hasBeenLaunchedBeforeFlag = "hasBeenLaunchedBeforeFlag"
+        let isFirstLaunch = !UserDefaults.standard.bool(forKey: hasBeenLaunchedBeforeFlag)
+        if isFirstLaunch {
+            UserDefaults.standard.set(true, forKey: hasBeenLaunchedBeforeFlag)
+            UserDefaults.standard.synchronize()
+        }
+        return isFirstLaunch
     }
 }

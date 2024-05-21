@@ -77,6 +77,11 @@ final class SelectSnackView: UIView {
             $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
             $0.bottom.equalToSuperview()
         }
+        
+        resultEmptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBarView.snp.bottom).offset(moderateScale(number: 74))
+            $0.centerX.equalToSuperview()
+        }
     }
 }
 
@@ -108,10 +113,12 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
             
         } else if viewModel.selectedSnackCount() < 5 {
             viewModel.changeSelectedState(isSelect: true, indexPath: indexPath)
+        } else {
+            didTabSnack?.selectedValue(["shouldShowErrorAlert": ()])
         }
 
         if isEditView {
-            didTabSnack?.selectedValue(["selectedValue": selectedSnackCellModel.name])
+            didTabSnack?.selectedValue(["selectedValue": selectedSnackCellModel])
             
         } else {
             didTabSnack?.selectedValue(["shouldSetCount": ()])
@@ -140,5 +147,9 @@ extension SelectSnackView: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return moderateScale(number: 22)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        endEditing(true)
     }
 }

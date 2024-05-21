@@ -26,16 +26,25 @@ final class MainLikeCell: UICollectionViewCell {
     
     private lazy var firstFeedImageView = UIImageView().then({
         $0.backgroundColor = .red
-        $0.layer.cornerRadius = 5
+        $0.layer.cornerRadius = moderateScale(number: 12)
         $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
         $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
     })
     
     private lazy var secondFeedImageView = UIImageView().then({
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.layer.maskedCorners = [.layerMaxXMinYCorner]
+        $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
         $0.backgroundColor = .green
     })
     
     private lazy var thirdFeedImageView = UIImageView().then({
+        $0.layer.cornerRadius = moderateScale(number: 12)
+        $0.layer.maskedCorners = [.layerMaxXMaxYCorner]
+        $0.layer.masksToBounds = true
+        $0.clipsToBounds = true
         $0.backgroundColor = .yellow
     })
     
@@ -52,8 +61,6 @@ final class MainLikeCell: UICollectionViewCell {
     private func addViews() {
         addSubview(containerView)
         containerView.addSubviews([titleLabel,
-//                                   titleFirstImageView,
-//                                   titleSecondImageView,
                                    arrowImageView,
                                    firstFeedImageView,
                                    secondFeedImageView,
@@ -62,7 +69,8 @@ final class MainLikeCell: UICollectionViewCell {
     
     private func makeConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(moderateScale(number: 20))
         }
         titleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
@@ -100,9 +108,11 @@ final class MainLikeCell: UICollectionViewCell {
             if let url = URL(string: feed.feeds[index].representImage ?? "") {
                 if index <= imageViews.count {
                     imageViews[index].kf.setImage(with: url)
+                } else {
+                    imageViews[index].image = UIImage(systemName: "circle.fill")
                 }
             } else {
-                print("사진 없어")
+                imageViews[index].image = UIImage(systemName: "circle.fill")
             }
         }
     }

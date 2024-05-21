@@ -13,24 +13,26 @@ protocol SearchSnack: AnyObject {
     func searchSnackWith(_ searchText: String)
 }
 
-public final class SelectSnackViewController: BaseViewController {
+public final class SelectSnackViewController: HiddenTabBarBaseViewController {
     
     var coordinator: Coordinator?
-    private let viewModel: SelectSnackViewModel
     private lazy var cancelBag = Set<AnyCancellable>()
+    private let viewModel: SelectSnackViewModel
+    private let selectTasteCase: SelectTasteCase
     
     private lazy var superViewInset = moderateScale(number: 20)
     
     private lazy var topHeaderView = UIView()
     
     private lazy var backButton = UIButton().then {
-        $0.setImage(UIImage(named: "common_backArrow"), for: .normal)
+        $0.setImage(UIImage(named: "common_leftArrow"), for: .normal)
         $0.addTarget(self, action: #selector(didTabBackButton), for: .touchUpInside)
     }
     
     private lazy var noFindSnackButton = UIButton().then {
         $0.setTitle("찾는 안주가 없어요", for: .normal)
         $0.titleLabel?.font = Font.semiBold(size: 14)
+        $0.setTitleColor(DesignSystemAsset.main.color, for: .normal)
     }
         
     private lazy var questionNumberLabel = UILabel().then {
@@ -71,15 +73,16 @@ public final class SelectSnackViewController: BaseViewController {
     
     private lazy var nextButton = UIButton().then {
         $0.addTarget(self, action: #selector(didTabNextButton), for: .touchUpInside)
-        $0.backgroundColor = DesignSystemAsset.gray300.color
+        $0.backgroundColor = DesignSystemAsset.gray100.color
         $0.titleLabel?.font = Font.bold(size: 16)
-        $0.titleLabel?.textColor = .white
+        $0.setTitleColor(DesignSystemAsset.gray300.color, for: .normal)
         $0.layer.cornerRadius = moderateScale(number: 12)
         $0.setTitle("다음", for: .normal)
     }
     
-    init(viewModel: SelectSnackViewModel) {
+    init(viewModel: SelectSnackViewModel, selectTasteCase: SelectTasteCase) {
         self.viewModel = viewModel
+        self.selectTasteCase = selectTasteCase
         super.init(nibName: nil, bundle: nil)
         
         selectSnackView = SelectSnackView(delegate: self,
@@ -105,15 +108,28 @@ public final class SelectSnackViewController: BaseViewController {
     }
     
     public override func viewDidLoad() {
-        self.tabBarController?.setTabBarHidden(true)
         view.backgroundColor = DesignSystemAsset.black.color
         overrideUserInterfaceStyle = .dark
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
 
         addViews()
         makeConstraints()
         bind()
         
+        switch selectTasteCase {
+        case .next:
+            nextButton.setTitle("다음", for: .normal)
+        case .store, .bottomSheet:
+            nextButton.setTitle("저장", for: .normal)
+        }
+        
         noFindSnackButton.onTapped { [weak self] in
+            let vc = AddSnackViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        selectSnackView.resultEmptyView.addSnackButton.onTapped { [weak self] in
             let vc = AddSnackViewController()
             self?.navigationController?.pushViewController(vc, animated: true)
         }
@@ -198,15 +214,11 @@ public final class SelectSnackViewController: BaseViewController {
             .sink { [weak self] in
                 guard let self = self else { return }
                 if let authCoordinator = self.coordinator as? AuthCoordinator {
-                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: nil)
+                    authCoordinator.moveTo(appFlow: TabBarFlow.auth(.profileInput(.selectComplete)), userData: ["userName": viewModel.getUserNickName()])
                 } else if let moreCoordinator = self.coordinator as? MoreCoordinator {
                     self.navigationController?.popViewController(animated: true)
                 }
             }.store(in: &cancelBag)
-    }
-    
-    @objc private func didTabAddSnackButton() {
-        
     }
     
     @objc private func didTabBackButton() {
@@ -219,6 +231,10 @@ public final class SelectSnackViewController: BaseViewController {
     
     @objc private func didTabNextButton() {
         self.viewModel.sendSetUserSnackPreference()
+    }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
     }
 }
 
@@ -242,17 +258,26 @@ extension SelectSnackViewController: SearchSnack {
 
 extension SelectSnackViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        guard let shouldSetCount = value["shouldSetCount"] as? Void else { return }
-        
-        let selectedSnackCount = viewModel.selectedSnackCount()
-
-        let fullText = "\(selectedSnackCount)개 선택됨"
-        let attribtuedString = NSMutableAttributedString(string: fullText)
-        let range = (fullText as NSString).range(of: "\(selectedSnackCount)개")
-        attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
-        
-        selectedCountLabel.attributedText = attribtuedString
-        selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
-        nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
+        if let _ = value["shouldSetCount"] as? Void {
+            let selectedSnackCount = viewModel.selectedSnackCount()
+            
+            let fullText = "\(selectedSnackCount)개 선택됨"
+            let attribtuedString = NSMutableAttributedString(string: fullText)
+            let range = (fullText as NSString).range(of: "\(selectedSnackCount)개")
+            attribtuedString.addAttribute(.font, value: Font.bold(size: 20), range: range)
+            
+            selectedCountLabel.attributedText = attribtuedString
+            selectedCountLabel.textColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray300.color
+            nextButton.backgroundColor = selectedSnackCount > 0 ? DesignSystemAsset.main.color : DesignSystemAsset.gray100.color
+            nextButton.setTitleColor(selectedSnackCount > 0 ? DesignSystemAsset.gray050.color : DesignSystemAsset.gray300.color, for: .normal)
+            
+        } else if let _ = value["shouldShowErrorAlert"] {
+            self.showAlertView(withType: .oneButton,
+                                title: "선택 불가",
+                                description: "5개 이상 선택할 수 없어요.",
+                                isSubmitColorYellow: true,
+                                submitCompletion: nil,
+                                cancelCompletion: nil)
+        }
     }
 }

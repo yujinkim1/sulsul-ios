@@ -28,6 +28,7 @@ final class SelectableImageView: UIImageView {
         layer.borderColor = DesignSystemAsset.white.color.cgColor
         layer.cornerRadius = moderateScale(number: 12)
         clipsToBounds = true
+        contentMode = .scaleAspectFill
     }
     
     func updateSelection() {

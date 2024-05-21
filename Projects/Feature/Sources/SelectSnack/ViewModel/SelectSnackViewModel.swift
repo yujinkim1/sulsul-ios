@@ -11,6 +11,18 @@ import Service
 import Alamofire
 
 final class SelectSnackViewModel {
+    private lazy var foodCategories: [String: String] = [
+        "패스트푸드": "🍕",
+        "육류": "🥩",
+        "탕류": "🍲",
+        "튀김류": "🍤",
+        "과일": "🍎",
+        "과자": "🥨",
+        "밥류": "🍚",
+        "면류": "🍜",
+        "회": "🐟",
+    ]
+    
     private lazy var jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
     private lazy var mapper = PairingModelMapper()
@@ -19,6 +31,7 @@ final class SelectSnackViewModel {
     private let userId = UserDefaultsUtil.shared.getInstallationId()
     private let accessToken = KeychainStore.shared.read(label: "accessToken")
     private var userInfo: UserInfoModel?
+    private var selectSnackType: SelectTasteCase
     
     // MARK: Output Subject
     private lazy var setCompletedSnackData = PassthroughSubject<Void, Never>()
@@ -29,7 +42,8 @@ final class SelectSnackViewModel {
     private lazy var sectionModels = [SnackSectionModel]()
     private lazy var cellModels = [SnackModel]()
     
-    init() {
+    init(selectSnackType: SelectTasteCase) {
+        self.selectSnackType = selectSnackType
         bind()
     }
     
@@ -72,6 +86,7 @@ final class SelectSnackViewModel {
                 if let userData = try? self?.jsonDecoder.decode(RemoteUserInfoItem.self, from: response) {
                     guard let mappedUserInfo = self?.userMapper.userInfoModel(from: userData) else { return }
                     self?.userInfo = mappedUserInfo
+                    self?.requestSnackList()
                 } else {
                     print("디코딩 모델 에러 9")
                 }
@@ -84,15 +99,28 @@ final class SelectSnackViewModel {
     private func makeSectionModelsWith(_ snackModels: [SnackModel]) -> [SnackSectionModel] {
         guard var currentSection = snackModels.first?.subtype else { return [] }
         
+        let selectedSnackIds = userInfo?.preference.foods
+        var snackModelsWithSelectedValue = snackModels
+        
+        if selectSnackType != .bottomSheet {
+            selectedSnackIds?.forEach { id in
+                if let selectedIndex = snackModelsWithSelectedValue.firstIndex(where: { $0.id == id }) {
+                    snackModelsWithSelectedValue[selectedIndex].isSelect = true
+                }
+            }
+        }
+        
+        self.cellModels = snackModelsWithSelectedValue
+        
         var sectionModels: [SnackSectionModel] = []
         var cellModelsOfSameSection: [SnackModel] = []
         
-        snackModels.enumerated().forEach { index, snack in
+        snackModelsWithSelectedValue.enumerated().forEach { index, snack in
             if snack.subtype == currentSection {
                 cellModelsOfSameSection.append(snack)
             } else {
-                let beforeCellModel = snackModels[index - 1]
-                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: beforeCellModel.image)
+                let beforeCellModel = snackModelsWithSelectedValue[index - 1]
+                let headerModel = SnackHeader(snackHeaderTitle: beforeCellModel.subtype, snackHeaderImage: foodCategories[beforeCellModel.subtype] ?? "")
                 let completedSectionModel: SnackSectionModel = .init(cellModels: cellModelsOfSameSection, headerModel: headerModel)
                 
                 sectionModels.append(completedSectionModel)
@@ -192,6 +220,10 @@ final class SelectSnackViewModel {
     func completeSnackPreferencePublisher() -> AnyPublisher<Void, Never> {
         return completeSnackPreference.eraseToAnyPublisher()
     }
+    
+    func getUserNickName() -> String {
+        return userInfo?.nickname ?? ""
+    }
 }
 
 extension SelectSnackViewModel {
@@ -219,7 +251,6 @@ extension SelectSnackViewModel {
                         selfRef.initSectionModels = selfRef.makeSectionModelsWith(snackModels)
                         selfRef.sectionModels = selfRef.initSectionModels
                         selfRef.setCompletedSnackData.send(())
-                        selfRef.cellModels = snackModels
                     } else {
                         print("[/pairings] Fail Decode")
                     }

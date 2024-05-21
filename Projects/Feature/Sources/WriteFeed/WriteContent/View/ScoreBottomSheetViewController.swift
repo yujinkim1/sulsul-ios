@@ -11,7 +11,10 @@ import DesignSystem
 
 final class ScoreBottomSheetViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
-    // private let viewModel: AddSnackViewModel!
+    
+    weak var delegate: OnSelectedValue?
+    
+    private lazy var currentScore = 0
     
     private let bottomHeight: CGFloat = moderateScale(number: 216)
 
@@ -133,6 +136,7 @@ final class ScoreBottomSheetViewController: BaseViewController {
     
     private func setTabEvents() {
         clapImageView1.onTapped { [weak self] in
+            self?.currentScore = 1
             self?.scoreLabel.text = "1점"
             self?.scoreLabel.textColor = DesignSystemAsset.main.color
             self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
@@ -144,6 +148,7 @@ final class ScoreBottomSheetViewController: BaseViewController {
         }
         
         clapImageView2.onTapped { [weak self] in
+            self?.currentScore = 2
             self?.scoreLabel.text = "2점"
             self?.scoreLabel.textColor = DesignSystemAsset.main.color
             self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
@@ -151,10 +156,11 @@ final class ScoreBottomSheetViewController: BaseViewController {
             self?.clapImageView3.image = UIImage(named: "writeFeed_clap")
             self?.clapImageView4.image = UIImage(named: "writeFeed_clap")
             self?.clapImageView5.image = UIImage(named: "writeFeed_clap")
-            self?.completeButton.setClickable(true)    
+            self?.completeButton.setClickable(true)
         }
         
         clapImageView3.onTapped { [weak self] in
+            self?.currentScore = 3
             self?.scoreLabel.text = "3점"
             self?.scoreLabel.textColor = DesignSystemAsset.main.color
             self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
@@ -166,6 +172,7 @@ final class ScoreBottomSheetViewController: BaseViewController {
         }
         
         clapImageView4.onTapped { [weak self] in
+            self?.currentScore = 4
             self?.scoreLabel.text = "4점"
             self?.scoreLabel.textColor = DesignSystemAsset.main.color
             self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
@@ -177,6 +184,7 @@ final class ScoreBottomSheetViewController: BaseViewController {
         }
         
         clapImageView5.onTapped { [weak self] in
+            self?.currentScore = 5
             self?.scoreLabel.text = "5점"
             self?.scoreLabel.textColor = DesignSystemAsset.main.color
             self?.clapImageView1.image = UIImage(named: "writeFeed_clapFilled")
@@ -185,6 +193,18 @@ final class ScoreBottomSheetViewController: BaseViewController {
             self?.clapImageView4.image = UIImage(named: "writeFeed_clapFilled")
             self?.clapImageView5.image = UIImage(named: "writeFeed_clapFilled")
             self?.completeButton.setClickable(true)
+        }
+        
+        completeButton.onTapped { [weak self] in
+            guard let selfRef = self else { return }
+            
+            if selfRef.currentScore != 0 {
+                self?.hideBottomSheetAndGoBack()
+                self?.delegate?.selectedValue(["shouldGoMain": (),
+                                               "score": selfRef.currentScore])
+            } else {
+                self?.showToastMessageView(toastType: .error, title: "점수를 선택해주세요!")
+            }
         }
     }
     

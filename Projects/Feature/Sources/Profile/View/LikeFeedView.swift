@@ -14,6 +14,7 @@ class LikeFeedView: UIView {
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
     private let tabBarController: UITabBarController
+    private var likeFeedState: MyFeedState?
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout()).then({
         $0.registerCell(NoDataCell.self)
@@ -37,10 +38,15 @@ class LikeFeedView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func bind() {
+    private func bind() {
         viewModel.likeFeedsPublisher()
             .receive(on: DispatchQueue.main)
-            .sink { _ in
+            .sink { response in
+                if response.count == 0 {
+                    self.likeFeedState = .loginFeedNotExist
+                } else {
+                    self.likeFeedState = .loginFeedExist
+                }
                 self.collectionView.reloadData()
             }
             .store(in: &cancelBag)
@@ -60,11 +66,25 @@ class LikeFeedView: UIView {
     }
     
     private func layout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout { _, _ in
-
-            //TODO: - 수정 필요
-            let itemHeight: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 80 + 133 + 80 : 220
-            let itemWidth: CGFloat = self.viewModel.getLikeFeedsValue().count == 0 ? 1 : 1/2
+        return UICollectionViewCompositionalLayout { [weak self] _, _ in
+            guard let self = self else { return nil }
+            
+            let itemWidth: CGFloat
+            let itemHeight: CGFloat
+            
+            switch likeFeedState {
+            case .loginFeedExist:
+                itemHeight = 220
+                itemWidth = 1/2
+            case .loginFeedNotExist:
+                itemHeight = 400
+                itemWidth = 1
+            case .notLogin:
+                itemHeight = 400
+                itemWidth = 1
+            case nil:
+                return nil
+            }
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemWidth),
                                                   heightDimension: .absolute(moderateScale(number: itemHeight)))
@@ -77,37 +97,66 @@ class LikeFeedView: UIView {
             
             let section = NSCollectionLayoutSection(group: group)
             
-            section.interGroupSpacing = 10
+            section.interGroupSpacing = moderateScale(number: 10)
             
             return section
         }
+    }
+    
+    func updateState(_ likeFeedState: MyFeedState) {
+        self.likeFeedState = likeFeedState
+        collectionView.reloadData()
     }
 }
 
 extension LikeFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return viewModel.getBeneficiaryCountryList().count + 1
-        if viewModel.getLikeFeedsValue().count == 0 {
-            return 1
-        } else {
+        switch likeFeedState {
+        case .loginFeedExist:
             return viewModel.getLikeFeedsValue().count
+        case .loginFeedNotExist:
+            return 1
+        case .notLogin:
+            return 1
+        case .none:
+            return 0
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if viewModel.getLikeFeedsValue().count == 0 {
-            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
-            cell.updateView(withType: .likeFeed)
-            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
-                guard let selfRef = self else { return }
-                selfRef.viewModel.sendGoFeedButtonIsTapped()
-            }
-            return cell
-        } else {
+        switch likeFeedState {
+        case .loginFeedExist:
             guard let cell = collectionView.dequeueReusableCell(LikeFeedCell.self, indexPath: indexPath) else { return .init() }
             let model = viewModel.getLikeFeedsValue()[indexPath.row]
             cell.bind(model)
+            cell.containerView.setOpaqueTapGestureRecognizer { [weak self] in
+                guard let self = self else { return }
+                self.viewModel.sendDetailFeed(model.feedId)
+            }
             return cell
+        case .loginFeedNotExist:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            cell.updateView(withType: .likeFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("피드가 없음")
+            }
+            
+            return cell
+        case .notLogin:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            cell.updateView(withType: .logOutMyFeed)
+            cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
+                print("로그인하러 가기")
+                guard let selfRef = self else { return }
+                selfRef.viewModel.sendLoginButtonIsTapped()
+            }
+            
+            return cell
+        case .none:
+            guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
+            
+            return cell
+            
         }
     }
 }

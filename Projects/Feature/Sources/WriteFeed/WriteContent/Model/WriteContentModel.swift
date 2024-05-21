@@ -14,4 +14,15 @@ struct WriteContentModel: Decodable {
         let foods: [String]
         let alcohols: [String]
     }
+    
+    struct WriteFeedRequestModel {
+        let title: String
+        let content: String
+        let represent_image: String
+        let images: [String]
+        let alcohol_pairing_ids: [Int]?
+        let food_pairing_ids: [Int]?
+        let user_tags_raw_string: String
+        let score: Int
+    }
 }

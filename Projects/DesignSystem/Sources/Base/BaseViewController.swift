@@ -68,7 +68,7 @@ open class BaseViewController: UIViewController {
             
             changedKeyboardHeight.send(0)
             
-            self.keyboardHeight = keyboardHeight
+            self.keyboardHeight = 0
         }
     }
     
@@ -88,18 +88,22 @@ open class BaseViewController: UIViewController {
                             isSubmitColorYellow: Bool = false,
                             submitCompletion: (() -> Void)?,
                             cancelCompletion: (() -> Void)?) {
-        let alertView = AlertView(alertType: type)
-        alertView.bind(title: title, description: description, cancelText: cancelText, submitText: submitText, submitCompletion: submitCompletion, cancelCompletion: cancelCompletion)
+        
+        guard let topVC = topViewController() else { return }
+        guard !(topVC is AlertViewController) else { return }
+        
+        let alertVC = AlertViewController(alertType: type)
+        alertVC.bind(title: title, description: description, cancelText: cancelText, submitText: submitText, submitCompletion: submitCompletion, cancelCompletion: cancelCompletion)
         
         if isSubmitColorYellow {
-            alertView.submitTouchableLabel.setClickable(true)
+            alertVC.submitTouchableLabel.setClickable(true)
         }
         
-        view.addSubview(alertView)
-        view.bringSubviewToFront(alertView)
+        alertVC.modalPresentationStyle = .overFullScreen
+        topVC.present(alertVC, animated: false)
     }
     
-    open func showToastMessageView(toastType: ToastType, title: String) {
+    open func showToastMessageView(toastType: ToastType, title: String, inset: CGFloat? = nil, completion: (() -> Void)? = nil) {
         let toastView = ToastMessageView()
         toastView.bind(toastType: toastType, title: title)
         
@@ -107,36 +111,61 @@ open class BaseViewController: UIViewController {
         view.bringSubviewToFront(toastView)
         
         toastView.snp.makeConstraints {
-            let inset: CGFloat = keyboardHeight == 0 ? 100 : 15
+            let inset: CGFloat = keyboardHeight == 0 ? 102 : (inset ?? 16)
             
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(keyboardHeight + moderateScale(number: inset))
         }
         
-        UIView.animate(withDuration: 1, delay: 0.5, options: .curveEaseOut, animations: { [weak self] in
+        UIView.animate(withDuration: 1, delay: 2, options: .curveEaseOut, animations: { [weak self] in
             toastView.alpha = 0.0
         }, completion: { [weak self] _ in
             toastView.removeFromSuperview()
+            completion?()
         })
     }
     
-    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, description: String?, submitCompletion: (() -> Void)?,
+    open func showBottomSheetAlertView(bottomSheetAlertType: BottomSheetAlertType, title: String, submitLabel: String?, cancelLabel: String?, description: String?, submitCompletion: (() -> Void)?,
                                        cancelCompletion: (() -> Void)?) {
+        guard !view.subviews.contains(where: { $0 is BottomSheetAlertView }) else { return }
         let bottomSheetAlertView = BottomSheetAlertView(bottomSheetAlertType: bottomSheetAlertType)
         bottomSheetAlertView.bind(title: title,
                                   description: description,
+                                  submitLabel: submitLabel,
+                                  cancelLabel: cancelLabel,
                                   submitCompletion: submitCompletion,
                                   cancelCompletion: cancelCompletion)
         view.addSubview(bottomSheetAlertView)
         view.bringSubviewToFront(bottomSheetAlertView)
     }
     
-    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?, selectAlbumCompletion: (() -> Void)?, baseCompletion: (() -> Void)?) {
+    open func showCameraBottomSheet(selectCameraCompletion: (() -> Void)?,
+                                    selectAlbumCompletion: (() -> Void)?,
+                                    baseCompletion: (() -> Void)?) {
         let cameraBottomSheet = CameraBottomSheet()
         cameraBottomSheet.bind(selectCameraCompletion: selectCameraCompletion,
                                selectAlbumCompletion: selectAlbumCompletion,
                                selectBaseCompletion: baseCompletion)
         view.addSubview(cameraBottomSheet)
         view.bringSubviewToFront(cameraBottomSheet)
+    }
+    
+    public func topViewController() -> UIViewController? {
+        let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.last { $0.isKeyWindow }
+        var topVC = keyWindow?.rootViewController
+        
+        while true {
+            if let presented = topVC?.presentedViewController {
+                topVC = presented
+            } else if let navigationController = topVC as? UINavigationController {
+                topVC = navigationController.visibleViewController
+            } else if let tabBarController = topVC as? UITabBarController {
+                topVC = tabBarController.selectedViewController
+            } else {
+                break
+            }
+        }
+        
+        return topVC
     }
 }

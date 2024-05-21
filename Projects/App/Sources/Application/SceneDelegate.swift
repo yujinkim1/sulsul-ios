@@ -21,12 +21,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         currentScene = scene
         mainCoordinator = MainCoordinator()
         setRootViewController(mainCoordinator!.start())
-//        let vc = CommentViewController()
-//        setRootViewController(vc)
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        
+        if let url = URLContexts.first?.url {
+            if AuthApi.isKakaoTalkLoginUrl(url) {
+                _ = AuthController.handleOpenUrl(url: url)
+            }
+        }
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

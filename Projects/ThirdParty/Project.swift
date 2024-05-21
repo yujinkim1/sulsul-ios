@@ -14,4 +14,6 @@ let project = Project.framework(name: Module.thirdParty.name,
                                                .snapKit,
                                                .then,
                                                .kingfisher,
-                                               .kakaoSDK])
+                                               .mantis,
+                                               .kakaoSDK,
+                                               .lottie])

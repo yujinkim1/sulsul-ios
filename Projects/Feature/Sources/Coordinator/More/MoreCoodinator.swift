@@ -52,14 +52,16 @@ final class MoreCoordinator: NSObject, MoreBaseCoordinator {
             currentNavigationViewController?.pushViewController(profileEditVC, animated: true)
         case .selectDrink:
             let viewModel = SelectDrinkViewModel()
-            let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+            let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel,
+                                                          selectTasteCase: .store)
             selectDrinkVC.coordinator = self
             currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
         case .selectSnack:
-            let viewModel = SelectSnackViewModel()
-            let selectDrinkVC = SelectSnackViewController(viewModel: viewModel)
-            selectDrinkVC.coordinator = self
-            currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
+            let viewModel = SelectSnackViewModel(selectSnackType: .store)
+            let selectSnackVC = SelectSnackViewController(viewModel: viewModel,
+                                                          selectTasteCase: .store)
+            selectSnackVC.coordinator = self
+            currentNavigationViewController?.pushViewController(selectSnackVC, animated: false)
         }
     }
 }

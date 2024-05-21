@@ -18,9 +18,11 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     var cancelBag = Set<AnyCancellable>()
     var coordinator: CommonBaseCoordinator?
     
+    private var selectedDrink: SnackModel?
+    private var selectedSnack: SnackModel?
+    
     private lazy var viewModel = WriteContentViewModel()
     private lazy var images: [UIImage] = []
-    
     private lazy var imageScrollView = UIScrollView().then {
         $0.showsHorizontalScrollIndicator = false
     }
@@ -41,7 +43,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.text = "인식된 술&안주"
         $0.textColor = DesignSystemAsset.gray900.color
         $0.font = Font.bold(size: 18)
-        $0.setContentCompressionResistancePriority(.init(1000), for: .horizontal)
     }
     
     private lazy var recognizedContentLabel = UILabel().then {
@@ -122,7 +123,10 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         $0.textColor = DesignSystemAsset.gray900.color
     }
     
-    private lazy var iconContainerView = UIView()
+    private lazy var iconContainerView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color
+    }
+    
     private lazy var iconLineView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray200.color
     }
@@ -143,16 +147,11 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
     
     open override func viewWillAppear(_ animated: Bool) {
         if let thumnailImage = images.first,
-           editViewController.selectedDrink == nil || editViewController.selectedSnack == nil {
+           editViewController.selectedDrink == nil && editViewController.selectedSnack == nil {
             viewModel.uploadImage(thumnailImage)
             
             recognizedContentLabel.text = "AI가 열심히 찾고있어요!"
             recognizedImageView.image = UIImage(named: "writeFeed_progress")
-        }
-        
-        if let text = UserDefaultsUtil.shared.getFeedContent() {
-            contentTextView.text = text
-            setTextViewUI()
         }
     }
     
@@ -221,15 +220,35 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
                 }
             }
             .store(in: &cancelBag)
+        
+        viewModel.completeCreateFeed
+            .sink { [weak self] isSuccessed in
+                if isSuccessed {
+                    let rootVC = self?.coordinator?.currentNavigationViewController?.viewControllers.first as? BaseViewController
+                    rootVC?.showToastMessageView(toastType: .success, title: "게시글 작성 완료!", inset: 64)
+                    
+                    self?.coordinator?.currentNavigationViewController?.popToRootViewController(animated: true)
+                } else {
+                    self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.", inset: 64)
+                }
+            }
+            .store(in: &cancelBag)
+        
+        viewModel.errorPublisher()
+            .sink { [weak self] in
+                self?.showToastMessageView(toastType: .error, title: "잠시 후 다시 시도해주세요.", inset: 64)
+            }
+            .store(in: &cancelBag)
     }
     
     private func setTabEvents() {
         tagAddButton.onTapped { [weak self] in
             guard let selfRef = self else { return }
             
+            self?.tagTextView.becomeFirstResponder()
+            
             if selfRef.tagContainerView.isHidden {
                 self?.tagTextView.text = "#"
-                self?.tagTextView.becomeFirstResponder()
                 self?.tagContainerView.isHidden = false
                 
             } else {
@@ -247,7 +266,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             guard let selfRef = self else { return }
             
             if selfRef.images.count == 5 {
-                selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요")
+                selfRef.showToastMessageView(toastType: .error, title: "5개 이상 선택할수 없어요", inset: 64)
             } else {
                 if let galleryVC = selfRef.coordinator?.currentNavigationViewController?.viewControllers[1] {
                     self?.coordinator?.currentNavigationViewController?.popToViewController(galleryVC, animated: true)
@@ -264,6 +283,7 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             
             if !isTextEmpty {
                 let vc = ScoreBottomSheetViewController(snack: snack, drink: drink)
+                vc.delegate = self
                 vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: false)
             }
@@ -283,10 +303,18 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
         self.images = images
         
         images.enumerated().forEach { index, image in
-            let imageView = DeletableImageView(image: image)
+            let imageView = DeletableImageView()
+            
+            imageView.imageView.image = image
             
             if index == 0 {
                 imageView.setDisplayDeleteIcon(true)
+                
+            } else {
+                imageView.deleteBackView.onTapped { [weak self] in
+                    self?.images.removeAll(where: { $0 == image })
+                    imageView.removeFromSuperview()
+                }
             }
 
             imageView.snp.makeConstraints {
@@ -294,11 +322,6 @@ open class WriteContentViewController: BaseHeaderViewController, CommonBaseCoord
             }
             
             imageStackView.addArrangedSubview(imageView)
-            
-            imageView.onTapped { [weak self] in
-                self?.images.removeAll(where: { $0 == image })
-                imageView.removeFromSuperview()
-            }
         }
     }
     
@@ -461,7 +484,7 @@ extension WriteContentViewController: UITextViewDelegate {
             let numberOfChars = newText.count
             
             if !(numberOfChars <= 500) {
-                showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.")
+                showToastMessageView(toastType: .error, title: "500자 까지 입력 가능해요.", inset: 64)
             }
             
             return numberOfChars <= 500
@@ -507,21 +530,58 @@ extension WriteContentViewController: UITextViewDelegate {
             changeActionColor(DesignSystemAsset.main.color)
         }
     }
+    
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
 }
 
 extension WriteContentViewController: OnSelectedValue {
     func selectedValue(_ value: [String : Any]) {
-        if let writtenText = value["writtenText"] as? [String] {
-            if writtenText.count == 2 {
-                recognizedContentLabel.isHidden = true
-                drinkSnackStackView.isHidden = false
-                recognizedDrinkLabel.text = "\(writtenText[0])"
-                recognizedSnackLabel.text = "\(writtenText[1])"
-            } else {
-                recognizedContentLabel.isHidden = false
-                drinkSnackStackView.isHidden = true
-                recognizedContentLabel.text = "정보 직접 입력하기"
-                recognizedImageView.image = UIImage(named: "writeFeed_rightArrow")
+        if let selectedDrink = value["selectedDrink"] as? SnackModel {
+            self.selectedDrink = selectedDrink
+            
+            recognizedContentLabel.isHidden = false
+            drinkSnackStackView.isHidden = true
+            recognizedContentLabel.text = "\(selectedDrink.name)"
+        }
+        
+        if let selectedSnack = value["selectedSnack"] as? SnackModel {
+            self.selectedSnack = selectedSnack
+            
+            recognizedContentLabel.isHidden = false
+            drinkSnackStackView.isHidden = true
+            recognizedContentLabel.text = "\(selectedSnack.name)"
+        }
+        
+        if let selectedDrink = value["selectedDrink"] as? SnackModel,
+           let selectedSnack = value["selectedSnack"] as? SnackModel {
+            
+            recognizedContentLabel.isHidden = true
+            drinkSnackStackView.isHidden = false
+            recognizedDrinkLabel.text = "\(selectedDrink.name)"
+            recognizedSnackLabel.text = "\(selectedSnack.name)"
+        }
+        
+        if let _ = value["shouldGoMain"] as? Void,
+           let score = value["score"] as? Int {
+            
+            if let title = UserDefaultsUtil.shared.getFeedTitle(),
+               let thumnailImage = viewModel.imageServerURLOfThumnail {
+                
+                let drinkId: [Int]? = (selectedDrink == nil) ? nil : [selectedDrink!.id]
+                let snackId: [Int]? = (selectedSnack == nil) ? nil : [selectedSnack!.id]
+
+                viewModel.requestModel = .init(title: title,
+                                               content: contentTextView.text,
+                                               represent_image: thumnailImage,
+                                               images: viewModel.imageServerURLArrOfFeed,
+                                               alcohol_pairing_ids: drinkId,
+                                               food_pairing_ids: snackId,
+                                               user_tags_raw_string: tagTextView.text,
+                                               score: score)
+                
+                viewModel.shouldUploadFeed.send(images)
             }
         }
     }

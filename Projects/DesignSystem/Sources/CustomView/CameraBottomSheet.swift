@@ -69,15 +69,15 @@ final class CameraBottomSheet: UIView {
             self?.removeFromSuperview()
         }
         selectCameraView.setOpaqueTapGestureRecognizer { [weak self] in
-            selectCameraCompletion
+            selectCameraCompletion?()
             self?.removeFromSuperview()
         }
         selectAlbumView.setOpaqueTapGestureRecognizer { [weak self] in
-            selectAlbumCompletion
+            selectAlbumCompletion?()
             self?.removeFromSuperview()
         }
         selectBaseView.setOpaqueTapGestureRecognizer { [weak self] in
-            selectBaseCompletion
+            selectBaseCompletion?()
             self?.removeFromSuperview()
         }
     }

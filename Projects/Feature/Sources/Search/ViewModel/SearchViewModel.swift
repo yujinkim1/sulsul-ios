@@ -42,6 +42,8 @@ final class SearchViewModel {
     lazy var reloadRecentKeywordData = PassthroughSubject<Void, Never>()
     lazy var reloadSearchData = PassthroughSubject<Void, Never>()
     
+    lazy var error = PassthroughSubject<Void, Never>()
+    
     init() {
         getPairings()
         
@@ -107,9 +109,11 @@ extension SearchViewModel {
                         selfRef.drinkList = parings.filter{ $0.type == "술" }
                         selfRef.snackList = parings.filter{ $0.type == "안주" }
                     } else {
+                        selfRef.error.send(())
                         print("[/pairings] Fail Decode")
                     }
                 case .failure(let error):
+                    selfRef.error.send(())
                     print("[/pairings] Fail : \(error)")
                 }
             }
@@ -126,9 +130,11 @@ extension SearchViewModel {
                     if let searchData = try? selfRef.jsonDecoder.decode(SearchModel.self, from: responseData) {
                         return promise(.success(searchData.results))
                     } else {
+                        selfRef.error.send(())
                         print("[/feeds/search] Fail Decode")
                     }
                 case .failure(let error):
+                    selfRef.error.send(())
                     print("[/feeds/search] Fail : \(error)")
                 }
             }

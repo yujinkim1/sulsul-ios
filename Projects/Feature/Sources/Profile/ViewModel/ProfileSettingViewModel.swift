@@ -11,20 +11,40 @@ import Alamofire
 import Service
 
 struct ProfileSettingViewModel {
-    private let accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIiLCJpYXQiOjE3MDU3NDk4MDEsImV4cCI6MTcwNjM1NDYwMSwiaWQiOjEsInNvY2lhbF90eXBlIjoiZ29vZ2xlIiwic3RhdHVzIjoiYWN0aXZlIn0.gucj-5g1CktXtAKqYp99K-_eI7sH_VmoyDTaVhKE6DU"
     private let jsonDecoder = JSONDecoder()
     private var cancelBag = Set<AnyCancellable>()
+    private let userMapper = UserMapper()
     
-    private var deleteUser = PassthroughSubject<Void, Never>()
+    private var deleteUserIsCompleted = PassthroughSubject<Bool, Never>()
     
     init() {
-        deleteUser
-            .sink {
-                // 삭제 api 호출
-            }.store(in: &cancelBag)
+       
     }
     
-    func sendDeleteUser() {
-        deleteUser.send(())
+    func deleteUser() {
+        guard let accessToken = KeychainStore.shared.read(label: "accessToken") else { return }
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
+        ]
+    
+        NetworkWrapper.shared.deleteBasicTask(stringURL: "/users/\(UserDefaultsUtil.shared.getInstallationId())", header: headers) { result in
+            switch result {
+            case .success(let response):
+                if let userData = try? self.jsonDecoder.decode(RemoteDeleteUserItem.self, from: response) {
+                    let mappedUserData = self.userMapper.deleteUserModel(from: userData)
+                    print(mappedUserData)
+                    deleteUserIsCompleted.send(mappedUserData.result)
+                } else {
+                    print("디코딩 모델 에러5")
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    func deleteUserIsCompletedPublisher() -> AnyPublisher<Bool, Never> {
+        return deleteUserIsCompleted.eraseToAnyPublisher()
     }
 }

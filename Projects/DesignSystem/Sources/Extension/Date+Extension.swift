@@ -10,6 +10,7 @@ import Foundation
 public enum DateFormat: String {
     case MM월dd일 = "MM월 dd일"
     case MM_dd = "MM.dd"
+    case MM월dd일요일 = "MM월 dd일 (E요일)"
 }
 
 extension Date {

@@ -38,8 +38,13 @@ final class AuthCoordinator: AuthBaseCoordinator {
         case .login:
             let loginVC = AuthViewController()
             loginVC.coordinator = self
-            currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
-            currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            if userData?["popToRoot"] != nil {
+                currentNavigationViewController?.popToRootViewController(animated: false)
+                currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            } else {
+                currentNavigationViewController?.interactivePopGestureRecognizer?.isEnabled = true
+                currentNavigationViewController?.pushViewController(loginVC, animated: true)
+            }
         }
     }
     
@@ -59,25 +64,28 @@ final class AuthCoordinator: AuthBaseCoordinator {
 
 extension AuthCoordinator {
     private func moveToNickNameScene(_ userData: [String: Any]?) {
-        let viewModel = SelectUserNameViewModel()
-        let setUserNameVC = SetUserNameViewController(viewModel: viewModel)
+        let viewModel = SetNicknameViewModel()
+        let setUserNameVC = SetNicknameViewController(viewModel: viewModel)
         setUserNameVC.coordinator = self
         currentNavigationViewController?.pushViewController(setUserNameVC, animated: false)
     }
     private func moveToSelectDrinkScene(_ userData: [String: Any]?) {
         let viewModel = SelectDrinkViewModel()
-        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel)
+        let selectDrinkVC = SelectDrinkViewController(viewModel: viewModel,
+                                                      selectTasteCase: .next)
         selectDrinkVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectDrinkVC, animated: false)
     }
     private func moveToSelectSnackScene(_ userData: [String: Any]?) {
-        let viewModel = SelectSnackViewModel()
-        let selectSnackVC = SelectSnackViewController(viewModel: viewModel)
+        let viewModel = SelectSnackViewModel(selectSnackType: .next)
+        let selectSnackVC = SelectSnackViewController(viewModel: viewModel,
+                                                      selectTasteCase: .next)
         selectSnackVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectSnackVC, animated: true)
     }
     private func moveToSelectCompleteScene(_ userData: [String: Any]?) {
-        let selectCompleteVC = CompleteViewController()
+        guard let userName = userData?["userName"] as? String else { return }
+        let selectCompleteVC = CompleteViewController(userName: userName)
         selectCompleteVC.coordinator = self
         currentNavigationViewController?.pushViewController(selectCompleteVC, animated: true)
     }
