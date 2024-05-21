@@ -279,7 +279,7 @@ extension DetailMainCell {
             $0.leading.trailing.equalTo(self.textView)
             $0.top.equalTo(self.textView.snp.bottom).offset(moderateScale(number: 32))
             $0.bottom.equalTo(self.feedViewsStackView.snp.top).offset(-moderateScale(number: 16))
-            $0.height.greaterThanOrEqualTo(moderateScale(number: 48))
+            $0.height.lessThanOrEqualTo(moderateScale(number: 48))
         }
         
         self.feedViewsStackView.snp.makeConstraints {
