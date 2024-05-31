@@ -80,6 +80,14 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
                          font:  Font.regular(size: 16))
     }
     
+    // TODO: 뷰 컨트롤러가 viewDidLoad 되고 나서 위에서 아래로 나타나는 뷰
+    // 1. "해당 서비스가 취급하는 내용이 아닌 부적절한 내용을 작성할 경우 관리자에 의해 계정이 차단될 수 있으니 주의하세요."라는 문구를 가진다.
+    // 2. 노란색 경고 아이콘이 뷰에 추가되어야 한다.
+    // 3. 확인했습니다.
+    private lazy var noticeView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.black.color.withAlphaComponent(0.4)
+    }
+    
     private lazy var addedImageView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 12)

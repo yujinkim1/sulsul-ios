@@ -13,6 +13,7 @@ import Kingfisher
 
 public final class ProfileMainViewController: BaseViewController {
     private var cancelBag = Set<AnyCancellable>()
+    var delegate: MyFeedViewDelegate?
     var coordinator: MoreBaseCoordinator?
     private let viewModel: ProfileMainViewModel
     
@@ -62,7 +63,9 @@ public final class ProfileMainViewController: BaseViewController {
         $0.updateView(false)
     })
     
-    private lazy var myFeedView = MyFeedView(viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController())
+    private lazy var myFeedView = MyFeedView(viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController()).then({
+        $0.delegate = self
+    })
     
     private lazy var likeFeedView = LikeFeedView( viewModel: viewModel, tabBarController: self.tabBarController ?? UITabBarController()).then({
         $0.isHidden = true
@@ -245,5 +248,13 @@ public final class ProfileMainViewController: BaseViewController {
     
     @objc func profileIsChanged() {
         viewModel.getUserInfo()
+    }
+}
+
+// MARK: - MyFeedView Delegate
+//
+extension ProfileMainViewController: MyFeedViewDelegate {
+    func didTapNextLabel() {
+        self.coordinator?.moveTo(appFlow: TabBarFlow.more(.writeFeed), userData: nil)
     }
 }
