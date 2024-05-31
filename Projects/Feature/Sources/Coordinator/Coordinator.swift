@@ -138,6 +138,7 @@ enum ProfileScene {
     case profileEdit
     case selectDrink
     case selectSnack
+    case writeFeed
 }
 
 enum ProfileManagementScene {

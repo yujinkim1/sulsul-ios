@@ -80,6 +80,56 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
                          font:  Font.regular(size: 16))
     }
     
+    private lazy var noticeView = UIView().then {
+        $0.backgroundColor = DesignSystemAsset.gray100.color.withAlphaComponent(0.4)
+        $0.layer.cornerRadius = 8
+        
+        let imageView = UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill"))
+        imageView.tintColor = DesignSystemAsset.main.color
+        
+        let label = UILabel()
+        label.setLineHeight(18,
+                            text: "서비스와 관련이 없는 부적절한 내용을 작성하는 경우,\n관리자에 의해 자동으로 계정이 차단될 수 있습니다.",
+                            font: Font.medium(size: 12))
+        label.textColor = DesignSystemAsset.white.color
+        label.numberOfLines = 0
+        
+        let moreLabel = TouchableLabel()
+        moreLabel.setLineHeight(18,
+                                text: "자세히",
+                                font: Font.medium(size: 12),
+                                hasUnderline: true)
+        moreLabel.textColor = DesignSystemAsset.white.color
+        
+        moreLabel.onTapped {
+            guard let url = URL(string: "https://mopil1102.notion.site/51b45ca9663843f89174798fb6f725e2?pvs=4") else { return }
+            
+            UIApplication.shared.open(url)
+        }
+        
+        $0.addSubviews([
+            imageView,
+            label,
+            moreLabel
+        ])
+        
+        imageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(moderateScale(number: 8))
+            $0.centerY.equalToSuperview()
+        }
+        
+        label.snp.makeConstraints {
+            $0.leading.equalTo(imageView.snp.trailing).offset(moderateScale(number: 8))
+            $0.centerY.equalToSuperview()
+        }
+        
+        moreLabel.snp.makeConstraints {
+            $0.leading.equalTo(label.snp.trailing)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-moderateScale(number: 8))
+        }
+    }
+    
     private lazy var addedImageView = UIView().then {
         $0.backgroundColor = DesignSystemAsset.gray200.color
         $0.layer.cornerRadius = moderateScale(number: 12)
@@ -208,6 +258,8 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
             descriptionLabel
         ])
         
+        view.addSubview(noticeView)
+        
         addedImageView.addSubview(addImageView2)
         
         thumnailImageView.addSubview(bottomGradientView)
@@ -232,7 +284,7 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         
         thumnailImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(headerView.snp.bottom)
+            $0.top.equalTo(noticeView.snp.bottom).offset(moderateScale(number: 8))
             $0.size.equalTo(moderateScale(number: 353))
         }
         
@@ -275,6 +327,12 @@ final class WriteTitleViewController: BaseHeaderViewController, CommonBaseCoordi
         
         addedImageView.snp.makeConstraints {
             $0.size.equalTo(moderateScale(number: 72))
+        }
+        
+        noticeView.snp.makeConstraints {
+            $0.leading.trailing.equalTo(thumnailImageView)
+            $0.top.equalTo(headerView.snp.bottom)
+            $0.height.equalTo(moderateScale(number: 52))
         }
     }
     

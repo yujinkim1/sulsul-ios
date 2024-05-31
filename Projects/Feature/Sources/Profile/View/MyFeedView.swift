@@ -15,7 +15,12 @@ enum MyFeedState {
     case notLogin
 }
 
+protocol MyFeedViewDelegate: AnyObject {
+    func didTapNextLabel()
+}
+
 class MyFeedView: UIView {
+    weak var delegate: MyFeedViewDelegate?
     
     private var cancelBag = Set<AnyCancellable>()
     private var viewModel: ProfileMainViewModel
@@ -144,7 +149,9 @@ extension MyFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
             guard let cell = collectionView.dequeueReusableCell(NoDataCell.self, indexPath: indexPath) else { return .init() }
             cell.updateView(withType: .logInMyFeed)
             cell.nextLabel.setOpaqueTapGestureRecognizer { [weak self] in
-                print("피드가 없음")
+                guard let self = self else { return }
+                
+                self.delegate?.didTapNextLabel()
             }
             
             return cell
